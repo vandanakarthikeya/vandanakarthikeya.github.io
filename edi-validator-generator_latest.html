@@ -1262,6 +1262,22 @@
 
                     <div class="validation-summary" id="validationSummaryCards"></div>
 
+                    <!-- Download Clean File - shown when errors = 0 -->
+                    <div id="downloadCleanBtnGroup" style="display:none; margin-top:1.25rem;">
+                        <button id="downloadCleanBtn" onclick="downloadCleanFile()" style="
+                            background:linear-gradient(135deg, #10b981, #059669);
+                            color:white; border:none; padding:0.85rem 1.5rem; border-radius:10px;
+                            font-weight:700; cursor:pointer; font-size:0.95rem; font-family:'Manrope',sans-serif;
+                            display:flex; align-items:center; gap:0.6rem; width:100%; justify-content:center;
+                            transition:transform 0.2s, box-shadow 0.2s;
+                        " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(16,185,129,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                            <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            <span id="downloadCleanBtnText">Download Clean File</span>
+                        </button>
+                    </div>
+
                     <div class="action-buttons" id="massFixButtonGroup" style="display: none;">
                         <button class="btn btn-secondary" onclick="exportValidationReport()">
                             <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
@@ -1721,6 +1737,26 @@
                 document.getElementById('totalSegments').textContent = segments;
                 document.getElementById('errorCount').textContent = calculateErrors(qualityProfile, claimCount);
                 document.getElementById('fileSize').textContent = (new Blob([data]).size / 1024).toFixed(2) + ' KB';
+                
+                // Show next-step help banner
+                var hint = document.getElementById('nextStepHint');
+                if (!hint) {
+                    hint = document.createElement('div');
+                    hint.id = 'nextStepHint';
+                    hint.style.cssText = 'margin-top:1.25rem;padding:1rem 1.25rem;background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.1));border:1px solid rgba(99,102,241,0.3);border-radius:10px;animation:fadeIn 0.4s ease;';
+                    hint.innerHTML = '<div style="display:flex;align-items:flex-start;gap:0.75rem;">' +
+                        '<span style="font-size:1.4rem;flex-shrink:0;">🚀</span>' +
+                        '<div>' +
+                        '<div style="font-weight:700;color:#a78bfa;margin-bottom:0.4rem;font-size:1.05rem;">Next Steps: Validate Your Generated Data</div>' +
+                        '<div style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">' +
+                        '<strong style="color:#c4b5fd;">Step 1:</strong> Click the <strong>Validate</strong> tab above<br>' +
+                        '<strong style="color:#c4b5fd;">Step 2:</strong> Click the <strong>"Use Generated Data"</strong> button to load your test data<br>' +
+                        '<strong style="color:#c4b5fd;">Step 3:</strong> Click <strong>"Validate"</strong> to check for errors and fix them' +
+                        '</div></div></div>';
+                    document.getElementById('statsSection').parentNode.insertBefore(hint, document.getElementById('statsSection').nextSibling);
+                } else {
+                    hint.style.display = 'block';
+                }
             }, 1000);
         }
 
@@ -1947,6 +1983,7 @@
                 } else {
                     document.getElementById('massFixButton').style.display = 'none';
                 }
+                showDownloadBtn(results.errors.length, results.warnings.length);
             }, 1000);
         }
 
@@ -2473,6 +2510,51 @@
             document.body.removeChild(a);
         }
 
+        function downloadCleanFile() {
+            var cleanData = '';
+            // Priority: currentValidatedData > correctedData > textarea > generatedData
+            if (typeof currentValidatedData !== 'undefined' && currentValidatedData && currentValidatedData.trim()) {
+                cleanData = currentValidatedData;
+            } else if (typeof correctedData !== 'undefined' && correctedData && correctedData.trim()) {
+                cleanData = correctedData;
+            } else {
+                var el = document.getElementById('validateInput');
+                if (el && el.value.trim()) cleanData = el.value;
+            }
+            if (!cleanData && typeof generatedData !== 'undefined' && generatedData && generatedData.trim()) {
+                cleanData = generatedData;
+            }
+            if (!cleanData) { alert('No data available to download.'); return; }
+
+            var fileType = 'P';
+            var fmt = document.getElementById('formatType');
+            if (fmt) fileType = fmt.value === 'institutional' ? 'I' : 'P';
+
+            var ts = new Date().toISOString().slice(0,10).replace(/-/g,'');
+            var filename = '837' + fileType + '_clean_' + ts + '.txt';
+            var blob = new Blob([cleanData], {type:'text/plain;charset=utf-8'});
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function(){ window.URL.revokeObjectURL(url); document.body.removeChild(a); }, 300);
+        }
+
+        function showDownloadBtn(errCount, warnCount) {
+            var g = document.getElementById('downloadCleanBtnGroup');
+            var t = document.getElementById('downloadCleanBtnText');
+            if (!g) return;
+            if (errCount === 0) {
+                g.style.display = 'block';
+                t.textContent = warnCount > 0 ? 'Download File (' + warnCount + ' warnings remain)' : 'Download Clean File';
+            } else {
+                g.style.display = 'none';
+            }
+        }
+
         function resetForm() {
             document.getElementById('formatType').value = 'professional';
             document.getElementById('qualityProfile').value = 'clean';
@@ -2483,6 +2565,7 @@
             document.getElementById('outputSection').classList.remove('active');
             document.getElementById('statsSection').style.display = 'none';
             document.getElementById('errorTypesPanel').style.display = 'none';
+            var hint = document.getElementById('nextStepHint'); if (hint) hint.style.display = 'none';
             generatedData = '';
         }
 
@@ -2490,6 +2573,7 @@
             document.getElementById('validationInput').value = '';
             document.getElementById('validationOutput').classList.remove('active');
             document.getElementById('massFixButton').style.display = 'none';
+            document.getElementById('downloadCleanBtnGroup').style.display = 'none';
             document.getElementById('massCorrectionPanel').classList.remove('active');
             document.getElementById('correctedDataSection').classList.remove('active');
             appliedFixes.clear();
@@ -3110,6 +3194,7 @@
                     // Show success notification
                     showValidationSuccess();
                 }
+                showDownloadBtn(results.errors.length, results.warnings.length);
             }, 1000);
         }
 
@@ -3309,6 +3394,7 @@
 
             // Hide error buttons
             document.getElementById('massFixButton').style.display = 'none';
+            showDownloadBtn(0, 0);
 
             // Show success celebration
             showValidationSuccess();
@@ -4184,6 +4270,7 @@
             } else {
                 massFixButton.style.display = 'none';
             }
+            showDownloadBtn(criticalCount + errorCount, warningCount);
 
             // Display individual errors
             console.log('Calling displayIndividualErrors...');
