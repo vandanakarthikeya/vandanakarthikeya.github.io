@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCC Risk Score Calculator - CMS V28 Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.03;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .version-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Grid Layout */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-help {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Diagnosis Input */
+        .diagnosis-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .diagnosis-input-group input {
+            flex: 1;
+        }
+
+        .btn-add {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .diagnosis-list {
+            margin-top: 1rem;
+        }
+
+        .diagnosis-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .diagnosis-chip .remove {
+            cursor: pointer;
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .hcc-tag {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Results */
+        .results-card {
+            grid-column: 1 / -1;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-box.secondary {
+            background: linear-gradient(135deg, var(--secondary), #0891b2);
+        }
+
+        .stat-box.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        /* HCC Summary Table */
+        .hcc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .hcc-table th,
+        .hcc-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hcc-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .hcc-table tr:hover {
+            background: var(--bg);
+        }
+
+        .coefficient {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Report Section */
+        .report-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .report-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .report-section p {
+            margin-bottom: 0.75rem;
+            line-height: 1.8;
+        }
+
+        .risk-tier {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .risk-tier.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .risk-tier.moderate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-tier.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .risk-tier.very-high {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+
+        /* Info Box */
+        .info-box {
+            padding: 1rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .info-box h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Model Comparison */
+        .model-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .model-box {
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+        }
+
+        .model-box h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .model-box .score {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .model-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+
+        /* Export Button */
+        .btn-export {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🏥 HCC Risk Score Calculator</h1>
+            <p class="subtitle">CMS Hierarchical Condition Category Risk Adjustment - Medicare Advantage</p>
+            <span class="version-badge">CMS-HCC Model V28 (2024-2026)</span>
+        </header>
+
+        <!-- Calculator Grid -->
+        <div class="calculator-grid">
+            <!-- Patient Demographics -->
+            <div class="card">
+                <h2>Patient Demographics</h2>
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="0" max="120" placeholder="Enter patient age">
+                    <p class="input-help">Medicare beneficiaries are typically 65+</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                        <option value="">Select gender</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="eligibility">Eligibility Status</label>
+                    <select id="eligibility">
+                        <option value="">Select status</option>
+                        <option value="CNA">Community Non-Dual Aged</option>
+                        <option value="CND">Community Non-Dual Disabled</option>
+                        <option value="CFA">Community Full Benefit Dual Aged</option>
+                        <option value="CFD">Community Full Benefit Dual Disabled</option>
+                        <option value="CPA">Community Partial Benefit Dual Aged</option>
+                        <option value="CPD">Community Partial Benefit Dual Disabled</option>
+                        <option value="INS">Institutional</option>
+                    </select>
+                    <p class="input-help">Determines base demographic coefficient</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ About V28 Model</h4>
+                    <ul style="font-size: 0.9rem; line-height: 1.6;">
+                        <li>115 payment HCC categories (up from 86 in V24)</li>
+                        <li>7,770 ICD-10 codes map to HCCs</li>
+                        <li>Uses constraining for related conditions</li>
+                        <li>Fully implemented in 2026</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Diagnosis Entry -->
+            <div class="card">
+                <h2>Diagnosis Codes (ICD-10)</h2>
+                
+                <div class="diagnosis-input-group">
+                    <input 
+                        type="text" 
+                        id="diagnosis-input" 
+                        placeholder="Enter ICD-10 code (e.g., E11.9, I10)"
+                        style="text-transform: uppercase;">
+                    <button class="btn-add" onclick="addDiagnosis()">Add</button>
+                </div>
+                <p class="input-help">Enter one diagnosis at a time. The tool will map it to the appropriate HCC.</p>
+
+                <div class="diagnosis-list" id="diagnosis-list">
+                    <p style="color: var(--text-light); font-style: italic;">No diagnoses added yet</p>
+                </div>
+
+                <div class="info-box" style="margin-top: 1.5rem;">
+                    <h4>💡 Common Diagnosis Examples</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Try these sample codes:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button class="diagnosis-chip" onclick="quickAdd('E11.9')" style="cursor: pointer; border: 2px solid var(--primary);">
+                            E11.9 - Diabetes Type 2
+                        </button>
+                        <button class="diagnosis-chip" onclick="quickAdd('I50.9')" style="cursor: pointer; border: 2px solid var(--primary);">
+                            I50.9 - Heart Failure
+                        </button>
+                        <button class="diagnosis-chip" onclick="quickAdd('J44.9')" style="cursor: pointer; border: 2px solid var(--primary);">
+                            J44.9 - COPD
+                        </button>
+                        <button class="diagnosis-chip" onclick="quickAdd('N18.3')" style="cursor: pointer; border: 2px solid var(--primary);">
+                            N18.3 - CKD Stage 3
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculate Button -->
+        <div class="card" style="margin-top: 2rem;">
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="calculateRAF()">🧮 Calculate RAF Score</button>
+                <button class="btn btn-secondary" onclick="resetCalculator()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="card results-card hidden" id="results-section">
+            <h2>Risk Adjustment Results</h2>
+            
+            <div class="results-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Total RAF Score (V28)</div>
+                    <div class="stat-value" id="raf-score">0.000</div>
+                </div>
+                
+                <div class="stat-box secondary">
+                    <div class="stat-label">Payment HCCs Captured</div>
+                    <div class="stat-value" id="hcc-count">0</div>
+                </div>
+                
+                <div class="stat-box success">
+                    <div class="stat-label">Estimated Monthly Payment</div>
+                    <div class="stat-value" id="estimated-payment">$0</div>
+                </div>
+            </div>
+
+            <!-- HCC Summary Table -->
+            <div id="hcc-summary-section">
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">HCC Categories Identified</h3>
+                <table class="hcc-table" id="hcc-table">
+                    <thead>
+                        <tr>
+                            <th>HCC</th>
+                            <th>Description</th>
+                            <th>ICD-10 Code</th>
+                            <th>Coefficient</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hcc-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Clinical Interpretation -->
+            <div class="report-section">
+                <h3>📊 Clinical Interpretation</h3>
+                <p id="risk-interpretation"></p>
+                <div id="risk-tier-display"></div>
+            </div>
+
+            <!-- Model Comparison (V24 vs V28) -->
+            <div class="report-section">
+                <h3>📈 Model Comparison (V24 vs V28)</h3>
+                <p>For transparency, here's how this patient's score would differ under both models:</p>
+                <div class="model-comparison">
+                    <div class="model-box">
+                        <h4>V24 Model (Legacy)</h4>
+                        <div class="score" id="v24-score">N/A</div>
+                        <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">
+                            Phasing out through 2025
+                        </p>
+                    </div>
+                    <div class="model-box">
+                        <h4>V28 Model (Current)</h4>
+                        <div class="score" id="v28-score">0.000</div>
+                        <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">
+                            100% implementation in 2026
+                        </p>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-light);">
+                    <strong>Note:</strong> <span id="model-impact"></span>
+                </p>
+            </div>
+
+            <!-- Export Button -->
+            <div class="button-group" style="margin-top: 2rem;">
+                <button class="btn btn-export" onclick="exportReport()">📄 Export PDF Report</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let diagnoses = [];
+        
+        // Sample HCC Mappings (V28) - In production, this would be a comprehensive database
+        const hccMappings = {
+            // Diabetes
+            'E11.9': { hcc: 37, description: 'Diabetes without Complication', coefficient: 0.166 },
+            'E11.21': { hcc: 37, description: 'Type 2 Diabetes with Diabetic Nephropathy', coefficient: 0.166 },
+            'E11.22': { hcc: 37, description: 'Type 2 Diabetes with Diabetic CKD', coefficient: 0.166 },
+            'E11.65': { hcc: 37, description: 'Type 2 Diabetes with Hyperglycemia', coefficient: 0.166 },
+            
+            // Heart Failure
+            'I50.9': { hcc: 223, description: 'Heart Failure, Unspecified', coefficient: 0.368 },
+            'I50.21': { hcc: 223, description: 'Acute Systolic Heart Failure', coefficient: 0.368 },
+            'I50.23': { hcc: 223, description: 'Acute on Chronic Systolic Heart Failure', coefficient: 0.368 },
+            'I50.31': { hcc: 223, description: 'Acute Diastolic Heart Failure', coefficient: 0.368 },
+            
+            // COPD
+            'J44.9': { hcc: 276, description: 'COPD, Unspecified', coefficient: 0.335 },
+            'J44.0': { hcc: 276, description: 'COPD with Acute Lower Respiratory Infection', coefficient: 0.335 },
+            'J44.1': { hcc: 276, description: 'COPD with Acute Exacerbation', coefficient: 0.335 },
+            
+            // CKD
+            'N18.3': { hcc: 326, description: 'Chronic Kidney Disease, Stage 3', coefficient: 0.237 },
+            'N18.4': { hcc: 327, description: 'Chronic Kidney Disease, Stage 4', coefficient: 0.237 },
+            'N18.5': { hcc: 328, description: 'Chronic Kidney Disease, Stage 5', coefficient: 0.451 },
+            'N18.6': { hcc: 329, description: 'End Stage Renal Disease', coefficient: 0.451 },
+            
+            // Hypertension
+            'I10': { hcc: null, description: 'Essential Hypertension', coefficient: 0.000 },
+            
+            // Dementia
+            'F03.90': { hcc: 127, description: 'Unspecified Dementia without Behavioral Disturbance', coefficient: 0.341 },
+            'G30.9': { hcc: 127, description: 'Alzheimer Disease, Unspecified', coefficient: 0.341 },
+            
+            // Cancer
+            'C50.919': { hcc: 22, description: 'Malignant Neoplasm of Breast', coefficient: 0.573 },
+            'C34.90': { hcc: 22, description: 'Malignant Neoplasm of Lung', coefficient: 0.573 },
+            
+            // Stroke
+            'I63.9': { hcc: 233, description: 'Cerebral Infarction, Unspecified', coefficient: 0.000 },
+            'I69.354': { hcc: 238, description: 'Hemiplegia Following Cerebral Infarction', coefficient: 0.579 },
+        };
+
+        // Demographic Coefficients (V28 - simplified examples)
+        const demographicCoefficients = {
+            'M_65_69_CNA': 0.459,
+            'M_70_74_CNA': 0.593,
+            'M_75_79_CNA': 0.758,
+            'M_80_84_CNA': 0.914,
+            'M_85_89_CNA': 1.005,
+            'M_90_94_CNA': 1.121,
+            'M_95_GT_CNA': 1.202,
+            'F_65_69_CNA': 0.468,
+            'F_70_74_CNA': 0.574,
+            'F_75_79_CNA': 0.694,
+            'F_80_84_CNA': 0.838,
+            'F_85_89_CNA': 0.966,
+            'F_90_94_CNA': 1.060,
+            'F_95_GT_CNA': 1.197,
+        };
+
+        // Add Diagnosis
+        function addDiagnosis() {
+            const input = document.getElementById('diagnosis-input');
+            const code = input.value.trim().toUpperCase();
+            
+            if (!code) {
+                alert('Please enter an ICD-10 code');
+                return;
+            }
+            
+            // Check if code exists in our mapping
+            if (!hccMappings[code]) {
+                alert(`Code ${code} not found in database. This is a demo with limited codes. Try: E11.9, I50.9, J44.9, N18.3`);
+                return;
+            }
+            
+            // Check for duplicates
+            if (diagnoses.some(d => d.code === code)) {
+                alert('This diagnosis has already been added');
+                return;
+            }
+            
+            const hccInfo = hccMappings[code];
+            diagnoses.push({
+                code: code,
+                hcc: hccInfo.hcc,
+                description: hccInfo.description,
+                coefficient: hccInfo.coefficient
+            });
+            
+            updateDiagnosisList();
+            input.value = '';
+        }
+
+        // Quick Add (for sample buttons)
+        function quickAdd(code) {
+            document.getElementById('diagnosis-input').value = code;
+            addDiagnosis();
+        }
+
+        // Update Diagnosis List Display
+        function updateDiagnosisList() {
+            const container = document.getElementById('diagnosis-list');
+            
+            if (diagnoses.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light); font-style: italic;">No diagnoses added yet</p>';
+                return;
+            }
+            
+            container.innerHTML = diagnoses.map((d, index) => `
+                <div class="diagnosis-chip">
+                    <span><strong>${d.code}</strong> - ${d.description}</span>
+                    ${d.hcc ? `<span class="hcc-tag">HCC ${d.hcc}</span>` : '<span style="color: var(--text-light); font-size: 0.8rem;">(No HCC)</span>'}
+                    <span class="remove" onclick="removeDiagnosis(${index})">✕</span>
+                </div>
+            `).join('');
+        }
+
+        // Remove Diagnosis
+        function removeDiagnosis(index) {
+            diagnoses.splice(index, 1);
+            updateDiagnosisList();
+        }
+
+        // Calculate RAF Score
+        function calculateRAF() {
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const eligibility = document.getElementById('eligibility').value;
+            
+            // Validation
+            if (!age || !gender || !eligibility) {
+                alert('Please fill in all demographic fields');
+                return;
+            }
+            
+            if (diagnoses.length === 0) {
+                alert('Please add at least one diagnosis');
+                return;
+            }
+            
+            // Calculate Demographic Score
+            const ageGroup = getAgeGroup(age);
+            const demoKey = `${gender}_${ageGroup}_${eligibility}`;
+            const demoCoefficient = demographicCoefficients[demoKey] || 0.500; // Default if not found
+            
+            // Calculate HCC Score (unique HCCs only, with hierarchy)
+            const uniqueHCCs = getUniqueHCCs(diagnoses);
+            const hccScore = uniqueHCCs.reduce((sum, d) => sum + d.coefficient, 0);
+            
+            // Total RAF Score
+            const rafScore = demoCoefficient + hccScore;
+            
+            // Estimated Payment (assuming $1000 PMPM base rate)
+            const baseRate = 1000;
+            const estimatedPayment = rafScore * baseRate;
+            
+            // Display Results
+            displayResults(rafScore, uniqueHCCs, estimatedPayment, demoCoefficient);
+        }
+
+        // Get Age Group
+        function getAgeGroup(age) {
+            if (age < 65) return '0_64';
+            if (age < 70) return '65_69';
+            if (age < 75) return '70_74';
+            if (age < 80) return '75_79';
+            if (age < 85) return '80_84';
+            if (age < 90) return '85_89';
+            if (age < 95) return '90_94';
+            return '95_GT';
+        }
+
+        // Get Unique HCCs (remove duplicates, apply hierarchy)
+        function getUniqueHCCs(diagnoses) {
+            // Group by HCC
+            const hccMap = new Map();
+            
+            diagnoses.forEach(d => {
+                if (d.hcc && !hccMap.has(d.hcc)) {
+                    hccMap.set(d.hcc, d);
+                }
+            });
+            
+            return Array.from(hccMap.values());
+        }
+
+        // Display Results
+        function displayResults(rafScore, hccs, payment, demoCoefficient) {
+            // Show results section
+            document.getElementById('results-section').classList.remove('hidden');
+            
+            // Update stat boxes
+            document.getElementById('raf-score').textContent = rafScore.toFixed(3);
+            document.getElementById('hcc-count').textContent = hccs.length;
+            document.getElementById('estimated-payment').textContent = '$' + Math.round(payment).toLocaleString();
+            
+            // Update HCC table
+            const tableBody = document.getElementById('hcc-table-body');
+            tableBody.innerHTML = hccs.map(d => `
+                <tr>
+                    <td><strong>HCC ${d.hcc}</strong></td>
+                    <td>${d.description}</td>
+                    <td><code>${d.code}</code></td>
+                    <td><span class="coefficient">${d.coefficient.toFixed(3)}</span></td>
+                </tr>
+            `).join('');
+            
+            // Add demographic row
+            tableBody.innerHTML += `
+                <tr style="background: var(--bg); font-weight: 600;">
+                    <td>BASE</td>
+                    <td>Demographic Factors (Age + Gender + Eligibility)</td>
+                    <td>-</td>
+                    <td><span class="coefficient">${demoCoefficient.toFixed(3)}</span></td>
+                </tr>
+            `;
+            
+            // Risk Interpretation
+            const riskTier = getRiskTier(rafScore);
+            document.getElementById('risk-interpretation').innerHTML = `
+                This patient has a RAF score of <strong>${rafScore.toFixed(3)}</strong>, indicating 
+                ${riskTier === 'low' ? 'lower than average' : riskTier === 'moderate' ? 'moderate' : 'higher than average'} 
+                predicted healthcare costs compared to the average Medicare beneficiary (RAF = 1.0).
+                <br><br>
+                The score reflects ${hccs.length} payment HCC ${hccs.length === 1 ? 'category' : 'categories'} plus demographic factors.
+            `;
+            
+            document.getElementById('risk-tier-display').innerHTML = `
+                <strong>Risk Tier:</strong>
+                <span class="risk-tier ${riskTier}">${riskTier.toUpperCase().replace('-', ' ')}</span>
+            `;
+            
+            // V28 Score display
+            document.getElementById('v28-score').textContent = rafScore.toFixed(3);
+            
+            // Model comparison note
+            const v24Estimate = rafScore * 1.15; // Simplified: V24 typically higher
+            document.getElementById('v24-score').textContent = v24Estimate.toFixed(3);
+            
+            const difference = ((rafScore - v24Estimate) / v24Estimate * 100).toFixed(1);
+            document.getElementById('model-impact').innerHTML = `
+                V28 model results in approximately ${Math.abs(difference)}% ${difference < 0 ? 'decrease' : 'increase'} 
+                compared to V24 due to constraining and coefficient recalibration.
+            `;
+            
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Get Risk Tier
+        function getRiskTier(rafScore) {
+            if (rafScore < 0.8) return 'low';
+            if (rafScore < 1.5) return 'moderate';
+            if (rafScore < 2.5) return 'high';
+            return 'very-high';
+        }
+
+        // Reset Calculator
+        function resetCalculator() {
+            diagnoses = [];
+            document.getElementById('age').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('eligibility').value = '';
+            document.getElementById('diagnosis-input').value = '';
+            updateDiagnosisList();
+            document.getElementById('results-section').classList.add('hidden');
+        }
+
+        // Export Report
+        function exportReport() {
+            alert('PDF Export functionality would integrate with a library like jsPDF in production.\n\nFor this demo, use the Print button to save as PDF via your browser.');
+        }
+
+        // Allow Enter key to add diagnosis
+        document.getElementById('diagnosis-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addDiagnosis();
+            }
+        });
+    </script>
+</body>
+</html>

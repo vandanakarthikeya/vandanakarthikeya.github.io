@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vandana Karthikeya — Healthcare AI & Engineering Leader</title>
+    <meta name="description" content="VP Engineering & Data Management with 26+ years building healthcare SaaS platforms. Explore AI-powered healthcare POCs including EDI validators, HCC risk calculators, and more.">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #0a0f1a;
+            --paper: #faf9f7;
+            --warm: #f5f0ea;
+            --accent: #c45d3e;
+            --accent-light: #e8734f;
+            --teal: #1a6b5a;
+            --teal-light: #238f79;
+            --slate: #3d4f5f;
+            --muted: #7a8a99;
+            --border: #d8cfc4;
+            --card-bg: #ffffff;
+            --gradient-warm: linear-gradient(135deg, #c45d3e 0%, #e8734f 50%, #d4956b 100%);
+            --gradient-teal: linear-gradient(135deg, #1a6b5a 0%, #238f79 100%);
+            --shadow-sm: 0 1px 3px rgba(10,15,26,0.06);
+            --shadow-md: 0 4px 20px rgba(10,15,26,0.08);
+            --shadow-lg: 0 12px 40px rgba(10,15,26,0.12);
+            --radius: 12px;
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== TEXTURE ========== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ========== UTILITY ========== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+        .section { padding: 5rem 0; }
+        .serif { font-family: 'DM Serif Display', serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+        .text-accent { color: var(--accent); }
+        .text-teal { color: var(--teal); }
+        .text-muted { color: var(--muted); }
+
+        /* ========== NAV ========== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(250,249,247,0.85);
+            backdrop-filter: blur(20px) saturate(1.5);
+            border-bottom: 1px solid rgba(216,207,196,0.5);
+            transition: all 0.3s;
+        }
+        nav.scrolled { box-shadow: var(--shadow-sm); }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem; color: var(--ink);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+        .nav-logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            text-decoration: none; color: var(--slate);
+            font-size: 0.88rem; font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-cta {
+            background: var(--gradient-teal) !important;
+            color: white !important; padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.3); }
+
+        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .mobile-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; transition: 0.3s; border-radius: 1px; }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center;
+            padding-top: 64px;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(196,93,62,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(26,107,90,0.05) 0%, transparent 50%);
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1.5rem;
+        }
+        .hero-tag::before {
+            content: ''; display: block; width: 24px; height: 2px;
+            background: var(--teal);
+        }
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--slate);
+            max-width: 520px;
+            margin-bottom: 2rem;
+        }
+        .hero-stats {
+            display: flex; gap: 2.5rem; margin-bottom: 2.5rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .hero-stat-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            margin-top: 0.3rem;
+        }
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.85rem 1.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--gradient-warm);
+            color: white;
+            box-shadow: 0 4px 14px rgba(196,93,62,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(196,93,62,0.35); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--slate);
+        }
+        .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* Hero visual */
+        .hero-visual {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .hero-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(216,207,196,0.4);
+            width: 100%; max-width: 420px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--gradient-warm);
+        }
+        .hero-card-header {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .hero-avatar {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: var(--gradient-teal);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            color: white; font-size: 1.4rem;
+        }
+        .hero-card-name { font-weight: 700; font-size: 1.1rem; }
+        .hero-card-title { color: var(--muted); font-size: 0.82rem; }
+        .hero-card-logos {
+            display: flex; gap: 0.75rem; flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .logo-pill {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            background: var(--warm);
+            color: var(--slate);
+            border: 1px solid var(--border);
+        }
+        .hero-card-domains {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .domain-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.82rem; color: var(--slate);
+            font-weight: 500;
+        }
+        .domain-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .domain-dot.teal { background: var(--teal); }
+        .domain-dot.accent { background: var(--accent); }
+
+        .floating-badge {
+            position: absolute;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(216,207,196,0.3);
+            font-size: 0.78rem;
+            font-weight: 600;
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-badge.top-right { top: -20px; right: -20px; animation-delay: -2s; }
+        .floating-badge.bottom-left { bottom: -15px; left: -15px; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-label {
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+        }
+
+        /* ========== ABOUT ========== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 4rem;
+            margin-top: 3rem;
+        }
+        .about-text p {
+            margin-bottom: 1.25rem;
+            color: var(--slate);
+            font-size: 1.05rem;
+        }
+        .about-highlight {
+            background: var(--warm);
+            border-left: 3px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 2rem 0;
+        }
+        .about-highlight p {
+            font-weight: 500;
+            color: var(--ink);
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+        }
+        .about-sidebar {
+            display: flex; flex-direction: column; gap: 1.25rem;
+        }
+        .about-fact {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        .about-fact-label {
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.4rem;
+        }
+        .about-fact-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* ========== EXPERIENCE TIMELINE ========== */
+        .timeline { margin-top: 3rem; position: relative; }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), var(--teal), var(--border));
+        }
+        .timeline-item {
+            padding-left: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        .timeline-dot {
+            position: absolute; left: -5px; top: 8px;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--accent);
+        }
+        .timeline-item:nth-child(even) .timeline-dot { border-color: var(--teal); }
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        .timeline-role {
+            font-weight: 700; font-size: 1.15rem;
+            margin-bottom: 0.15rem;
+        }
+        .timeline-company { color: var(--teal); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .timeline-desc { color: var(--slate); font-size: 0.9rem; max-width: 600px; }
+        .timeline-metrics {
+            display: flex; gap: 1.5rem; margin-top: 0.75rem;
+        }
+        .timeline-metric {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 500;
+            background: rgba(196,93,62,0.08);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        /* ========== POC GALLERY ========== */
+        .poc-gallery { margin-top: 3rem; }
+        .poc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.75rem;
+        }
+        .poc-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .poc-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(196,93,62,0.3);
+        }
+        .poc-preview {
+            height: 200px;
+            background: var(--ink);
+            position: relative;
+            overflow: hidden;
+        }
+        .poc-preview-inner {
+            position: absolute; inset: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .poc-preview-mockup {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            padding: 1rem;
+        }
+        .mockup-bar {
+            display: flex; gap: 4px; margin-bottom: 0.75rem;
+        }
+        .mockup-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .mockup-dot:nth-child(1) { background: #ef4444; }
+        .mockup-dot:nth-child(2) { background: #f59e0b; }
+        .mockup-dot:nth-child(3) { background: #10b981; }
+        .mockup-lines { flex: 1; display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+        .mockup-line {
+            height: 3px; border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .mockup-line.short { width: 40%; }
+        .mockup-line.medium { width: 65%; }
+        .mockup-line.long { width: 85%; }
+        .mockup-line.accent { background: rgba(196,93,62,0.4); }
+        .mockup-line.teal-l { background: rgba(26,107,90,0.4); }
+
+        .poc-badge {
+            position: absolute; top: 12px; right: 12px;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .poc-badge.free { background: rgba(16,185,129,0.9); color: white; }
+        .poc-badge.premium { background: rgba(196,93,62,0.9); color: white; }
+        .poc-badge.coming { background: rgba(122,138,153,0.8); color: white; }
+
+        .poc-content { padding: 1.5rem; }
+        .poc-category {
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+        }
+        .poc-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem; }
+        .poc-desc { color: var(--muted); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .poc-tags {
+            display: flex; gap: 0.4rem; flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .poc-tag {
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--warm);
+            color: var(--slate);
+        }
+        .poc-actions { display: flex; gap: 0.75rem; }
+        .poc-btn {
+            flex: 1;
+            padding: 0.65rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .poc-btn-preview {
+            background: var(--warm);
+            color: var(--slate);
+        }
+        .poc-btn-preview:hover { background: var(--border); }
+        .poc-btn-get {
+            background: var(--gradient-teal);
+            color: white;
+        }
+        .poc-btn-get:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.25); }
+        .poc-btn-locked {
+            background: var(--warm);
+            color: var(--muted);
+            cursor: default;
+        }
+
+        /* ========== PRICING ========== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        .price-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .price-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(196,93,62,0.15);
+        }
+        .price-card.featured::before {
+            content: 'Most Popular';
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--gradient-warm);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .price-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .price-amount {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.8rem;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        .price-period { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+        .price-features { list-style: none; text-align: left; margin-bottom: 2rem; }
+        .price-features li {
+            padding: 0.4rem 0;
+            font-size: 0.88rem;
+            color: var(--slate);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .price-features li::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+        .price-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .price-btn-primary {
+            background: var(--gradient-warm);
+            color: white;
+        }
+        .price-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(196,93,62,0.3); }
+        .price-btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--slate);
+        }
+        .price-btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* ========== IDEAS SECTION ========== */
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 3rem;
+        }
+        .idea-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .idea-card:hover { border-color: var(--teal); }
+        .idea-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--border);
+            margin-bottom: 0.5rem;
+        }
+        .idea-title { font-weight: 700; margin-bottom: 0.4rem; }
+        .idea-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .idea-impact {
+            display: flex; gap: 0.25rem;
+        }
+        .idea-fire { font-size: 0.85rem; }
+
+        /* ========== CONTACT ========== */
+        .contact-section {
+            background: var(--ink);
+            color: white;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(196,93,62,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(26,107,90,0.1) 0%, transparent 60%);
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        .contact-section .section-label { color: var(--accent-light); }
+        .contact-section .section-title { color: white; }
+        .contact-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+        .contact-link {
+            display: flex; align-items: center; gap: 1rem;
+            text-decoration: none;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .contact-link:hover { color: var(--accent-light); }
+        .contact-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .contact-form {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 0.4rem;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        .form-submit {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            background: var(--gradient-warm);
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .form-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(196,93,62,0.4); }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--ink);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 2rem 0;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.82rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(10,15,26,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center; align-items: center;
+            padding: 2rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none;
+            font-size: 1.5rem;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .modal h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .modal p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* ========== PREVIEW MODAL ========== */
+        .preview-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(10,15,26,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        .preview-overlay.active { display: flex; }
+        .preview-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem;
+            color: white;
+        }
+        .preview-header h3 { font-family: 'DM Serif Display', serif; }
+        .preview-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .preview-frame {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+        .preview-frame iframe {
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* ========== ANIMATIONS ========== */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .about-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px; left: 0; right: 0;
+                background: var(--paper);
+                padding: 1.5rem 2rem;
+                border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow-md);
+            }
+        }
+        @media (max-width: 600px) {
+            .section { padding: 3rem 0; }
+            .container { padding: 0 1.25rem; }
+            .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+            .poc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">VK<span>.</span></a>
+        <div class="nav-links" id="navLinks">
+            <a href="#about">About</a>
+            <a href="#experience">Experience</a>
+            <a href="#pocs">AI Lab</a>
+            <a href="#access">Access</a>
+            <a href="#ideas">Roadmap</a>
+            <a href="#contact" class="nav-cta">Let's Talk</a>
+        </div>
+        <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="fade-up">
+                <div class="hero-tag">Healthcare AI & Engineering</div>
+                <h1>Building the <em>Future</em> of Healthcare Technology</h1>
+                <p class="hero-desc">
+                    VP-level engineering leader with 26+ years scaling healthcare SaaS platforms, integrated delivery systems, and enterprise technology. 
+                    I build AI-powered tools that solve real payer, provider, and revenue cycle problems — and I ship them.
+                </p>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">26+</div>
+                        <div class="hero-stat-label">Years in Tech</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">$30M+</div>
+                        <div class="hero-stat-label">Portfolio Managed</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">100+</div>
+                        <div class="hero-stat-label">Engineers Led</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">$20M+</div>
+                        <div class="hero-stat-label">Cost Savings</div>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <a href="#pocs" class="btn btn-primary">Explore AI Lab →</a>
+                    <a href="#contact" class="btn btn-outline">Hire Me</a>
+                </div>
+            </div>
+            <div class="hero-visual fade-up stagger-2">
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <div class="hero-avatar">VK</div>
+                        <div>
+                            <div class="hero-card-name">Vandana Karthikeya</div>
+                            <div class="hero-card-title">VP Engineering, Data & Ops</div>
+                        </div>
+                    </div>
+                    <div class="hero-card-logos">
+                        <span class="logo-pill">Healthcare SaaS</span>
+                        <span class="logo-pill">Payer / MA Plans</span>
+                        <span class="logo-pill">Integrated Delivery</span>
+                        <span class="logo-pill">FinTech</span>
+                    </div>
+                    <div class="hero-card-domains">
+                        <div class="domain-item"><span class="domain-dot teal"></span>EDI / Claims</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>AI / ML Ops</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>HCC / RAF</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>HEDIS / Stars</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>SRE / DevOps</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>Data Governance</div>
+                    </div>
+                </div>
+                <div class="floating-badge top-right">🤖 AI-Powered</div>
+                <div class="floating-badge bottom-left">💼 Open to Roles</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">About</div>
+        <div class="section-title fade-up">Where Domain Expertise <br>Meets Engineering Execution</div>
+        <div class="about-grid">
+            <div class="about-text fade-up">
+                <p>
+                    I'm a hands-on technology leader who has spent the last decade at the intersection of healthcare and engineering — building and scaling data operations for organizations serving millions of patients.
+                </p>
+                <p>
+                    Most recently as <strong>VP of Engineering, Data & Ops at a healthcare analytics SaaS startup</strong>, I built the entire engineering and data operations function from scratch. I led an AI-powered integration technology replacement — migrating from legacy tooling to industry-standard platforms, completing a complex tech migration with less than 2% issues post production go-live. The new stack was also successfully leveraged for the 2026 Annual Enrollment Period (AEP).
+                </p>
+                <div class="about-highlight">
+                    <p>"I don't just talk about AI in healthcare — I build production-grade tools that solve real problems. Every POC in my AI Lab is a working application, not a slide deck."</p>
+                </div>
+                <p>
+                    Previously, I served as <strong>Sr. Director of IT at a Fortune 50 health insurer</strong>, managing a $30M portfolio and 43+ clinics serving 100K+ patients. Before that, I <strong>built IT shared services at one of the nation's largest integrated health systems</strong>, scaling across 10 departments. I carry an MS in Computer Science from BITS Pilani, leadership credentials from MIT Sloan, and a PG Diploma in AI/ML from UT Austin.
+                </p>
+                <p>
+                    Beyond technology, I'm deeply passionate about <strong>mentoring and growing people</strong>. Throughout my career I've helped engineers, managers, and individual contributors find their path — whether that's stepping into their first leadership role, pivoting into healthcare tech, or discovering strengths they didn't know they had. Several people I've mentored have gone on to Director and VP-level roles. I believe great teams are built by investing in people first, and the best technology outcomes follow naturally from that.
+                </p>
+                <p>
+                    I'm currently open to <strong>VP+ Engineering, Data, and Consulting roles</strong> at mid-size healthcare companies that are scaling and offer equity participation. I bring the rare combination of deep healthcare domain knowledge, engineering leadership at scale, hands-on AI building capability, and a track record of developing high-performing teams.
+                </p>
+            </div>
+            <div class="about-sidebar fade-up stagger-2">
+                <div class="about-fact">
+                    <div class="about-fact-label">Education</div>
+                    <div class="about-fact-value">MS Computer Science, BITS Pilani<br>MIT Sloan Leadership<br>AI/ML PG, UT Austin</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Certifications</div>
+                    <div class="about-fact-value">SAFe Agilist 5.1<br>SAFe POPM 5.1<br>AI/ML Post-Graduate</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Domain Expertise</div>
+                    <div class="about-fact-value">Payer Analytics • EDI Processing<br>Risk Adjustment (HCC/RAF)<br>HEDIS/Stars Quality<br>Value-Based Care</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Tech Stack</div>
+                    <div class="about-fact-value">Python • Java • C++<br>MuleSoft • SSIS • Mirth<br>AI/ML • GenAI/LLMs<br>AWS • Azure • DevOps</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Mentorship</div>
+                    <div class="about-fact-value">Mentored engineers into<br>Director & VP roles<br>Women in Tech advocate<br>DEI champion</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Based In</div>
+                    <div class="about-fact-value">Cerritos, California 🌴</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section" id="experience">
+    <div class="container">
+        <div class="section-label fade-up">Career</div>
+        <div class="section-title fade-up">26 Years of Scaling <br>Technology Organizations</div>
+        <div class="section-subtitle fade-up">From startups to Fortune 50 — I build teams, systems, and cultures that ship.</div>
+
+        <div class="timeline">
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Jun 2024 – Present</div>
+                <div class="timeline-role">VP Engineering, Data & Ops</div>
+                <div class="timeline-company">Healthcare Analytics SaaS Startup — B2B Platform</div>
+                <div class="timeline-desc">Built engineering & data ops from scratch. Led AI-powered integration technology replacement from legacy to industry-standard tooling with &lt;2% post-production issues. Successfully leveraged for 2026 AEP. Supported AI platform for payer and provider clients.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">~15 Direct Reports</span>
+                    <span class="timeline-metric">$15M Portfolio</span>
+                    <span class="timeline-metric">$100K+ Saved/Customer</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Sep 2022 – May 2024</div>
+                <div class="timeline-role">Sr. Director IT</div>
+                <div class="timeline-company">Fortune 50 Health Insurer — Care Delivery Division</div>
+                <div class="timeline-desc">Led technical vision for Care Delivery products, co-led EPIC EMR rollout, merged two data centers, and managed infrastructure for 43+ clinics serving 100K+ patients across the US.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">~30 Engineers</span>
+                    <span class="timeline-metric">$30M Portfolio</span>
+                    <span class="timeline-metric">$1.2B Revenue Supported</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Dec 2015 – Sep 2022</div>
+                <div class="timeline-role">Director IT</div>
+                <div class="timeline-company">Top 5 US Integrated Health System — 12.5M+ Members</div>
+                <div class="timeline-desc">Built IT shared services across 10 departments. Led Pharmacy, TeleHealth, and Care at Home strategy. Consolidated legacy apps saving $5M+.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">17 Engineers</span>
+                    <span class="timeline-metric">$10-15M Portfolio</span>
+                    <span class="timeline-metric">$5M Saved</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Oct 2009 – Nov 2015</div>
+                <div class="timeline-role">Sr. Tech Manager, Projects</div>
+                <div class="timeline-company">Global FinTech Leader — US & UK Operations</div>
+                <div class="timeline-desc">Led cloud transformation, enterprise monitoring as a service, and ServiceNow rollout across US and UK locations.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">10 Engineers</span>
+                    <span class="timeline-metric">$8-10M Portfolio</span>
+                    <span class="timeline-metric">20% IT Cost Reduction</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">1998 – 2009</div>
+                <div class="timeline-role">Early Career — Tech Lead to Manager</div>
+                <div class="timeline-company">Fortune 500 IT Services & Product Companies</div>
+                <div class="timeline-desc">Architected crew management system for a major aerospace manufacturer, led ITSM tooling rollouts, enterprise product management, and large-scale application development across US and India.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">11 Years</span>
+                    <span class="timeline-metric">3 Companies</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI LAB / POCs -->
+<section class="section" id="pocs" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">AI Lab</div>
+        <div class="section-title fade-up">Healthcare AI Tools<br>I Built From Scratch</div>
+        <div class="section-subtitle fade-up">Working applications — not wireframes. Click "Open App" to use any tool directly in your browser.</div>
+
+        <div class="poc-gallery">
+            <div class="poc-grid">
+
+                <!-- POC 1: EDI Validator -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div>
+                                    <div class="mockup-line medium"></div>
+                                    <div class="mockup-line short teal-l"></div>
+                                    <div class="mockup-line long"></div>
+                                    <div class="mockup-line medium accent"></div>
+                                    <div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Revenue Cycle</div>
+                        <div class="poc-title">837 EDI Claims Validator & Generator</div>
+                        <div class="poc-desc">Full-featured EDI 837P/837I test data generator and validator with 5010 spec compliance, real-time parsing, segment-level validation, and exportable claim files.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">EDI 837</span>
+                            <span class="poc-tag">5010 Spec</span>
+                            <span class="poc-tag">Claims Processing</span>
+                            <span class="poc-tag">Validation Engine</span>
+                        </div>
+                        <div class="poc-actions">
+                            <button class="poc-btn poc-btn-get" onclick="openApp('edi')" style="flex:1;">Open App →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POC 2: HCC Risk Calculator -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div>
+                                    <div class="mockup-line long"></div>
+                                    <div class="mockup-line medium accent"></div>
+                                    <div class="mockup-line long teal-l"></div>
+                                    <div class="mockup-line short"></div>
+                                    <div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Risk Adjustment</div>
+                        <div class="poc-title">HCC Risk Score Calculator — CMS V28</div>
+                        <div class="poc-desc">Interactive CMS V28 HCC risk score calculator with ICD-10 to HCC mapping, RAF scoring, predicted annual cost estimation, and professional PDF report generation.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">HCC/RAF</span>
+                            <span class="poc-tag">CMS V28</span>
+                            <span class="poc-tag">Medicare Advantage</span>
+                            <span class="poc-tag">Risk Adjustment</span>
+                        </div>
+                        <div class="poc-actions">
+                            <button class="poc-btn poc-btn-get" onclick="openApp('hcc')" style="flex:1;">Open App →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POC 3: Coming Soon - FHIR Mapper -->
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a22, #238f7922);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines" style="align-items:center;">
+                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q1 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge coming">Coming Soon</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Interoperability</div>
+                        <div class="poc-title">HL7 FHIR Data Mapper & Validator</div>
+                        <div class="poc-desc">Maps legacy HL7 v2 messages to FHIR R4 resources. Side-by-side comparison, bundle validation, and JSON export for ADT, ORU, and ORM message types.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">HL7 v2</span>
+                            <span class="poc-tag">FHIR R4</span>
+                            <span class="poc-tag">Interoperability</span>
+                            <span class="poc-tag">JSON Schema</span>
+                        </div>
+                        <div class="poc-actions">
+                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POC 4: Coming Soon - Prior Auth AI -->
+                <div class="poc-card fade-up stagger-3">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #c45d3e11, #e8734f11);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines" style="align-items:center;">
+                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q2 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge coming">Coming Soon</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">GenAI + Clinical Ops</div>
+                        <div class="poc-title">Prior Authorization AI Assistant</div>
+                        <div class="poc-desc">AI-powered tool analyzing prior auth requests, predicting approval likelihood, flagging denial risks, and generating supporting documentation using LLM intelligence.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">GenAI / LLM</span>
+                            <span class="poc-tag">Prior Auth</span>
+                            <span class="poc-tag">RAG Architecture</span>
+                            <span class="poc-tag">Clinical Ops</span>
+                        </div>
+                        <div class="poc-actions">
+                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POC 5: Coming Soon - Claims Denial Predictor -->
+                <div class="poc-card fade-up stagger-4">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a11, #c45d3e11);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines" style="align-items:center;">
+                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q2 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge coming">Coming Soon</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Revenue Cycle AI</div>
+                        <div class="poc-title">Claims Denial Predictor</div>
+                        <div class="poc-desc">ML-powered prediction of claim denials before submission. Identifies risk factors, suggests corrections, and tracks denial patterns across CPT/ICD-10 combinations.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">Machine Learning</span>
+                            <span class="poc-tag">Denial Prevention</span>
+                            <span class="poc-tag">Revenue Cycle</span>
+                        </div>
+                        <div class="poc-actions">
+                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POC 6: Coming Soon - HEDIS Dashboard -->
+                <div class="poc-card fade-up stagger-4">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a15, #238f7915);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines" style="align-items:center;">
+                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q1 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge coming">Coming Soon</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Quality Analytics</div>
+                        <div class="poc-title">HEDIS / Stars Quality Dashboard</div>
+                        <div class="poc-desc">Interactive dashboard calculating HEDIS quality measures, Stars ratings impact, and care gap analysis with member-level drill-down and gap closure workflows.</div>
+                        <div class="poc-tags">
+                            <span class="poc-tag">HEDIS</span>
+                            <span class="poc-tag">Star Ratings</span>
+                            <span class="poc-tag">Quality Measures</span>
+                            <span class="poc-tag">D3.js</span>
+                        </div>
+                        <div class="poc-actions">
+                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ACCESS -->
+<section class="section" id="access">
+    <div class="container">
+        <div style="text-align: center;">
+            <div class="section-label fade-up">Access</div>
+            <div class="section-title fade-up">Use These Tools — Free & Open</div>
+            <div class="section-subtitle fade-up" style="margin: 0 auto;">All apps are fully interactive and available directly on this site. For consulting, custom tools, or to discuss working together — reach out.</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <div class="price-card fade-up" style="text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🚀</div>
+                <div class="price-name">Use the Apps</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">All healthcare AI tools are fully interactive. Open any app and start using it — no login, no paywall.</p>
+                <button class="price-btn price-btn-outline" onclick="document.getElementById('pocs').scrollIntoView({behavior:'smooth'})">Browse AI Lab</button>
+            </div>
+            <div class="price-card fade-up stagger-1" style="text-align: center; border-color: var(--accent);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">💼</div>
+                <div class="price-name">Hire Me</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Looking for a VP+ Engineering or Data leader? I'm open to full-time roles at mid-size healthcare companies with equity.</p>
+                <a class="price-btn price-btn-primary" style="display:block;text-decoration:none;color:white;" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Role%20Opportunity&body=Hi%20Vandana%2C%0A%0AI%20came%20across%20your%20portfolio%20and%20would%20like%20to%20discuss%20an%20opportunity.%0A%0AName%3A%20%0ACompany%3A%20%0ARole%3A%20%0A%0AThank%20you!">Get in Touch →</a>
+            </div>
+            <div class="price-card fade-up stagger-2" style="text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🤝</div>
+                <div class="price-name">Consulting</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Need a custom tool, tech strategy, or data ops buildout? Let's discuss your healthcare engineering needs.</p>
+                <a class="price-btn price-btn-outline" style="display:block;text-decoration:none;" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Consulting%20Inquiry&body=Hi%20Vandana%2C%0A%0AI%20am%20interested%20in%20discussing%20a%20consulting%20engagement.%0A%0AName%3A%20%0ACompany%3A%20%0ABrief%20Description%3A%20%0A%0AThank%20you!">Let's Talk →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- IDEAS / ROADMAP -->
+<section class="section" id="ideas" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">Roadmap</div>
+        <div class="section-title fade-up">What I'm Building Next</div>
+        <div class="section-subtitle fade-up">AI-powered healthcare tools targeting the biggest pain points in value-based care.</div>
+
+        <div class="ideas-grid">
+            <div class="idea-card fade-up">
+                <div class="idea-num">01</div>
+                <div class="idea-title">Medical Coding AI Assistant</div>
+                <div class="idea-desc">NLP-powered ICD-10 and CPT code suggestion from clinical notes. Confidence scoring, HCC mapping, and upcoding alerts.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">02</div>
+                <div class="idea-title">SDOH Risk Screener</div>
+                <div class="idea-desc">Social Determinants of Health screening with Z-code mapping, community resource referrals, and population analytics dashboard.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">03</div>
+                <div class="idea-title">Care Gap Closure Engine</div>
+                <div class="idea-desc">Intelligent gap identification, AI-prioritized outreach lists, and closure tracking with Stars impact simulation.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">04</div>
+                <div class="idea-title">Medication Adherence Tracker</div>
+                <div class="idea-desc">PDC calculation, non-adherent patient identification, AI-generated personalized outreach, and quality score impact analysis.</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up">
+                <div class="idea-num">05</div>
+                <div class="idea-title">270/271 Eligibility Checker</div>
+                <div class="idea-desc">Real-time insurance eligibility verification simulator. Parses EDI 271 responses into human-readable benefit summaries.</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">06</div>
+                <div class="idea-title">Star Ratings Impact Calculator</div>
+                <div class="idea-desc">Input measure scores, simulate improvement scenarios, and calculate the revenue impact of Stars rating changes.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">07</div>
+                <div class="idea-title">Population Health Registry</div>
+                <div class="idea-desc">Chronic disease registry with AI risk stratification, intervention ROI modeling, and care management dashboards.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+            </div>
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">08</div>
+                <div class="idea-title">CPT Bundling Checker</div>
+                <div class="idea-desc">NCCI edit validation for CPT code combinations. Prevent claim denials from incorrect bundling before submission.</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+    <div class="container">
+        <div class="contact-grid">
+            <div>
+                <div class="section-label fade-up">Connect</div>
+                <div class="section-title fade-up" style="color: white;">Let's Build Something<br>Together</div>
+                <p class="contact-desc fade-up">
+                    I'm actively exploring VP+ Engineering, Data, and Consulting opportunities at healthcare companies that are scaling. If my POCs and experience resonate with your mission, let's talk.
+                </p>
+                <div class="contact-links fade-up">
+                    <a href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website" class="contact-link">
+                        <div class="contact-icon">✉</div>
+                        <div>
+                            <div style="font-weight:600;">Email</div>
+                            <div style="font-size:0.85rem;opacity:0.6;">Vandana_karthik@yahoo.com</div>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/vandanakarthik/" target="_blank" class="contact-link">
+                        <div class="contact-icon">in</div>
+                        <div>
+                            <div style="font-weight:600;">LinkedIn</div>
+                            <div style="font-size:0.85rem;opacity:0.6;">linkedin.com/in/vandanakarthik</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="fade-up stagger-2">
+                <div class="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" placeholder="Your name" id="contactName">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="you@company.com" id="contactEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">What are you looking for?</label>
+                        <select class="form-input" id="contactType">
+                            <option value="">Select...</option>
+                            <option value="hire">Full-time VP+ Role</option>
+                            <option value="consult">Consulting Engagement</option>
+                            <option value="poc">POC / App Question</option>
+                            <option value="other">Something Else</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" placeholder="Tell me about your company and what you need..." id="contactMsg"></textarea>
+                    </div>
+                    <button class="form-submit" onclick="handleContact()">Send Message →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p>© 2026 Vandana Karthikeya. All rights reserved. Built with expertise, not just code.</p>
+    </div>
+</footer>
+
+<!-- APP VIEWER -->
+<div class="preview-overlay" id="appModal">
+    <div class="preview-header">
+        <h3 id="appTitle">App</h3>
+        <button class="preview-close" onclick="closeApp()">✕</button>
+    </div>
+    <div class="preview-frame">
+        <iframe id="appFrame" sandbox="allow-scripts allow-same-origin" style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+</div>
+
+<!-- Purchase modal removed - all access via email -->
+
+<script>
+    // Scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Nav scroll effect
+    window.addEventListener('scroll', () => {
+        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // App viewer
+    // Place your POC HTML files in the SAME folder as this website file
+    const pocFiles = {
+        edi: { title: '837 EDI Claims Validator & Generator', file: 'edi-validator-generator_latest.html' },
+        hcc: { title: 'HCC Risk Score Calculator — CMS V28', file: 'hcc_risk_calculator.html' }
+    };
+
+    function openApp(pocId) {
+        const poc = pocFiles[pocId];
+        if (!poc) return;
+
+        // Detect if running locally (file://) vs hosted (http/https)
+        if (window.location.protocol === 'file:') {
+            // Local: open in new tab (iframes blocked on file://)
+            window.open(poc.file, '_blank');
+        } else {
+            // Hosted: open in full-screen overlay
+            document.getElementById('appTitle').textContent = poc.title;
+            document.getElementById('appFrame').src = poc.file;
+            document.getElementById('appModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeApp() {
+        document.getElementById('appModal').classList.remove('active');
+        document.getElementById('appFrame').src = '';
+        document.body.style.overflow = '';
+    }
+
+    function handleContact() {
+        const name = document.getElementById('contactName').value;
+        const email = document.getElementById('contactEmail').value;
+        const type = document.getElementById('contactType').value;
+        const msg = document.getElementById('contactMsg').value;
+        if (!name || !email) { alert('Please fill in your name and email.'); return; }
+        const subject = encodeURIComponent(`Query from ${name} via the LinkedIn website`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${type}\n\n${msg}`);
+        window.location.href = `mailto:Vandana_karthik@yahoo.com?subject=${subject}&body=${body}`;
+    }
+
+    // Close app viewer on overlay click
+    document.getElementById('appModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('appModal')) closeApp();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closeApp(); }
+    });
+</script>
+
+</body>
+</html>
