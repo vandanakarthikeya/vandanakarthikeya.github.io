@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HL7 FHIR Data Mapper & Validator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1419;
+            --bg-card: #1a1f2e;
+            --bg-hover: #242b3d;
+            --border: #2a3142;
+            --text: #e4e8f1;
+            --text-secondary: #7a8a99;
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --hl7-color: #f97316;
+            --fhir-color: #06b6d4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2.5rem 0 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--hl7-color), var(--fhir-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        .header .badges {
+            display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-hl7 { background: rgba(249,115,22,0.15); color: var(--hl7-color); border: 1px solid rgba(249,115,22,0.3); }
+        .badge-fhir { background: rgba(6,182,212,0.15); color: var(--fhir-color); border: 1px solid rgba(6,182,212,0.3); }
+        .badge-r4 { background: rgba(99,102,241,0.15); color: var(--primary); border: 1px solid rgba(99,102,241,0.3); }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 0.25rem; margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border); padding-bottom: 0;
+        }
+        .tab {
+            padding: 0.75rem 1.5rem; cursor: pointer; border: none;
+            background: transparent; color: var(--text-secondary); font-family: inherit;
+            font-size: 0.9rem; font-weight: 600; border-bottom: 2px solid transparent;
+            transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .tab:hover { color: var(--text); }
+        .tab.active {
+            color: var(--primary); border-bottom-color: var(--primary);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card h2 {
+            font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem;
+            display: flex; align-items: center; gap: 0.6rem;
+        }
+        .card h2 .icon { width: 22px; height: 22px; stroke: var(--primary); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        @media (max-width: 900px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block; font-size: 0.78rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-secondary); margin-bottom: 0.4rem;
+        }
+        select, textarea, input[type="text"] {
+            width: 100%; padding: 0.7rem 1rem;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem; transition: border-color 0.2s;
+        }
+        select:focus, textarea:focus, input:focus {
+            outline: none; border-color: var(--primary);
+        }
+        textarea {
+            min-height: 280px; resize: vertical; line-height: 1.5;
+        }
+        textarea.output { min-height: 280px; background: #0d1117; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.7rem 1.5rem; border: none; border-radius: 8px;
+            font-family: inherit; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .btn-hl7 {
+            background: linear-gradient(135deg, var(--hl7-color), #ea580c);
+            color: white;
+        }
+        .btn-hl7:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(249,115,22,0.3); }
+        .btn-fhir {
+            background: linear-gradient(135deg, var(--fhir-color), #0891b2);
+            color: white;
+        }
+        .btn-fhir:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(6,182,212,0.3); }
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        .btn-success:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .btn-secondary {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+        }
+        .btn-secondary:hover { border-color: var(--primary); background: var(--bg-hover); }
+        .action-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+        /* Summary Cards */
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+        .summary-card {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+            padding: 1rem; text-align: center; transition: all 0.2s;
+        }
+        .summary-card.success { border-color: rgba(16,185,129,0.4); }
+        .summary-card.error { border-color: rgba(239,68,68,0.4); }
+        .summary-card.warning { border-color: rgba(245,158,11,0.4); }
+        .summary-card.info { border-color: rgba(59,130,246,0.4); }
+        .summary-value { font-size: 1.8rem; font-weight: 700; }
+        .summary-card.success .summary-value { color: var(--success); }
+        .summary-card.error .summary-value { color: var(--error); }
+        .summary-card.warning .summary-value { color: var(--warning); }
+        .summary-card.info .summary-value { color: var(--info); }
+        .summary-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; }
+
+        /* Validation Issues */
+        .issue-item {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; margin-bottom: 0.75rem; border-left: 3px solid transparent;
+        }
+        .issue-item.error { border-left-color: var(--error); }
+        .issue-item.warning { border-left-color: var(--warning); }
+        .issue-item.success { border-left-color: var(--success); }
+        .issue-item.info { border-left-color: var(--info); }
+        .issue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+        .issue-type { font-weight: 700; font-size: 0.85rem; }
+        .issue-item.error .issue-type { color: var(--error); }
+        .issue-item.warning .issue-type { color: var(--warning); }
+        .issue-item.success .issue-type { color: var(--success); }
+        .issue-item.info .issue-type { color: var(--info); }
+        .issue-severity {
+            font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 10px; text-transform: uppercase;
+        }
+        .sev-error { background: rgba(239,68,68,0.15); color: var(--error); }
+        .sev-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .sev-info { background: rgba(59,130,246,0.15); color: var(--info); }
+        .issue-message { font-size: 0.88rem; color: var(--text-secondary); }
+        .issue-path { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.3rem; font-family: 'JetBrains Mono', monospace; }
+
+        /* Resource mapping cards */
+        .mapping-card {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; margin-bottom: 0.75rem;
+        }
+        .mapping-card-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;
+        }
+        .mapping-card-title { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
+        .mapping-arrow {
+            color: var(--primary); font-size: 1.2rem; margin: 0 0.5rem;
+        }
+        .mapping-row {
+            display: grid; grid-template-columns: 1fr 30px 1fr; gap: 0.5rem;
+            align-items: center; padding: 0.35rem 0; border-bottom: 1px solid rgba(42,49,66,0.5);
+            font-size: 0.82rem;
+        }
+        .mapping-row:last-child { border-bottom: none; }
+        .mapping-hl7 { color: var(--hl7-color); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+        .mapping-fhir { color: var(--fhir-color); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+        .mapping-row .arrow { color: var(--text-secondary); text-align: center; }
+
+        /* Sample buttons */
+        .sample-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+        .sample-btn {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 0.6rem; text-align: center; cursor: pointer;
+            font-family: inherit; color: var(--text); font-size: 0.8rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .sample-btn:hover { border-color: var(--primary); background: var(--bg-hover); }
+        .sample-btn .sample-type { font-size: 0.7rem; color: var(--text-secondary); }
+
+        /* JSON tree */
+        .json-viewer {
+            background: #0d1117; border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+            max-height: 500px; overflow: auto; white-space: pre-wrap; line-height: 1.6;
+        }
+        .json-key { color: #7ee787; }
+        .json-string { color: #a5d6ff; }
+        .json-number { color: #ffa657; }
+        .json-bool { color: #ff7b72; }
+        .json-null { color: #8b949e; }
+
+        /* Side by side comparison */
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .comparison-panel h3 {
+            font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .comparison-panel h3 .dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+        }
+        .dot-hl7 { background: var(--hl7-color); }
+        .dot-fhir { background: var(--fhir-color); }
+
+        /* Loading */
+        .loading { text-align: center; padding: 2rem; color: var(--text-secondary); }
+        .spinner {
+            width: 32px; height: 32px; border: 3px solid var(--border);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 0.7s linear infinite; margin: 0 auto 0.75rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Info box */
+        .info-box {
+            background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.85rem;
+            color: var(--text-secondary); margin-bottom: 1rem;
+        }
+        .info-box strong { color: var(--text); }
+
+        /* Download area */
+        .download-area {
+            display: none; margin-top: 1rem; padding: 1rem;
+            background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .comparison { grid-template-columns: 1fr; }
+            .sample-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>HL7 FHIR Data Mapper & Validator</h1>
+        <p class="subtitle">Convert legacy HL7 v2.x messages to FHIR R4 resources with validation & compliance checks</p>
+        <div class="badges">
+            <span class="badge badge-hl7">HL7 v2.x</span>
+            <span class="badge badge-fhir">FHIR R4</span>
+            <span class="badge badge-r4">ADT • ORU • ORM</span>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('convert')">
+            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            Convert HL7 → FHIR
+        </button>
+        <button class="tab" onclick="switchTab('validate')">
+            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Validate FHIR
+        </button>
+        <button class="tab" onclick="switchTab('reference')">
+            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Reference
+        </button>
+    </div>
+
+    <!-- TAB 1: Convert HL7 → FHIR -->
+    <div id="convertTab" class="tab-content active">
+        <div class="grid">
+            <!-- Left: HL7 Input -->
+            <div>
+                <div class="card">
+                    <h2>
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        HL7 v2.x Message Input
+                    </h2>
+
+                    <div class="form-group">
+                        <label>Load Sample Message</label>
+                        <div class="sample-grid">
+                            <button class="sample-btn" onclick="loadSample('ADT_A01')">
+                                <div>ADT^A01</div>
+                                <div class="sample-type">Patient Admit</div>
+                            </button>
+                            <button class="sample-btn" onclick="loadSample('ADT_A08')">
+                                <div>ADT^A08</div>
+                                <div class="sample-type">Patient Update</div>
+                            </button>
+                            <button class="sample-btn" onclick="loadSample('ORU_R01')">
+                                <div>ORU^R01</div>
+                                <div class="sample-type">Lab Result</div>
+                            </button>
+                            <button class="sample-btn" onclick="loadSample('ORM_O01')">
+                                <div>ORM^O01</div>
+                                <div class="sample-type">Order Message</div>
+                            </button>
+                            <button class="sample-btn" onclick="loadSample('ADT_A04')">
+                                <div>ADT^A04</div>
+                                <div class="sample-type">Patient Register</div>
+                            </button>
+                            <button class="sample-btn" onclick="loadSample('ADT_A03')">
+                                <div>ADT^A03</div>
+                                <div class="sample-type">Patient Discharge</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>HL7 Message</label>
+                        <textarea id="hl7Input" placeholder="Paste your HL7 v2.x message here...&#10;&#10;MSH|^~\&|SENDER|FACILITY|RECEIVER|DEST|...&#10;PID|1||MRN123^^^HOSP||DOE^JOHN||19800101|M||...&#10;PV1|1|I|4N^401^1|||..."></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-hl7" onclick="convertHL7toFHIR()">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            Convert to FHIR R4
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearConvert()">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: FHIR Output -->
+            <div>
+                <div class="card" id="fhirOutputCard">
+                    <h2>
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke:var(--fhir-color)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                        FHIR R4 Bundle Output
+                    </h2>
+                    <div id="fhirOutput">
+                        <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);">
+                            <div style="font-size:2.5rem;margin-bottom:1rem;">🔄</div>
+                            <div style="font-weight:600;margin-bottom:0.5rem;">Ready to Convert</div>
+                            <div style="font-size:0.88rem;">Paste an HL7 message or load a sample, then click "Convert to FHIR R4"</div>
+                        </div>
+                    </div>
+                    <div id="fhirActions" style="display:none;">
+                        <div class="action-buttons">
+                            <button class="btn btn-fhir" onclick="copyFHIR()">
+                                <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                Copy JSON
+                            </button>
+                            <button class="btn btn-success" onclick="downloadFHIR()">
+                                <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Download FHIR JSON
+                            </button>
+                            <button class="btn btn-primary" onclick="validateConvertedFHIR()">
+                                <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Validate Output
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mapping Details -->
+        <div class="card" id="mappingDetailsCard" style="display:none;">
+            <h2>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/></svg>
+                Field Mapping Details
+            </h2>
+            <div id="mappingDetails"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Validate FHIR -->
+    <div id="validateTab" class="tab-content">
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <h2>
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        FHIR JSON Input
+                    </h2>
+                    <div class="info-box">
+                        💡 <strong>Tip:</strong> Paste any FHIR R4 Bundle or Resource JSON to validate structure, required fields, and data types.
+                    </div>
+                    <div class="form-group">
+                        <label>FHIR JSON to Validate</label>
+                        <textarea id="fhirValidateInput" placeholder='Paste FHIR R4 JSON here...&#10;&#10;{&#10;  "resourceType": "Bundle",&#10;  "type": "transaction",&#10;  "entry": [...]&#10;}'></textarea>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-fhir" onclick="validateFHIR()">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Validate FHIR
+                        </button>
+                        <button class="btn btn-secondary" onclick="loadConvertedForValidation()">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4"/></svg>
+                            Use Converted Output
+                        </button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('fhirValidateInput').value=''; document.getElementById('validationOutput').style.display='none';">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card" id="validationOutput" style="display:none;">
+                    <h2>
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        Validation Results
+                    </h2>
+                    <div id="validationSummary"></div>
+                    <div id="validationIssues"></div>
+                    <div id="downloadValidatedGroup" style="display:none; margin-top:1rem;">
+                        <button class="btn btn-success" onclick="downloadValidatedFHIR()" style="width:100%; justify-content:center;">
+                            <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span id="downloadValidatedText">Download Validated FHIR JSON</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: Reference -->
+    <div id="referenceTab" class="tab-content">
+        <div class="grid">
+            <div class="card">
+                <h2>
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke:var(--hl7-color)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    HL7 v2.x → FHIR R4 Mapping Reference
+                </h2>
+                <div id="referenceContent"></div>
+            </div>
+            <div class="card">
+                <h2>
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke:var(--fhir-color)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    FHIR R4 Resource Types
+                </h2>
+                <div id="resourceReference"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // GLOBAL STATE
+    // ============================================================
+    let currentFHIRBundle = null;
+    let lastHL7Message = null;
+
+    // ============================================================
+    // TAB SWITCHING
+    // ============================================================
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+        event.target.closest('.tab').classList.add('active');
+    }
+
+    // ============================================================
+    // SAMPLE HL7 MESSAGES
+    // ============================================================
+    const samples = {
+        ADT_A01: `MSH|^~\\&|EPIC|UCSF|RHAPSODY|STATE_HIE|20260115120000||ADT^A01^ADT_A01|MSG00001|P|2.5.1|||AL|NE
+EVN|A01|20260115120000|||JSMITH^Smith^John^A^^^MD
+PID|1||MRN98765^^^UCSF^MR||GARCIA^MARIA^ELENA^^MS||19850315|F||2106-3^White^HL70005|123 OAK DRIVE^^SAN FRANCISCO^CA^94102^US||4155551234^PRN^PH|||M||ACCT123456|555-12-3456
+NK1|1|GARCIA^CARLOS|SPO^Spouse^HL70063||4155555678^PRN^PH
+PV1|1|I|4N^401^1^^^UCSF||||1234567890^PATEL^ANITA^R^^^MD^NPI||||MED|||1234567890^PATEL^ANITA^R^^^MD^NPI|IN||BCBS|||||||||||||||||||UCSF|||||20260115120000
+DG1|1||I10^Essential Hypertension^ICD10||20260115|A
+IN1|1|BCBS001|BCBS OF CALIFORNIA|PO BOX 629010^^ROSEVILLE^CA^95662|||||GROUP001|||20250101|20261231||GARCIA^MARIA^ELENA|SELF|19850315|123 OAK DRIVE^^SAN FRANCISCO^CA^94102^US|||1|||||||||||||MEMBER123`,
+
+        ADT_A08: `MSH|^~\\&|CERNER|MERCY|RHAPSODY|STATE_HIE|20260118143000||ADT^A08^ADT_A08|MSG00002|P|2.5.1|||AL|NE
+EVN|A08|20260118143000
+PID|1||MRN54321^^^MERCY^MR||JOHNSON^ROBERT^WILLIAM||19720628|M||2054-5^Black^HL70005|456 MAPLE ST^^CHICAGO^IL^60601^US||3125559876^PRN^PH|||S||ACCT789012|321-65-4987
+PV1|1|O|CLINIC^201^1|||9876543210^LEE^SARAH^M^^^MD^NPI||||FAM||||9876543210^LEE^SARAH^M^^^MD^NPI`,
+
+        ORU_R01: `MSH|^~\\&|LABSYS|QUEST|EPIC|HOSPITAL|20260120090000||ORU^R01^ORU_R01|MSG00003|P|2.5.1|||AL|NE
+PID|1||MRN12345^^^HOSP^MR||DOE^JANE^A||19900710|F||2106-3^White|789 ELM ST^^SEATTLE^WA^98101^US||2065553456^PRN^PH
+PV1|1|O|LAB||||5555555555^CHEN^DAVID^L^^^MD^NPI
+ORC|RE|ORD001|FILLER001||CM||||20260120090000|||5555555555^CHEN^DAVID^L^^^MD^NPI
+OBR|1|ORD001|FILLER001|80053^Comprehensive Metabolic Panel^CPT|||20260119080000|||||||20260119083000|BLOOD|5555555555^CHEN^DAVID^L^^^MD^NPI||||||20260120090000|||F
+OBX|1|NM|2345-7^Glucose^LN||98|mg/dL|74-106|N|||F|||20260119080000
+OBX|2|NM|2160-0^Creatinine^LN||1.2|mg/dL|0.7-1.3|N|||F|||20260119080000
+OBX|3|NM|3094-0^BUN^LN||18|mg/dL|7-20|N|||F|||20260119080000
+OBX|4|NM|2951-2^Sodium^LN||140|mEq/L|136-145|N|||F|||20260119080000
+OBX|5|NM|2823-3^Potassium^LN||4.2|mEq/L|3.5-5.1|N|||F|||20260119080000
+OBX|6|NM|1742-6^ALT^LN||25|U/L|7-56|N|||F|||20260119080000
+OBX|7|NM|1920-8^AST^LN||22|U/L|10-40|N|||F|||20260119080000`,
+
+        ORM_O01: `MSH|^~\\&|CPOE|HOSPITAL|PHARMACY|HOSPITAL|20260121100000||ORM^O01^ORM_O01|MSG00004|P|2.5.1|||AL|NE
+PID|1||MRN67890^^^HOSP^MR||SMITH^ALICE^B||19650422|F||2106-3^White|321 PINE AVE^^PORTLAND^OR^97201^US||5035557890^PRN^PH
+PV1|1|I|6S^612^1|||8888888888^BROWN^MICHAEL^J^^^MD^NPI||||MED|||8888888888^BROWN^MICHAEL^J^^^MD^NPI
+ORC|NW|ORD002||||||^^^20260121100000^^R||20260121100000|NURSE001^JONES^MARY||8888888888^BROWN^MICHAEL^J^^^MD^NPI
+OBR|1|ORD002||71046^Chest X-Ray 2 Views^CPT|||20260121100000||||||||8888888888^BROWN^MICHAEL^J^^^MD^NPI
+NTE|1||R/O pneumonia - patient presenting with cough and fever x 3 days`,
+
+        ADT_A04: `MSH|^~\\&|EPIC|CLINIC|RHAPSODY|HIE|20260122140000||ADT^A04^ADT_A04|MSG00005|P|2.5.1|||AL|NE
+EVN|A04|20260122140000
+PID|1||MRN11111^^^CLINIC^MR||WILLIAMS^SARAH^J||19951201|F||2106-3^White|555 BIRCH LN^^AUSTIN^TX^78701^US||5125551111^PRN^PH|||S||ACCT111111
+PV1|1|O|PED^101^A|||7777777777^REED^AMANDA^K^^^MD^NPI||||PED||||7777777777^REED^AMANDA^K^^^MD^NPI`,
+
+        ADT_A03: `MSH|^~\\&|EPIC|UCSF|RHAPSODY|STATE_HIE|20260125160000||ADT^A03^ADT_A03|MSG00006|P|2.5.1|||AL|NE
+EVN|A03|20260125160000|||JSMITH^Smith^John
+PID|1||MRN98765^^^UCSF^MR||GARCIA^MARIA^ELENA^^MS||19850315|F||2106-3^White|123 OAK DRIVE^^SAN FRANCISCO^CA^94102^US||4155551234^PRN^PH
+PV1|1|I|4N^401^1^^^UCSF||||1234567890^PATEL^ANITA^R^^^MD^NPI||||MED|||1234567890^PATEL^ANITA^R^^^MD^NPI|IN||BCBS|||||||||||||||||||UCSF|||||20260115120000|||20260125160000
+DG1|1||I10^Essential Hypertension^ICD10||20260115|A
+DG1|2||E11.9^Type 2 Diabetes^ICD10||20260116|A`
+    };
+
+    function loadSample(type) {
+        document.getElementById('hl7Input').value = samples[type];
+        document.getElementById('fhirOutput').innerHTML = `
+            <div style="text-align:center;padding:2rem;color:var(--text-secondary);">
+                <div style="font-size:2rem;margin-bottom:0.75rem;">✅</div>
+                <div style="font-weight:600;color:var(--hl7-color);">${type.replace('_', '^')} loaded</div>
+                <div style="font-size:0.85rem;margin-top:0.4rem;">Click "Convert to FHIR R4" to transform</div>
+            </div>`;
+    }
+
+    // ============================================================
+    // HL7 PARSER
+    // ============================================================
+    function parseHL7(message) {
+        const lines = message.trim().split(/\r?\n/).filter(l => l.trim());
+        const segments = {};
+        const segmentList = [];
+
+        lines.forEach(line => {
+            const segType = line.substring(0, 3);
+            const fields = line.split('|');
+            if (!segments[segType]) segments[segType] = [];
+            segments[segType].push(fields);
+            segmentList.push({ type: segType, fields: fields });
+        });
+
+        return { segments, segmentList };
+    }
+
+    function getField(fields, index, component) {
+        if (!fields || index >= fields.length) return '';
+        const val = fields[index] || '';
+        if (component !== undefined) {
+            const comps = val.split('^');
+            return comps[component] || '';
+        }
+        return val;
+    }
+
+    // ============================================================
+    // HL7 → FHIR CONVERSION ENGINE
+    // ============================================================
+    function convertHL7toFHIR() {
+        const input = document.getElementById('hl7Input').value.trim();
+        if (!input) {
+            alert('Please paste an HL7 message or load a sample.');
+            return;
+        }
+
+        document.getElementById('fhirOutput').innerHTML = '<div class="loading"><div class="spinner"></div>Converting HL7 to FHIR R4...</div>';
+
+        setTimeout(() => {
+            try {
+                const parsed = parseHL7(input);
+                lastHL7Message = parsed;
+                const bundle = buildFHIRBundle(parsed);
+                currentFHIRBundle = bundle;
+
+                // Render output
+                const json = JSON.stringify(bundle, null, 2);
+                document.getElementById('fhirOutput').innerHTML = '<div class="json-viewer">' + syntaxHighlight(json) + '</div>';
+                document.getElementById('fhirActions').style.display = 'block';
+
+                // Show mapping details
+                showMappingDetails(parsed, bundle);
+
+                // Show next step hint
+                showConvertHint();
+            } catch (e) {
+                document.getElementById('fhirOutput').innerHTML = `
+                    <div class="issue-item error">
+                        <div class="issue-header"><span class="issue-type">Conversion Error</span></div>
+                        <div class="issue-message">${e.message}</div>
+                    </div>`;
+            }
+        }, 800);
+    }
+
+    function showConvertHint() {
+        let hint = document.getElementById('convertHint');
+        if (!hint) {
+            hint = document.createElement('div');
+            hint.id = 'convertHint';
+            hint.style.cssText = 'margin-top:1rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(99,102,241,0.08));border:1px solid rgba(6,182,212,0.25);border-radius:10px;animation:fadeIn 0.4s ease;';
+            hint.innerHTML = '<div style="display:flex;align-items:flex-start;gap:0.75rem;">' +
+                '<span style="font-size:1.3rem;flex-shrink:0;">💡</span>' +
+                '<div><div style="font-weight:700;color:var(--fhir-color);margin-bottom:0.3rem;">Next Step: Validate Your FHIR Output</div>' +
+                '<div style="color:var(--text-secondary);font-size:0.88rem;">Click <strong>"Validate Output"</strong> above to check compliance, or go to the <strong>Validate FHIR</strong> tab for detailed validation.</div></div></div>';
+            document.getElementById('fhirActions').appendChild(hint);
+        }
+        hint.style.display = 'block';
+    }
+
+    function buildFHIRBundle(parsed) {
+        const bundle = {
+            resourceType: "Bundle",
+            id: "hl7-converted-" + Date.now(),
+            type: "transaction",
+            timestamp: new Date().toISOString(),
+            entry: []
+        };
+
+        const msh = parsed.segments.MSH ? parsed.segments.MSH[0] : null;
+        const pid = parsed.segments.PID ? parsed.segments.PID[0] : null;
+        const pv1 = parsed.segments.PV1 ? parsed.segments.PV1[0] : null;
+        const evn = parsed.segments.EVN ? parsed.segments.EVN[0] : null;
+        const nk1List = parsed.segments.NK1 || [];
+        const dg1List = parsed.segments.DG1 || [];
+        const in1List = parsed.segments.IN1 || [];
+        const obxList = parsed.segments.OBX || [];
+        const obrList = parsed.segments.OBR || [];
+        const orcList = parsed.segments.ORC || [];
+        const nteList = parsed.segments.NTE || [];
+
+        // Determine message type
+        let msgType = '';
+        if (msh) msgType = getField(msh, 8, 0) + '^' + getField(msh, 8, 1);
+
+        // 1. Patient Resource (from PID)
+        if (pid) {
+            const patient = buildPatient(pid);
+            bundle.entry.push({
+                fullUrl: "urn:uuid:patient-1",
+                resource: patient,
+                request: { method: "POST", url: "Patient" }
+            });
+        }
+
+        // 2. Encounter Resource (from PV1)
+        if (pv1) {
+            const encounter = buildEncounter(pv1, msh, evn, msgType);
+            bundle.entry.push({
+                fullUrl: "urn:uuid:encounter-1",
+                resource: encounter,
+                request: { method: "POST", url: "Encounter" }
+            });
+        }
+
+        // 3. Practitioner (from PV1 attending)
+        if (pv1) {
+            const practitioner = buildPractitioner(pv1);
+            if (practitioner) {
+                bundle.entry.push({
+                    fullUrl: "urn:uuid:practitioner-1",
+                    resource: practitioner,
+                    request: { method: "POST", url: "Practitioner" }
+                });
+            }
+        }
+
+        // 4. Conditions (from DG1)
+        dg1List.forEach((dg1, idx) => {
+            const condition = buildCondition(dg1, idx);
+            if (condition) {
+                bundle.entry.push({
+                    fullUrl: "urn:uuid:condition-" + (idx + 1),
+                    resource: condition,
+                    request: { method: "POST", url: "Condition" }
+                });
+            }
+        });
+
+        // 5. Observations (from OBX - for ORU messages)
+        obxList.forEach((obx, idx) => {
+            const obs = buildObservation(obx, obrList[0], idx);
+            if (obs) {
+                bundle.entry.push({
+                    fullUrl: "urn:uuid:observation-" + (idx + 1),
+                    resource: obs,
+                    request: { method: "POST", url: "Observation" }
+                });
+            }
+        });
+
+        // 6. DiagnosticReport (from OBR - for ORU messages)
+        if (obrList.length > 0 && obxList.length > 0) {
+            const report = buildDiagnosticReport(obrList[0], obxList);
+            bundle.entry.push({
+                fullUrl: "urn:uuid:diagnosticreport-1",
+                resource: report,
+                request: { method: "POST", url: "DiagnosticReport" }
+            });
+        }
+
+        // 7. ServiceRequest (from ORC/OBR - for ORM messages)
+        if (orcList.length > 0) {
+            const serviceReq = buildServiceRequest(orcList[0], obrList[0], nteList);
+            bundle.entry.push({
+                fullUrl: "urn:uuid:servicerequest-1",
+                resource: serviceReq,
+                request: { method: "POST", url: "ServiceRequest" }
+            });
+        }
+
+        // 8. RelatedPerson (from NK1)
+        nk1List.forEach((nk1, idx) => {
+            const related = buildRelatedPerson(nk1, idx);
+            if (related) {
+                bundle.entry.push({
+                    fullUrl: "urn:uuid:relatedperson-" + (idx + 1),
+                    resource: related,
+                    request: { method: "POST", url: "RelatedPerson" }
+                });
+            }
+        });
+
+        // 9. Coverage (from IN1)
+        in1List.forEach((in1, idx) => {
+            const coverage = buildCoverage(in1, idx);
+            if (coverage) {
+                bundle.entry.push({
+                    fullUrl: "urn:uuid:coverage-" + (idx + 1),
+                    resource: coverage,
+                    request: { method: "POST", url: "Coverage" }
+                });
+            }
+        });
+
+        return bundle;
+    }
+
+    // ---- Resource Builders ----
+    function buildPatient(pid) {
+        const patient = { resourceType: "Patient" };
+        
+        // Identifiers (PID-3)
+        const mrn = getField(pid, 3, 0);
+        const authority = getField(pid, 3, 3);
+        if (mrn) {
+            patient.identifier = [{ use: "usual", type: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0203", code: "MR" }] }, system: authority ? "urn:oid:" + authority : "http://hospital.org/mrn", value: mrn }];
+        }
+
+        // Name (PID-5)
+        const family = getField(pid, 5, 0);
+        const given = getField(pid, 5, 1);
+        const middle = getField(pid, 5, 2);
+        const prefix = getField(pid, 5, 4);
+        if (family || given) {
+            const name = { use: "official", family: family };
+            name.given = [given];
+            if (middle) name.given.push(middle);
+            if (prefix) name.prefix = [prefix];
+            patient.name = [name];
+        }
+
+        // DOB (PID-7)
+        const dob = getField(pid, 7);
+        if (dob && dob.length >= 8) {
+            patient.birthDate = dob.substring(0,4) + '-' + dob.substring(4,6) + '-' + dob.substring(6,8);
+        }
+
+        // Gender (PID-8)
+        const genderMap = { 'M': 'male', 'F': 'female', 'O': 'other', 'U': 'unknown' };
+        const gender = getField(pid, 8);
+        if (gender) patient.gender = genderMap[gender] || 'unknown';
+
+        // Race (PID-10)
+        const raceCode = getField(pid, 10, 0);
+        const raceText = getField(pid, 10, 1);
+        if (raceCode) {
+            patient.extension = patient.extension || [];
+            patient.extension.push({
+                url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+                extension: [{ url: "ombCategory", valueCoding: { system: "urn:oid:2.16.840.1.113883.6.238", code: raceCode, display: raceText || raceCode } }, { url: "text", valueString: raceText || raceCode }]
+            });
+        }
+
+        // Address (PID-11)
+        const street = getField(pid, 11, 0);
+        const city = getField(pid, 11, 2);
+        const state = getField(pid, 11, 3);
+        const zip = getField(pid, 11, 4);
+        const country = getField(pid, 11, 5);
+        if (street || city) {
+            patient.address = [{ use: "home", line: street ? [street] : [], city: city, state: state, postalCode: zip, country: country || "US" }];
+        }
+
+        // Phone (PID-13)
+        const phone = getField(pid, 13, 0);
+        if (phone) {
+            patient.telecom = [{ system: "phone", value: phone, use: "home" }];
+        }
+
+        // Marital Status (PID-16)
+        const maritalMap = { 'S': 'S', 'M': 'M', 'D': 'D', 'W': 'W' };
+        const marital = getField(pid, 16);
+        if (marital) {
+            patient.maritalStatus = { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus", code: maritalMap[marital] || marital }] };
+        }
+
+        // SSN (PID-19)
+        const ssn = getField(pid, 19);
+        if (ssn) {
+            patient.identifier = patient.identifier || [];
+            patient.identifier.push({ use: "official", type: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0203", code: "SS" }] }, system: "http://hl7.org/fhir/sid/us-ssn", value: ssn });
+        }
+
+        return patient;
+    }
+
+    function buildEncounter(pv1, msh, evn, msgType) {
+        const encounter = { resourceType: "Encounter" };
+
+        // Status based on message type
+        const statusMap = {
+            'ADT^A01': 'in-progress', 'ADT^A02': 'in-progress', 'ADT^A03': 'finished',
+            'ADT^A04': 'arrived', 'ADT^A08': 'in-progress', 'ORU^R01': 'finished', 'ORM^O01': 'planned'
+        };
+        encounter.status = statusMap[msgType] || 'unknown';
+
+        // Class (PV1-2)
+        const classMap = { 'I': 'IMP', 'O': 'AMB', 'E': 'EMER', 'P': 'PRENC' };
+        const cls = getField(pv1, 2);
+        encounter.class = { system: "http://terminology.hl7.org/CodeSystem/v3-ActCode", code: classMap[cls] || cls || 'AMB' };
+
+        // Type (PV1-4 or PV1-10)
+        const admitType = getField(pv1, 10);
+        if (admitType) {
+            encounter.type = [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0007", code: admitType }] }];
+        }
+
+        // Location (PV1-3)
+        const loc = getField(pv1, 3, 0);
+        const room = getField(pv1, 3, 1);
+        const bed = getField(pv1, 3, 2);
+        if (loc) {
+            encounter.location = [{ location: { display: [loc, room, bed].filter(Boolean).join(' - ') }, status: "active" }];
+        }
+
+        // Participant / Attending (PV1-7)
+        const attendNPI = getField(pv1, 7, 0);
+        const attendFamily = getField(pv1, 7, 1);
+        if (attendNPI || attendFamily) {
+            encounter.participant = [{ type: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-ParticipationType", code: "ATND" }] }], individual: { reference: "urn:uuid:practitioner-1" } }];
+        }
+
+        // Period
+        const admitDate = getField(pv1, 44);
+        const dischargeDate = getField(pv1, 45);
+        encounter.period = {};
+        if (admitDate) encounter.period.start = formatHL7Date(admitDate);
+        if (dischargeDate) encounter.period.end = formatHL7Date(dischargeDate);
+        if (!admitDate && evn) {
+            const evnDate = getField(evn, 2);
+            if (evnDate) encounter.period.start = formatHL7Date(evnDate);
+        }
+
+        // Subject
+        encounter.subject = { reference: "urn:uuid:patient-1" };
+
+        return encounter;
+    }
+
+    function buildPractitioner(pv1) {
+        const npi = getField(pv1, 7, 0);
+        const family = getField(pv1, 7, 1);
+        const given = getField(pv1, 7, 2);
+        if (!npi && !family) return null;
+
+        const prac = { resourceType: "Practitioner" };
+        if (npi) {
+            prac.identifier = [{ system: "http://hl7.org/fhir/sid/us-npi", value: npi }];
+        }
+        if (family || given) {
+            prac.name = [{ family: family, given: given ? [given] : [] }];
+        }
+        return prac;
+    }
+
+    function buildCondition(dg1, idx) {
+        const code = getField(dg1, 3, 0);
+        const desc = getField(dg1, 3, 1);
+        const codeSys = getField(dg1, 3, 2);
+        if (!code) return null;
+
+        const sysMap = { 'ICD10': 'http://hl7.org/fhir/sid/icd-10-cm', 'ICD9': 'http://hl7.org/fhir/sid/icd-9-cm', 'I10': 'http://hl7.org/fhir/sid/icd-10-cm' };
+
+        return {
+            resourceType: "Condition",
+            clinicalStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "active" }] },
+            code: { coding: [{ system: sysMap[codeSys] || 'http://hl7.org/fhir/sid/icd-10-cm', code: code, display: desc }], text: desc || code },
+            subject: { reference: "urn:uuid:patient-1" },
+            encounter: { reference: "urn:uuid:encounter-1" },
+            recordedDate: formatHL7Date(getField(dg1, 5)) || new Date().toISOString().substring(0, 10)
+        };
+    }
+
+    function buildObservation(obx, obr, idx) {
+        const valueType = getField(obx, 2);
+        const code = getField(obx, 3, 0);
+        const codeDesc = getField(obx, 3, 1);
+        const codeSys = getField(obx, 3, 2);
+        const value = getField(obx, 5);
+        const units = getField(obx, 6);
+        const refRange = getField(obx, 7);
+        const abnFlag = getField(obx, 8);
+        const status = getField(obx, 11);
+        const obsDate = getField(obx, 14);
+
+        const obs = {
+            resourceType: "Observation",
+            status: status === 'F' ? 'final' : status === 'P' ? 'preliminary' : 'final',
+            category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/observation-category", code: "laboratory", display: "Laboratory" }] }],
+            code: { coding: [{ system: codeSys === 'LN' ? 'http://loinc.org' : 'http://loinc.org', code: code, display: codeDesc }], text: codeDesc },
+            subject: { reference: "urn:uuid:patient-1" },
+            encounter: { reference: "urn:uuid:encounter-1" }
+        };
+
+        if (obsDate) obs.effectiveDateTime = formatHL7Date(obsDate);
+
+        // Value
+        if (valueType === 'NM' && value) {
+            obs.valueQuantity = { value: parseFloat(value), unit: units, system: "http://unitsofmeasure.org", code: units };
+        } else if (value) {
+            obs.valueString = value;
+        }
+
+        // Reference range
+        if (refRange && refRange.includes('-')) {
+            const parts = refRange.split('-');
+            obs.referenceRange = [{ low: { value: parseFloat(parts[0]), unit: units }, high: { value: parseFloat(parts[1]), unit: units } }];
+        }
+
+        // Interpretation
+        const interpMap = { 'N': 'N', 'H': 'H', 'L': 'L', 'HH': 'HH', 'LL': 'LL', 'A': 'A' };
+        if (abnFlag && interpMap[abnFlag]) {
+            obs.interpretation = [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", code: interpMap[abnFlag] }] }];
+        }
+
+        return obs;
+    }
+
+    function buildDiagnosticReport(obr, obxList) {
+        const code = getField(obr, 4, 0);
+        const desc = getField(obr, 4, 1);
+        const codeSys = getField(obr, 4, 2);
+        const status = getField(obr, 25);
+
+        const report = {
+            resourceType: "DiagnosticReport",
+            status: status === 'F' ? 'final' : 'preliminary',
+            category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0074", code: "LAB", display: "Laboratory" }] }],
+            code: { coding: [{ system: codeSys === 'CPT' ? 'http://www.ama-assn.org/go/cpt' : 'http://loinc.org', code: code, display: desc }], text: desc },
+            subject: { reference: "urn:uuid:patient-1" },
+            encounter: { reference: "urn:uuid:encounter-1" },
+            result: obxList.map((_, idx) => ({ reference: "urn:uuid:observation-" + (idx + 1) }))
+        };
+
+        const collectDate = getField(obr, 7);
+        const reportDate = getField(obr, 22);
+        if (collectDate) report.effectiveDateTime = formatHL7Date(collectDate);
+        if (reportDate) report.issued = formatHL7Date(reportDate);
+
+        return report;
+    }
+
+    function buildServiceRequest(orc, obr, nteList) {
+        const req = {
+            resourceType: "ServiceRequest",
+            status: "active",
+            intent: "order",
+            subject: { reference: "urn:uuid:patient-1" },
+            encounter: { reference: "urn:uuid:encounter-1" }
+        };
+
+        if (obr) {
+            const code = getField(obr, 4, 0);
+            const desc = getField(obr, 4, 1);
+            const codeSys = getField(obr, 4, 2);
+            req.code = { coding: [{ system: codeSys === 'CPT' ? 'http://www.ama-assn.org/go/cpt' : 'http://loinc.org', code: code, display: desc }], text: desc };
+        }
+
+        const orderId = getField(orc, 2);
+        if (orderId) req.identifier = [{ value: orderId }];
+
+        const orderDate = getField(orc, 9);
+        if (orderDate) req.authoredOn = formatHL7Date(orderDate);
+
+        // Priority from ORC-7
+        const priority = getField(orc, 7);
+        if (priority && priority.includes('R')) req.priority = 'routine';
+        if (priority && priority.includes('S')) req.priority = 'stat';
+
+        // Notes from NTE
+        if (nteList && nteList.length > 0) {
+            req.note = nteList.map(nte => ({ text: getField(nte, 3) })).filter(n => n.text);
+        }
+
+        return req;
+    }
+
+    function buildRelatedPerson(nk1, idx) {
+        const family = getField(nk1, 2, 0);
+        const given = getField(nk1, 2, 1);
+        const relCode = getField(nk1, 3, 0);
+        const relText = getField(nk1, 3, 1);
+        if (!family && !given) return null;
+
+        return {
+            resourceType: "RelatedPerson",
+            patient: { reference: "urn:uuid:patient-1" },
+            relationship: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0063", code: relCode, display: relText }] }],
+            name: [{ family: family, given: given ? [given] : [] }],
+            telecom: getField(nk1, 5, 0) ? [{ system: "phone", value: getField(nk1, 5, 0) }] : undefined
+        };
+    }
+
+    function buildCoverage(in1, idx) {
+        const planId = getField(in1, 2);
+        const planName = getField(in1, 4);
+        const groupNum = getField(in1, 8);
+        const startDate = getField(in1, 12);
+        const endDate = getField(in1, 13);
+        const memberId = getField(in1, 36);
+
+        return {
+            resourceType: "Coverage",
+            status: "active",
+            subscriber: { reference: "urn:uuid:patient-1" },
+            beneficiary: { reference: "urn:uuid:patient-1" },
+            payor: [{ display: planName || planId }],
+            class: groupNum ? [{ type: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/coverage-class", code: "group" }] }, value: groupNum }] : undefined,
+            period: { start: formatHL7Date(startDate), end: formatHL7Date(endDate) },
+            identifier: memberId ? [{ value: memberId }] : undefined
+        };
+    }
+
+    // ============================================================
+    // FHIR VALIDATOR
+    // ============================================================
+    function validateFHIR() {
+        const input = document.getElementById('fhirValidateInput').value.trim();
+        if (!input) { alert('Please paste FHIR JSON to validate.'); return; }
+
+        let fhir;
+        try {
+            fhir = JSON.parse(input);
+        } catch (e) {
+            document.getElementById('validationOutput').style.display = 'block';
+            document.getElementById('validationSummary').innerHTML = '';
+            document.getElementById('validationIssues').innerHTML = `
+                <div class="issue-item error">
+                    <div class="issue-header"><span class="issue-type">JSON Parse Error</span><span class="issue-severity sev-error">ERROR</span></div>
+                    <div class="issue-message">${e.message}</div>
+                </div>`;
+            return;
+        }
+
+        const issues = runFHIRValidation(fhir);
+        displayValidationResults(issues, fhir);
+    }
+
+    function validateConvertedFHIR() {
+        if (!currentFHIRBundle) { alert('No converted output to validate.'); return; }
+        document.getElementById('fhirValidateInput').value = JSON.stringify(currentFHIRBundle, null, 2);
+        switchTabDirect('validate');
+        setTimeout(() => validateFHIR(), 300);
+    }
+
+    function loadConvertedForValidation() {
+        if (!currentFHIRBundle) { alert('No converted output available. Convert an HL7 message first.'); return; }
+        document.getElementById('fhirValidateInput').value = JSON.stringify(currentFHIRBundle, null, 2);
+    }
+
+    function runFHIRValidation(fhir) {
+        const issues = [];
+
+        // Top-level checks
+        if (!fhir.resourceType) {
+            issues.push({ severity: 'error', type: 'Structure', message: 'Missing required field: resourceType', path: 'root' });
+        }
+
+        if (fhir.resourceType === 'Bundle') {
+            if (!fhir.type) issues.push({ severity: 'error', type: 'Required Field', message: 'Bundle.type is required', path: 'Bundle.type' });
+            if (!fhir.entry || !Array.isArray(fhir.entry)) {
+                issues.push({ severity: 'error', type: 'Structure', message: 'Bundle.entry must be an array', path: 'Bundle.entry' });
+            } else {
+                fhir.entry.forEach((entry, idx) => {
+                    if (!entry.resource) {
+                        issues.push({ severity: 'error', type: 'Required Field', message: `Entry ${idx} missing resource`, path: `Bundle.entry[${idx}].resource` });
+                    } else {
+                        const resIssues = validateResource(entry.resource, `Bundle.entry[${idx}].resource`);
+                        issues.push(...resIssues);
+                    }
+                    if (fhir.type === 'transaction' && !entry.request) {
+                        issues.push({ severity: 'warning', type: 'Best Practice', message: `Transaction bundle entry ${idx} should have a request element`, path: `Bundle.entry[${idx}].request` });
+                    }
+                });
+            }
+        } else {
+            const resIssues = validateResource(fhir, '');
+            issues.push(...resIssues);
+        }
+
+        return issues;
+    }
+
+    function validateResource(resource, basePath) {
+        const issues = [];
+        const rt = resource.resourceType;
+        const p = basePath ? basePath + '.' : '';
+
+        if (!rt) {
+            issues.push({ severity: 'error', type: 'Structure', message: 'Resource missing resourceType', path: basePath || 'root' });
+            return issues;
+        }
+
+        // Resource-specific validation
+        switch (rt) {
+            case 'Patient':
+                if (!resource.name || resource.name.length === 0) issues.push({ severity: 'warning', type: 'US Core', message: 'Patient.name is required by US Core', path: p + 'name' });
+                if (!resource.gender) issues.push({ severity: 'warning', type: 'US Core', message: 'Patient.gender is required by US Core', path: p + 'gender' });
+                if (resource.gender && !['male','female','other','unknown'].includes(resource.gender))
+                    issues.push({ severity: 'error', type: 'Value Set', message: `Invalid gender value: "${resource.gender}". Must be male|female|other|unknown`, path: p + 'gender' });
+                if (resource.birthDate && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(resource.birthDate))
+                    issues.push({ severity: 'error', type: 'Format', message: 'birthDate must be YYYY, YYYY-MM, or YYYY-MM-DD', path: p + 'birthDate' });
+                if (!resource.identifier || resource.identifier.length === 0) issues.push({ severity: 'info', type: 'Best Practice', message: 'Patient should have at least one identifier (MRN)', path: p + 'identifier' });
+                break;
+
+            case 'Encounter':
+                if (!resource.status) issues.push({ severity: 'error', type: 'Required Field', message: 'Encounter.status is required', path: p + 'status' });
+                if (resource.status && !['planned','arrived','triaged','in-progress','onleave','finished','cancelled','entered-in-error','unknown'].includes(resource.status))
+                    issues.push({ severity: 'error', type: 'Value Set', message: `Invalid Encounter.status: "${resource.status}"`, path: p + 'status' });
+                if (!resource.class) issues.push({ severity: 'error', type: 'Required Field', message: 'Encounter.class is required', path: p + 'class' });
+                if (!resource.subject) issues.push({ severity: 'warning', type: 'Best Practice', message: 'Encounter should reference a Patient', path: p + 'subject' });
+                break;
+
+            case 'Condition':
+                if (!resource.code) issues.push({ severity: 'error', type: 'Required Field', message: 'Condition.code is required', path: p + 'code' });
+                if (!resource.subject) issues.push({ severity: 'error', type: 'Required Field', message: 'Condition.subject is required', path: p + 'subject' });
+                if (!resource.clinicalStatus) issues.push({ severity: 'warning', type: 'US Core', message: 'Condition.clinicalStatus is recommended', path: p + 'clinicalStatus' });
+                break;
+
+            case 'Observation':
+                if (!resource.status) issues.push({ severity: 'error', type: 'Required Field', message: 'Observation.status is required', path: p + 'status' });
+                if (!resource.code) issues.push({ severity: 'error', type: 'Required Field', message: 'Observation.code is required', path: p + 'code' });
+                if (!resource.subject) issues.push({ severity: 'warning', type: 'Best Practice', message: 'Observation should reference a Patient', path: p + 'subject' });
+                if (!resource.valueQuantity && !resource.valueString && !resource.valueCodeableConcept)
+                    issues.push({ severity: 'info', type: 'Completeness', message: 'Observation has no value[x] element', path: p + 'value[x]' });
+                break;
+
+            case 'DiagnosticReport':
+                if (!resource.status) issues.push({ severity: 'error', type: 'Required Field', message: 'DiagnosticReport.status is required', path: p + 'status' });
+                if (!resource.code) issues.push({ severity: 'error', type: 'Required Field', message: 'DiagnosticReport.code is required', path: p + 'code' });
+                break;
+
+            case 'ServiceRequest':
+                if (!resource.status) issues.push({ severity: 'error', type: 'Required Field', message: 'ServiceRequest.status is required', path: p + 'status' });
+                if (!resource.intent) issues.push({ severity: 'error', type: 'Required Field', message: 'ServiceRequest.intent is required', path: p + 'intent' });
+                if (!resource.subject) issues.push({ severity: 'error', type: 'Required Field', message: 'ServiceRequest.subject is required', path: p + 'subject' });
+                break;
+
+            case 'Practitioner':
+                if (!resource.name || resource.name.length === 0) issues.push({ severity: 'warning', type: 'Best Practice', message: 'Practitioner should have a name', path: p + 'name' });
+                if (!resource.identifier || resource.identifier.length === 0) issues.push({ severity: 'info', type: 'Best Practice', message: 'Practitioner should have NPI', path: p + 'identifier' });
+                break;
+
+            case 'Coverage':
+                if (!resource.status) issues.push({ severity: 'error', type: 'Required Field', message: 'Coverage.status is required', path: p + 'status' });
+                if (!resource.beneficiary) issues.push({ severity: 'error', type: 'Required Field', message: 'Coverage.beneficiary is required', path: p + 'beneficiary' });
+                if (!resource.payor) issues.push({ severity: 'error', type: 'Required Field', message: 'Coverage.payor is required', path: p + 'payor' });
+                break;
+
+            case 'RelatedPerson':
+                if (!resource.patient) issues.push({ severity: 'error', type: 'Required Field', message: 'RelatedPerson.patient is required', path: p + 'patient' });
+                break;
+        }
+
+        return issues;
+    }
+
+    function displayValidationResults(issues, fhir) {
+        document.getElementById('validationOutput').style.display = 'block';
+        const errors = issues.filter(i => i.severity === 'error').length;
+        const warnings = issues.filter(i => i.severity === 'warning').length;
+        const infos = issues.filter(i => i.severity === 'info').length;
+        const resourceCount = fhir.resourceType === 'Bundle' && fhir.entry ? fhir.entry.length : 1;
+
+        document.getElementById('validationSummary').innerHTML = `
+            <div class="summary-grid">
+                <div class="summary-card ${errors > 0 ? 'error' : 'success'}">
+                    <div class="summary-value">${errors}</div><div class="summary-label">Errors</div>
+                </div>
+                <div class="summary-card ${warnings > 0 ? 'warning' : 'success'}">
+                    <div class="summary-value">${warnings}</div><div class="summary-label">Warnings</div>
+                </div>
+                <div class="summary-card info">
+                    <div class="summary-value">${infos}</div><div class="summary-label">Info</div>
+                </div>
+                <div class="summary-card ${errors === 0 ? 'success' : 'error'}">
+                    <div class="summary-value">${resourceCount}</div><div class="summary-label">Resources</div>
+                </div>
+            </div>`;
+
+        let html = '';
+        if (issues.length === 0) {
+            html = `<div class="issue-item success">
+                <div class="issue-header"><span class="issue-type">✅ Validation Passed</span></div>
+                <div class="issue-message">No errors, warnings, or issues found. FHIR data is valid.</div>
+            </div>`;
+        } else {
+            issues.forEach(issue => {
+                html += `<div class="issue-item ${issue.severity}">
+                    <div class="issue-header">
+                        <span class="issue-type">${issue.type}</span>
+                        <span class="issue-severity sev-${issue.severity}">${issue.severity.toUpperCase()}</span>
+                    </div>
+                    <div class="issue-message">${issue.message}</div>
+                    <div class="issue-path">📍 ${issue.path}</div>
+                </div>`;
+            });
+        }
+        document.getElementById('validationIssues').innerHTML = html;
+
+        // Show download button when errors = 0
+        var dlGroup = document.getElementById('downloadValidatedGroup');
+        var dlText = document.getElementById('downloadValidatedText');
+        if (errors === 0) {
+            dlGroup.style.display = 'block';
+            dlText.textContent = warnings > 0 ? 'Download FHIR JSON (' + warnings + ' warnings)' : 'Download Validated FHIR JSON';
+        } else {
+            dlGroup.style.display = 'none';
+        }
+    }
+
+    // ============================================================
+    // MAPPING DETAILS
+    // ============================================================
+    function showMappingDetails(parsed, bundle) {
+        const card = document.getElementById('mappingDetailsCard');
+        card.style.display = 'block';
+        let html = '';
+
+        bundle.entry.forEach(entry => {
+            const r = entry.resource;
+            html += `<div class="mapping-card">
+                <div class="mapping-card-header">
+                    <div class="mapping-card-title">
+                        <span style="color:var(--hl7-color)">HL7 Segments</span>
+                        <span class="mapping-arrow">→</span>
+                        <span style="color:var(--fhir-color)">${r.resourceType}</span>
+                    </div>
+                </div>`;
+
+            const mappings = getResourceMappings(r);
+            mappings.forEach(m => {
+                html += `<div class="mapping-row">
+                    <div class="mapping-hl7">${m.hl7}</div>
+                    <div class="arrow">→</div>
+                    <div class="mapping-fhir">${m.fhir}</div>
+                </div>`;
+            });
+            html += '</div>';
+        });
+
+        document.getElementById('mappingDetails').innerHTML = html;
+    }
+
+    function getResourceMappings(resource) {
+        const rt = resource.resourceType;
+        const mappings = [];
+
+        switch (rt) {
+            case 'Patient':
+                mappings.push({ hl7: 'PID-3 (MRN)', fhir: 'Patient.identifier' });
+                mappings.push({ hl7: 'PID-5 (Name)', fhir: 'Patient.name' });
+                mappings.push({ hl7: 'PID-7 (DOB)', fhir: 'Patient.birthDate' });
+                mappings.push({ hl7: 'PID-8 (Sex)', fhir: 'Patient.gender' });
+                mappings.push({ hl7: 'PID-11 (Address)', fhir: 'Patient.address' });
+                mappings.push({ hl7: 'PID-13 (Phone)', fhir: 'Patient.telecom' });
+                break;
+            case 'Encounter':
+                mappings.push({ hl7: 'PV1-2 (Class)', fhir: 'Encounter.class' });
+                mappings.push({ hl7: 'PV1-3 (Location)', fhir: 'Encounter.location' });
+                mappings.push({ hl7: 'PV1-7 (Attending)', fhir: 'Encounter.participant' });
+                mappings.push({ hl7: 'MSH-9 (Msg Type)', fhir: 'Encounter.status' });
+                break;
+            case 'Condition':
+                mappings.push({ hl7: 'DG1-3 (Diagnosis)', fhir: 'Condition.code' });
+                mappings.push({ hl7: 'DG1-5 (Date)', fhir: 'Condition.recordedDate' });
+                break;
+            case 'Observation':
+                mappings.push({ hl7: 'OBX-3 (Code)', fhir: 'Observation.code' });
+                mappings.push({ hl7: 'OBX-5 (Value)', fhir: 'Observation.value[x]' });
+                mappings.push({ hl7: 'OBX-6 (Units)', fhir: 'Observation.valueQuantity.unit' });
+                mappings.push({ hl7: 'OBX-7 (Range)', fhir: 'Observation.referenceRange' });
+                break;
+            case 'DiagnosticReport':
+                mappings.push({ hl7: 'OBR-4 (Test)', fhir: 'DiagnosticReport.code' });
+                mappings.push({ hl7: 'OBR-7 (Collect)', fhir: 'DiagnosticReport.effective' });
+                mappings.push({ hl7: 'OBR-25 (Status)', fhir: 'DiagnosticReport.status' });
+                break;
+            case 'ServiceRequest':
+                mappings.push({ hl7: 'ORC-2 (Order ID)', fhir: 'ServiceRequest.identifier' });
+                mappings.push({ hl7: 'OBR-4 (Code)', fhir: 'ServiceRequest.code' });
+                mappings.push({ hl7: 'ORC-9 (Date)', fhir: 'ServiceRequest.authoredOn' });
+                break;
+            case 'Practitioner':
+                mappings.push({ hl7: 'PV1-7.0 (NPI)', fhir: 'Practitioner.identifier' });
+                mappings.push({ hl7: 'PV1-7.1-2 (Name)', fhir: 'Practitioner.name' });
+                break;
+            case 'Coverage':
+                mappings.push({ hl7: 'IN1-4 (Plan)', fhir: 'Coverage.payor' });
+                mappings.push({ hl7: 'IN1-8 (Group)', fhir: 'Coverage.class' });
+                mappings.push({ hl7: 'IN1-12/13 (Dates)', fhir: 'Coverage.period' });
+                break;
+            case 'RelatedPerson':
+                mappings.push({ hl7: 'NK1-2 (Name)', fhir: 'RelatedPerson.name' });
+                mappings.push({ hl7: 'NK1-3 (Relation)', fhir: 'RelatedPerson.relationship' });
+                break;
+        }
+        return mappings;
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function formatHL7Date(dateStr) {
+        if (!dateStr || dateStr.length < 8) return undefined;
+        const y = dateStr.substring(0, 4);
+        const m = dateStr.substring(4, 6);
+        const d = dateStr.substring(6, 8);
+        if (dateStr.length >= 14) {
+            const h = dateStr.substring(8, 10);
+            const mi = dateStr.substring(10, 12);
+            const s = dateStr.substring(12, 14);
+            return `${y}-${m}-${d}T${h}:${mi}:${s}Z`;
+        }
+        return `${y}-${m}-${d}`;
+    }
+
+    function syntaxHighlight(json) {
+        return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'json-number';
+                if (/^"/.test(match)) {
+                    cls = /:$/.test(match) ? 'json-key' : 'json-string';
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-bool';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+    }
+
+    function copyFHIR() {
+        if (!currentFHIRBundle) return;
+        navigator.clipboard.writeText(JSON.stringify(currentFHIRBundle, null, 2)).then(() => {
+            showNotification('FHIR JSON copied to clipboard!', 'success');
+        });
+    }
+
+    function downloadFHIR() {
+        if (!currentFHIRBundle) return;
+        downloadJSON(currentFHIRBundle, 'fhir_bundle_' + new Date().toISOString().slice(0,10) + '.json');
+    }
+
+    function downloadValidatedFHIR() {
+        var input = document.getElementById('fhirValidateInput').value.trim();
+        if (!input) return;
+        try {
+            var fhir = JSON.parse(input);
+            downloadJSON(fhir, 'fhir_validated_' + new Date().toISOString().slice(0,10) + '.json');
+        } catch(e) { alert('Invalid JSON'); }
+    }
+
+    function downloadJSON(obj, filename) {
+        var blob = new Blob([JSON.stringify(obj, null, 2)], {type: 'application/json'});
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style.display = 'none'; a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ window.URL.revokeObjectURL(url); document.body.removeChild(a); }, 300);
+    }
+
+    function showNotification(msg, type) {
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;top:1.5rem;right:1.5rem;background:' + (type === 'success' ? 'var(--success)' : 'var(--error)') + ';color:white;padding:0.75rem 1.25rem;border-radius:8px;font-weight:600;font-size:0.9rem;z-index:10000;animation:fadeIn 0.3s ease;font-family:Space Grotesk,sans-serif;';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(function(){ if(document.body.contains(toast)) document.body.removeChild(toast); }, 2500);
+    }
+
+    function switchTabDirect(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+        document.querySelectorAll('.tab')[tab === 'convert' ? 0 : tab === 'validate' ? 1 : 2].classList.add('active');
+    }
+
+    function clearConvert() {
+        document.getElementById('hl7Input').value = '';
+        document.getElementById('fhirOutput').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);"><div style="font-size:2.5rem;margin-bottom:1rem;">🔄</div><div style="font-weight:600;margin-bottom:0.5rem;">Ready to Convert</div><div style="font-size:0.88rem;">Paste an HL7 message or load a sample, then click "Convert to FHIR R4"</div></div>';
+        document.getElementById('fhirActions').style.display = 'none';
+        document.getElementById('mappingDetailsCard').style.display = 'none';
+        currentFHIRBundle = null;
+        var hint = document.getElementById('convertHint'); if(hint) hint.style.display = 'none';
+    }
+
+    // ============================================================
+    // REFERENCE TAB CONTENT
+    // ============================================================
+    function loadReferenceContent() {
+        const mappings = [
+            { hl7: 'MSH (Message Header)', fhir: 'MessageHeader / Bundle.meta', desc: 'Message metadata, sending/receiving systems' },
+            { hl7: 'PID (Patient ID)', fhir: 'Patient', desc: 'Demographics, identifiers, addresses, contacts' },
+            { hl7: 'PV1 (Patient Visit)', fhir: 'Encounter', desc: 'Visit class, location, attending, admit/discharge' },
+            { hl7: 'NK1 (Next of Kin)', fhir: 'RelatedPerson', desc: 'Family/emergency contacts, relationships' },
+            { hl7: 'DG1 (Diagnosis)', fhir: 'Condition', desc: 'ICD codes, diagnosis dates, clinical status' },
+            { hl7: 'IN1 (Insurance)', fhir: 'Coverage', desc: 'Payer, plan, group, member ID, dates' },
+            { hl7: 'OBR (Observation Req)', fhir: 'DiagnosticReport / ServiceRequest', desc: 'Lab panels, imaging orders, procedure requests' },
+            { hl7: 'OBX (Observation)', fhir: 'Observation', desc: 'Lab results, vitals, measurements with values & ranges' },
+            { hl7: 'ORC (Order Control)', fhir: 'ServiceRequest', desc: 'Order identifiers, status, priority, dates' },
+            { hl7: 'EVN (Event Type)', fhir: 'Encounter.status', desc: 'Trigger events mapped to encounter lifecycle' },
+            { hl7: 'NTE (Notes)', fhir: 'Annotation / note', desc: 'Free-text clinical notes and comments' },
+        ];
+
+        let html = '';
+        mappings.forEach(m => {
+            html += `<div class="mapping-card" style="padding:0.75rem 1rem;">
+                <div class="mapping-row" style="border-bottom:none;">
+                    <div class="mapping-hl7" style="font-size:0.85rem;font-weight:600;">${m.hl7}</div>
+                    <div class="arrow">→</div>
+                    <div class="mapping-fhir" style="font-size:0.85rem;font-weight:600;">${m.fhir}</div>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-secondary);padding-left:0.25rem;">${m.desc}</div>
+            </div>`;
+        });
+        document.getElementById('referenceContent').innerHTML = html;
+
+        // Resource reference
+        const resources = [
+            { name: 'Patient', required: ['identifier','name','gender'], desc: 'Core demographics and administrative data' },
+            { name: 'Encounter', required: ['status','class','subject'], desc: 'Visit/admission tracking and context' },
+            { name: 'Condition', required: ['code','subject'], desc: 'Clinical diagnoses and problem list' },
+            { name: 'Observation', required: ['status','code'], desc: 'Lab results, vitals, clinical measurements' },
+            { name: 'DiagnosticReport', required: ['status','code'], desc: 'Lab panels, imaging, pathology reports' },
+            { name: 'ServiceRequest', required: ['status','intent','subject'], desc: 'Orders for procedures, labs, referrals' },
+            { name: 'Practitioner', required: ['name'], desc: 'Provider demographics and credentials' },
+            { name: 'Coverage', required: ['status','beneficiary','payor'], desc: 'Insurance and payer information' },
+            { name: 'RelatedPerson', required: ['patient'], desc: 'Next of kin, emergency contacts, guardians' },
+        ];
+
+        let rhtml = '';
+        resources.forEach(r => {
+            rhtml += `<div class="mapping-card" style="padding:0.85rem 1rem;">
+                <div style="font-weight:700;color:var(--fhir-color);margin-bottom:0.3rem;">${r.name}</div>
+                <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.4rem;">${r.desc}</div>
+                <div style="font-size:0.75rem;"><strong style="color:var(--text);">Required:</strong> <span style="color:var(--warning);font-family:'JetBrains Mono',monospace;">${r.required.join(', ')}</span></div>
+            </div>`;
+        });
+        document.getElementById('resourceReference').innerHTML = rhtml;
+    }
+
+    // Init
+    loadReferenceContent();
+</script>
+</body>
+</html>
