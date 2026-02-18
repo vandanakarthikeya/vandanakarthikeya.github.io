@@ -1113,18 +1113,23 @@
                     </div>
                 </div>
 
-                <!-- POC 3: Coming Soon - FHIR Mapper -->
+                <!-- POC 3: HL7 FHIR Data Mapper & Validator -->
                 <div class="poc-card fade-up stagger-2">
                     <div class="poc-preview">
                         <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a22, #238f7922);">
                             <div class="poc-preview-mockup">
                                 <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
-                                <div class="mockup-lines" style="align-items:center;">
-                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q1 2026</div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div>
+                                    <div class="mockup-line medium"></div>
+                                    <div class="mockup-line short teal-l"></div>
+                                    <div class="mockup-line long"></div>
+                                    <div class="mockup-line medium accent"></div>
+                                    <div class="mockup-line short"></div>
                                 </div>
                             </div>
                         </div>
-                        <span class="poc-badge coming">Coming Soon</span>
+                        <span class="poc-badge free">Available</span>
                     </div>
                     <div class="poc-content">
                         <div class="poc-category">Interoperability</div>
@@ -1137,7 +1142,7 @@
                             <span class="poc-tag">JSON Schema</span>
                         </div>
                         <div class="poc-actions">
-                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
+                            <button class="poc-btn poc-btn-get" onclick="openApp('fhir')" style="flex:1;">Open App →</button>
                         </div>
                     </div>
                 </div>
@@ -1423,7 +1428,8 @@
     // Place your POC HTML files in the SAME folder as this website file
     const pocFiles = {
         edi: { title: '837 EDI Claims Validator & Generator', file: 'edi-validator-generator_latest.html' },
-        hcc: { title: 'HCC Risk Score Calculator — CMS V28', file: 'hcc_risk_calculator.html' }
+        hcc: { title: 'HCC Risk Score Calculator — CMS V28', file: 'hcc_risk_calculator.html' },
+        fhir: { title: 'HL7 FHIR Data Mapper & Validator', file: 'hl7-fhir-mapper.html' }
     };
 
     function openApp(pocId) {
