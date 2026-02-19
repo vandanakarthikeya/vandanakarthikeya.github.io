@@ -1242,17 +1242,45 @@
                     <div class="cs-desc">Automated incident triage, severity classification, escalation routing, and real-time status dashboards for production support teams.</div>
                     <div class="cs-badge">Coming Soon</div>
                 </div>
-                <div class="coming-soon-card fade-up stagger-1">
-                    <div class="cs-icon">🔍</div>
-                    <div class="cs-title">Root Cause Analysis (RCA) Builder</div>
-                    <div class="cs-desc">Interactive 5-Why and fishbone diagram tool with timeline reconstruction, contributing factor mapping, and action item tracking.</div>
-                    <div class="cs-badge">Coming Soon</div>
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #3b82f622, #a78bfa22);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Incident Management</div>
+                        <div class="poc-title">Root Cause Analysis (RCA) Builder</div>
+                        <div class="poc-desc">Interactive RCA tool with incident timeline, 5 Whys drill-down, fishbone (Ishikawa) diagrams, contributing factor analysis, action item tracking, and exportable RCA reports.</div>
+                        <div class="poc-tags"><span class="poc-tag">RCA / 5 Whys</span><span class="poc-tag">Fishbone</span><span class="poc-tag">Action Tracking</span><span class="poc-tag">Report Export</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('rca')" style="flex:1;">Open App →</button></div>
+                    </div>
                 </div>
-                <div class="coming-soon-card fade-up stagger-2">
-                    <div class="cs-icon">📊</div>
-                    <div class="cs-title">Change Advisory Board (CAB) Simulator</div>
-                    <div class="cs-desc">Change request risk scoring, impact analysis, approval workflow simulation, and deployment calendar coordination for Ops/Eng teams.</div>
-                    <div class="cs-badge">Coming Soon</div>
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #f59e0b22, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Change Management</div>
+                        <div class="poc-title">Change Advisory Board (CAB) Simulator</div>
+                        <div class="poc-desc">Interactive CAB workflow with change request submission, risk scoring, board voting simulation, pre-deployment checklists, deployment calendar, and approval metrics dashboard.</div>
+                        <div class="poc-tags"><span class="poc-tag">ITSM</span><span class="poc-tag">CAB Workflow</span><span class="poc-tag">Risk Scoring</span><span class="poc-tag">Change Mgmt</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('cab')" style="flex:1;">Open App →</button></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1533,7 +1561,9 @@
         translator: { title: 'Multi-Language Healthcare Translator', file: 'healthcare-translator.html' },
         rudram: { title: 'Śrī Rudram Learning App', file: 'rudram-app.html' },
         bhagavatam: { title: 'Bhagavatam Skandha 1 Learning App', file: 'bhagavatam-skandha1.html' },
-        sundarar: { title: 'Sundaramurthi Nayanar — Friend of God', file: 'sundarar-nayanar.html' }
+        sundarar: { title: 'Sundaramurthi Nayanar — Friend of God', file: 'sundarar-nayanar.html' },
+        cab: { title: 'Change Advisory Board (CAB) Simulator', file: 'cab-simulator.html' },
+        rca: { title: 'Root Cause Analysis (RCA) Builder', file: 'rca-builder.html' }
     };
 
     function openApp(pocId) {

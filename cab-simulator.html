@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Change Advisory Board (CAB) Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0c111b;--bg2:#131a2b;--bg3:#182035;--bdr:#1e2a42;--bdr2:#263354;
+--tx:#e2e8f0;--tx2:#8494a7;--tx3:#5a6a82;
+--blue:#3b82f6;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;--cyan:#06b6d4;--pink:#ec4899;
+--green-bg:rgba(34,197,94,.08);--green-bdr:rgba(34,197,94,.2);
+--amber-bg:rgba(245,158,11,.08);--amber-bdr:rgba(245,158,11,.2);
+--red-bg:rgba(239,68,68,.08);--red-bdr:rgba(239,68,68,.2);
+--blue-bg:rgba(59,130,246,.08);--blue-bdr:rgba(59,130,246,.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Layout */
+.app{display:grid;grid-template-columns:320px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--bdr);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.topbar h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:.6rem}
+.topbar h1 span{font-size:1.3rem}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.sidebar{background:var(--bg2);border-right:1px solid var(--bdr);padding:1rem;overflow-y:auto;max-height:calc(100vh - 52px)}
+.main{padding:1.25rem;overflow-y:auto;max-height:calc(100vh - 52px)}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{max-height:none;border-right:none;border-bottom:1px solid var(--bdr)}}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx2);margin-bottom:.75rem;display:flex;align-items:center;gap:.45rem}
+
+/* Form elements */
+.fg{margin-bottom:.75rem}
+.fg label{display:block;font-size:.75rem;font-weight:600;color:var(--tx2);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.4px}
+select,input[type=text],input[type=number],input[type=date],textarea{width:100%;padding:.5rem .7rem;background:var(--bg);border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:inherit;font-size:.84rem;transition:.15s}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue)}
+textarea{min-height:70px;resize:vertical}
+
+/* Buttons */
+.btn{padding:.55rem 1.1rem;border:none;border-radius:7px;font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:.15s}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(1.15)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{filter:brightness(1.15)}
+.btn-amber{background:var(--amber);color:#000}.btn-amber:hover{filter:brightness(1.15)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(1.15)}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--tx2)}.btn-ghost:hover{border-color:var(--blue);color:var(--tx)}
+.btn-sm{padding:.35rem .7rem;font-size:.75rem}
+
+/* Risk meter */
+.risk-meter{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:.4rem 0}
+.risk-fill{height:100%;border-radius:4px;transition:width .5s ease,background .3s}
+.risk-label{font-size:.75rem;font-weight:700;letter-spacing:.3px}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:5px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.b-low{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.b-med{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
+.b-high{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr)}
+.b-crit{background:rgba(239,68,68,.15);color:#ff6b6b;border:1px solid rgba(239,68,68,.3)}
+.b-approved{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.b-pending{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
+.b-rejected{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr)}
+.b-info{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bdr)}
+
+/* Score ring */
+.score-ring{width:120px;height:120px;position:relative;margin:0 auto .5rem}
+.score-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.score-ring .bg-ring{fill:none;stroke:var(--bg);stroke-width:8}
+.score-ring .fg-ring{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .3s}
+.score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.8rem;font-weight:800;line-height:1}
+.score-label{text-align:center;font-size:.78rem;color:var(--tx2);font-weight:600}
+
+/* Timeline */
+.timeline{position:relative;padding-left:1.5rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--bdr)}
+.tl-item{position:relative;margin-bottom:1rem;padding-left:.75rem}
+.tl-item::before{content:'';position:absolute;left:-1.1rem;top:.45rem;width:10px;height:10px;border-radius:50%;border:2px solid var(--bdr);background:var(--bg2)}
+.tl-item.approved::before{background:var(--green);border-color:var(--green)}
+.tl-item.rejected::before{background:var(--red);border-color:var(--red)}
+.tl-item.pending::before{background:var(--amber);border-color:var(--amber)}
+.tl-time{font-size:.7rem;color:var(--tx3);font-family:'IBM Plex Mono',monospace}
+.tl-text{font-size:.84rem;color:var(--tx)}
+.tl-role{font-size:.72rem;font-weight:600;color:var(--tx2)}
+
+/* Impact matrix */
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem}
+.impact-cell{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:.5rem;text-align:center;font-size:.75rem}
+.impact-cell .ic-label{color:var(--tx2);font-size:.65rem;font-weight:600;text-transform:uppercase;margin-bottom:.2rem}
+.impact-cell .ic-val{font-weight:700;font-size:.95rem}
+
+/* Checklist */
+.check-item{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;font-size:.84rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.check-item:last-child{border-bottom:none}
+.check-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.check-pass{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.check-fail{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr)}
+.check-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
+
+/* Calendar strip */
+.cal-strip{display:flex;gap:.35rem;margin:.5rem 0;flex-wrap:wrap}
+.cal-day{width:36px;padding:.35rem 0;text-align:center;border-radius:5px;font-size:.65rem;font-weight:600;background:var(--bg);border:1px solid var(--bdr);cursor:pointer;transition:.15s}
+.cal-day:hover{border-color:var(--blue)}
+.cal-day.blocked{background:var(--red-bg);border-color:rgba(239,68,68,.2);color:var(--red);cursor:not-allowed}
+.cal-day.busy{background:var(--amber-bg);border-color:rgba(245,158,11,.2);color:var(--amber)}
+.cal-day.open{background:var(--green-bg);border-color:rgba(34,197,94,.2);color:var(--green)}
+.cal-day.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* Tabs in main */
+.mtabs{display:flex;gap:.2rem;margin-bottom:1rem;border-bottom:1px solid var(--bdr)}
+.mtab{padding:.55rem 1rem;cursor:pointer;border:none;background:0 0;color:var(--tx2);font-family:inherit;font-size:.82rem;font-weight:600;border-bottom:2px solid transparent;transition:.15s}
+.mtab:hover{color:var(--tx)}.mtab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Queue table */
+.q-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.q-table th{text-align:left;padding:.5rem .6rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);border-bottom:1px solid var(--bdr)}
+.q-table td{padding:.55rem .6rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.q-table tr:hover td{background:rgba(59,130,246,.03)}
+.q-table .cr-id{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--blue);font-size:.78rem}
+
+/* Notification toast */
+.toast{position:fixed;top:1rem;right:1rem;padding:.7rem 1.2rem;border-radius:8px;font-weight:600;font-size:.84rem;z-index:9999;animation:slideIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+@keyframes slideIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+.toast-success{background:var(--green);color:#fff}
+.toast-error{background:var(--red);color:#fff}
+.toast-info{background:var(--blue);color:#fff}
+
+/* Board members */
+.board{display:flex;flex-direction:column;gap:.5rem}
+.board-member{display:flex;align-items:center;gap:.6rem;padding:.5rem;background:var(--bg);border-radius:7px;border:1px solid var(--bdr)}
+.bm-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+.bm-info{flex:1;min-width:0}
+.bm-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bm-role{font-size:.7rem;color:var(--tx2)}
+.bm-vote{font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px}
+
+/* Animations */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s ease infinite}
+
+/* Reject reasons panel */
+.reject-panel{background:var(--bg);border:1px solid var(--red);border-radius:8px;padding:1rem;margin-top:.75rem;display:none}
+.reject-panel.open{display:block;animation:slideIn .2s ease}
+.reject-panel .rp-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:.6rem}
+.rp-option{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem 0;cursor:pointer;font-size:.84rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.rp-option:last-of-type{border-bottom:none}
+.rp-option input[type=checkbox]{accent-color:var(--red);margin-top:.2rem;width:16px;height:16px;flex-shrink:0;cursor:pointer}
+.rp-option label{cursor:pointer;color:var(--tx);line-height:1.4}
+.rp-other{margin-top:.6rem}
+.rp-other textarea{min-height:50px;border-color:var(--bdr);font-size:.82rem}
+.rp-actions{display:flex;gap:.5rem;margin-top:.6rem}
+.reject-reasons-display{margin-top:.5rem;padding:.6rem .8rem;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:6px;font-size:.82rem}
+.reject-reasons-display .rrd-item{display:flex;align-items:flex-start;gap:.35rem;padding:.2rem 0;color:var(--tx)}
+.reject-reasons-display .rrd-item::before{content:'✗';color:var(--red);font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+    <h1><span>🏛️</span> Change Advisory Board (CAB) Simulator</h1>
+    <div class="topbar-right">
+        <span class="badge b-info mono" id="clockBadge">CAB Session Active</span>
+        <button class="btn btn-ghost btn-sm" onclick="resetAll()">↻ Reset</button>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="card">
+        <div class="card-title">📝 New Change Request</div>
+        <div class="fg"><label>CR Title</label><input type="text" id="crTitle" placeholder="e.g. Database migration to Aurora"></div>
+        <div class="fg"><label>Change Type</label>
+            <select id="crType">
+                <option value="standard">Standard</option>
+                <option value="normal">Normal</option>
+                <option value="emergency">Emergency</option>
+            </select>
+        </div>
+        <div class="fg"><label>Category</label>
+            <select id="crCat">
+                <option value="infrastructure">Infrastructure</option>
+                <option value="application">Application</option>
+                <option value="database">Database</option>
+                <option value="network">Network</option>
+                <option value="security">Security</option>
+                <option value="integration">Integration / API</option>
+            </select>
+        </div>
+        <div class="fg"><label>Environment</label>
+            <select id="crEnv">
+                <option value="production">Production</option>
+                <option value="staging">Staging</option>
+                <option value="uat">UAT</option>
+                <option value="dev">Development</option>
+            </select>
+        </div>
+        <div class="fg"><label>Affected Systems</label><input type="text" id="crSystems" placeholder="e.g. Claims Engine, Member Portal"></div>
+        <div class="fg"><label>Description</label><textarea id="crDesc" placeholder="Describe the change, impact, and rollback plan..."></textarea></div>
+        <div class="fg"><label>Requested By</label>
+            <select id="crRequestor">
+                <option value="engineering">Engineering</option>
+                <option value="ops">Ops / Data Team</option>
+                <option value="security">Security</option>
+                <option value="product">Product</option>
+                <option value="devops">DevOps / SRE</option>
+            </select>
+        </div>
+        <div class="fg"><label>Target Date</label><input type="date" id="crDate"></div>
+        <div class="fg"><label>Estimated Duration</label>
+            <select id="crDuration">
+                <option value="15">15 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="60" selected>1 hour</option>
+                <option value="120">2 hours</option>
+                <option value="240">4 hours (maintenance window)</option>
+                <option value="480">8 hours (full day)</option>
+            </select>
+        </div>
+        <div class="fg"><label>Rollback Plan</label>
+            <select id="crRollback">
+                <option value="automated">Automated Rollback</option>
+                <option value="manual">Manual Rollback (documented)</option>
+                <option value="none">No Rollback Plan</option>
+            </select>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem">
+            <button class="btn btn-blue" onclick="submitCR()" style="flex:1">Submit to CAB →</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">👥 CAB Board Members</div>
+        <div class="board" id="boardMembers"></div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <div class="mtabs">
+        <button class="mtab active" onclick="showTab('review',this)">🔍 Active Review</button>
+        <button class="mtab" onclick="showTab('queue',this)">📋 CR Queue <span id="queueCount" class="mono" style="font-size:.7rem;color:var(--tx3)"></span></button>
+        <button class="mtab" onclick="showTab('calendar',this)">📅 Deploy Calendar</button>
+        <button class="mtab" onclick="showTab('metrics',this)">📊 Metrics</button>
+    </div>
+
+    <div id="reviewPanel" class="tab-panel">
+        <div id="noActive" style="text-align:center;padding:4rem 2rem;color:var(--tx3);">
+            <div style="font-size:3rem;margin-bottom:1rem;opacity:.4">🏛️</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--tx2);margin-bottom:.4rem">No Active Change Request</div>
+            <div style="font-size:.85rem">Submit a change request from the left panel, or select one from the queue to begin CAB review.</div>
+        </div>
+        <div id="activeReview" style="display:none"></div>
+    </div>
+
+    <div id="queuePanel" class="tab-panel" style="display:none">
+        <div class="card">
+            <div class="card-title">📋 Change Request Queue</div>
+            <table class="q-table" id="queueTable">
+                <thead><tr><th>CR ID</th><th>Title</th><th>Type</th><th>Risk</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="queueBody"></tbody>
+            </table>
+            <div id="emptyQueue" style="text-align:center;padding:2rem;color:var(--tx3);font-size:.85rem">No change requests in queue. Submit one to get started.</div>
+        </div>
+    </div>
+
+    <div id="calendarPanel" class="tab-panel" style="display:none">
+        <div class="card">
+            <div class="card-title">📅 Deployment Calendar — Next 14 Days</div>
+            <div style="display:flex;gap:.5rem;margin-bottom:.75rem;font-size:.72rem;color:var(--tx2)">
+                <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;border-radius:3px;background:var(--green-bg);border:1px solid var(--green-bdr)"></span> Open</span>
+                <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;border-radius:3px;background:var(--amber-bg);border:1px solid var(--amber-bdr)"></span> Busy</span>
+                <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;border-radius:3px;background:var(--red-bg);border:1px solid var(--red-bdr)"></span> Blocked</span>
+            </div>
+            <div id="calendarGrid"></div>
+            <div id="calendarDetail" style="margin-top:1rem"></div>
+        </div>
+    </div>
+
+    <div id="metricsPanel" class="tab-panel" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem" id="metricCards"></div>
+        <div class="card">
+            <div class="card-title">📈 Recent CAB Activity Log</div>
+            <div class="timeline" id="activityLog"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+const BOARD=[
+{name:"Sarah Chen",role:"VP Engineering",avatar:"SC",color:"#3b82f6",bias:.7},
+{name:"Raj Mehta",role:"Director Ops / SRE",avatar:"RM",color:"#22c55e",bias:.65},
+{name:"Lisa Park",role:"CISO / Security",avatar:"LP",color:"#ef4444",bias:.45},
+{name:"David Wright",role:"Release Manager",avatar:"DW",color:"#f59e0b",bias:.6},
+{name:"Maria Santos",role:"QA Lead",avatar:"MS",color:"#a78bfa",bias:.55}
+];
+let queue=[],activeCR=null,crCounter=1000,history=[],metrics={submitted:0,approved:0,rejected:0,emergency:0};
+const CIRC=2*Math.PI*52;
+
+function init(){
+    renderBoard();renderQueue();renderCalendar();renderMetrics();
+    document.getElementById('crDate').valueAsDate=new Date(Date.now()+2*86400000);
+    // Seed sample CRs
+    seedSamples();
+}
+
+function seedSamples(){
+    const samples=[
+        {title:"Upgrade Informatica PowerCenter to v10.5.6",type:"normal",cat:"integration",env:"production",systems:"Claims API, Eligibility Gateway",desc:"Upgrade Informatica PowerCenter from 10.5.3 to 10.5.6 for security patches and ETL performance improvements. Requires 30-min downtime window.",requestor:"devops",duration:"120",rollback:"automated"},
+        {title:"Patch Log4j vulnerability CVE-2026-1234",type:"emergency",cat:"security",env:"production",systems:"All Java microservices",desc:"Critical zero-day patch for Log4j. Affects 14 production services. Rolling deployment with canary.",requestor:"security",duration:"240",rollback:"automated"},
+        {title:"Add member search index to PostgreSQL",type:"standard",cat:"database",env:"staging",systems:"Member Portal, Provider Directory",desc:"Create new GIN index on member_search table to improve search performance. Non-blocking DDL.",requestor:"engineering",duration:"15",rollback:"manual"}
+    ];
+    samples.forEach(s=>{
+        const cr=buildCR(s);
+        queue.push(cr);
+    });
+    renderQueue();renderCalendar();
+}
+
+function buildCR(data){
+    const id='CR-'+(++crCounter);
+    const risk=calcRisk(data);
+    return{id,title:data.title,type:data.type,cat:data.cat,env:data.env,systems:data.systems,desc:data.desc,requestor:data.requestor,duration:data.duration,rollback:data.rollback,date:data.date||document.getElementById('crDate').value,risk,status:'pending',votes:{},submitted:new Date().toISOString()};
+}
+
+function calcRisk(d){
+    let score=0;
+    if(d.env==='production')score+=35;else if(d.env==='staging')score+=15;else if(d.env==='uat')score+=8;
+    if(d.type==='emergency')score+=20;else if(d.type==='normal')score+=10;
+    if(d.cat==='database')score+=12;else if(d.cat==='security')score+=15;else if(d.cat==='infrastructure')score+=10;
+    if(d.rollback==='none')score+=25;else if(d.rollback==='manual')score+=10;
+    if(parseInt(d.duration)>=240)score+=10;else if(parseInt(d.duration)>=120)score+=5;
+    return Math.min(score,100);
+}
+
+function riskLevel(r){return r>=70?'Critical':r>=45?'High':r>=25?'Medium':'Low'}
+function riskClass(r){return r>=70?'b-crit':r>=45?'b-high':r>=25?'b-med':'b-low'}
+function riskColor(r){return r>=70?'var(--red)':r>=45?'#ff8c00':r>=25?'var(--amber)':'var(--green)'}
+
+function submitCR(){
+    const t=document.getElementById('crTitle').value.trim();
+    if(!t){toast('Please enter a CR title','error');return}
+    const data={title:t,type:v('crType'),cat:v('crCat'),env:v('crEnv'),systems:v('crSystems'),desc:v('crDesc'),requestor:v('crRequestor'),duration:v('crDuration'),rollback:v('crRollback'),date:v('crDate')};
+    const cr=buildCR(data);
+    queue.push(cr);
+    metrics.submitted++;
+    if(cr.type==='emergency')metrics.emergency++;
+    addHistory('submitted',cr);
+    toast('CR '+cr.id+' submitted to CAB','success');
+    // Clear form
+    document.getElementById('crTitle').value='';document.getElementById('crDesc').value='';document.getElementById('crSystems').value='';
+    renderQueue();renderCalendar();renderMetrics();
+    // Auto-open for review if emergency
+    if(cr.type==='emergency'){openReview(cr.id);toast('⚠️ Emergency change — expedited review','info')}
+}
+
+function v(id){return document.getElementById(id).value}
+
+function openReview(crId){
+    const cr=queue.find(c=>c.id===crId);if(!cr)return;
+    activeCR=cr;
+    showTab('review',document.querySelector('.mtab'));
+    renderReview();
+}
+
+function renderReview(){
+    if(!activeCR){document.getElementById('noActive').style.display='';document.getElementById('activeReview').style.display='none';return}
+    const cr=activeCR;
+    document.getElementById('noActive').style.display='none';
+    const el=document.getElementById('activeReview');el.style.display='';
+    const checks=getChecklist(cr);
+    const passCount=checks.filter(c=>c.status==='pass').length;
+
+    el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem">
+        <div>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.3rem">
+                <span class="mono" style="font-size:.85rem;font-weight:700;color:var(--blue)">${cr.id}</span>
+                <span class="badge ${cr.type==='emergency'?'b-crit':cr.type==='normal'?'b-med':'b-low'}">${cr.type}</span>
+                <span class="badge b-info">${cr.cat}</span>
+                <span class="badge ${cr.env==='production'?'b-high':'b-low'}">${cr.env}</span>
+            </div>
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:.2rem">${esc(cr.title)}</h2>
+            <div style="font-size:.82rem;color:var(--tx2)">Requested by <strong>${cr.requestor}</strong> · Duration: ${cr.duration} min · Rollback: ${cr.rollback}</div>
+            ${cr.systems?`<div style="font-size:.8rem;color:var(--tx3);margin-top:.2rem">Systems: ${esc(cr.systems)}</div>`:''}
+        </div>
+        <div style="text-align:center">
+            <div class="score-ring">
+                <svg viewBox="0 0 120 120"><circle class="bg-ring" cx="60" cy="60" r="52"/><circle class="fg-ring" cx="60" cy="60" r="52" style="stroke:${riskColor(cr.risk)};stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC-(cr.risk/100)*CIRC}"/></svg>
+                <div class="score-val" style="color:${riskColor(cr.risk)}">${cr.risk}</div>
+            </div>
+            <div class="score-label">Risk Score — <span class="badge ${riskClass(cr.risk)}">${riskLevel(cr.risk)}</span></div>
+        </div>
+    </div>
+
+    ${cr.desc?`<div class="card"><div class="card-title">📄 Description</div><div style="font-size:.85rem;color:var(--tx);line-height:1.7">${esc(cr.desc)}</div></div>`:''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="card">
+            <div class="card-title">🔍 Pre-Deployment Checklist</div>
+            <div>${checks.map(c=>`<div class="check-item"><div class="check-icon ${c.status==='pass'?'check-pass':c.status==='fail'?'check-fail':'check-warn'}">${c.status==='pass'?'✓':c.status==='fail'?'✗':'!'}</div><span style="color:${c.status==='fail'?'var(--red)':c.status==='warn'?'var(--amber)':'var(--tx)'}">${c.label}</span></div>`).join('')}</div>
+            <div style="margin-top:.6rem;font-size:.78rem;color:var(--tx2)">${passCount}/${checks.length} checks passed</div>
+        </div>
+        <div class="card">
+            <div class="card-title">📊 Impact Assessment</div>
+            <div class="impact-grid">
+                <div class="impact-cell"><div class="ic-label">Users Affected</div><div class="ic-val" style="color:${cr.env==='production'?'var(--red)':'var(--green)'}">${cr.env==='production'?'All':'Limited'}</div></div>
+                <div class="impact-cell"><div class="ic-label">Downtime</div><div class="ic-val" style="color:${parseInt(cr.duration)>=120?'var(--red)':parseInt(cr.duration)>=60?'var(--amber)':'var(--green)'}">${cr.duration} min</div></div>
+                <div class="impact-cell"><div class="ic-label">Rollback</div><div class="ic-val" style="color:${cr.rollback==='none'?'var(--red)':cr.rollback==='automated'?'var(--green)':'var(--amber)'}">${cr.rollback==='automated'?'Auto':cr.rollback==='manual'?'Manual':'None'}</div></div>
+                <div class="impact-cell"><div class="ic-label">Change Type</div><div class="ic-val">${cr.type}</div></div>
+                <div class="impact-cell"><div class="ic-label">Category</div><div class="ic-val">${cr.cat}</div></div>
+                <div class="impact-cell"><div class="ic-label">Risk Level</div><div class="ic-val" style="color:${riskColor(cr.risk)}">${riskLevel(cr.risk)}</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🗳️ CAB Board Voting</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem">
+            ${BOARD.map((b,i)=>{
+                const vote=cr.votes[i];
+                return`<div class="board-member" style="flex:1;min-width:160px">
+                    <div class="bm-avatar" style="background:${b.color}22;color:${b.color}">${b.avatar}</div>
+                    <div class="bm-info"><div class="bm-name">${b.name}</div><div class="bm-role">${b.role}</div></div>
+                    <div class="bm-vote" style="background:${vote==='approve'?'var(--green-bg)':vote==='reject'?'var(--red-bg)':'var(--bg)'};color:${vote==='approve'?'var(--green)':vote==='reject'?'var(--red)':'var(--tx3)'}">${vote?vote==='approve'?'✓ Yes':'✗ No':'—'}</div>
+                </div>`;
+            }).join('')}
+        </div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <button class="btn btn-green" onclick="simulateVote()">🎲 Simulate CAB Vote</button>
+            <button class="btn btn-blue" onclick="approveManual()">✓ Force Approve</button>
+            <button class="btn btn-red" onclick="toggleRejectPanel()">✗ Reject with Reasons</button>
+            <button class="btn btn-ghost" onclick="clearReview()">← Back to Queue</button>
+        </div>
+        <div class="reject-panel" id="rejectPanel">
+            <div class="rp-title">⚠️ Select Rejection Reason(s)</div>
+            <div class="rp-option"><input type="checkbox" id="rr1" value="Incomplete rollback plan — no documented steps or automation"><label for="rr1">Incomplete rollback plan — no documented steps or automation</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr2" value="Insufficient testing — no evidence of UAT or staging validation"><label for="rr2">Insufficient testing — no evidence of UAT or staging validation</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr3" value="Change window conflict — overlaps with existing deployment or freeze"><label for="rr3">Change window conflict — overlaps with existing deployment or freeze</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr4" value="Risk too high — production impact exceeds acceptable threshold"><label for="rr4">Risk too high — production impact exceeds acceptable threshold</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr5" value="Missing security review — required for this change category"><label for="rr5">Missing security review — required for this change category</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr6" value="Affected systems not fully identified or downstream impact unclear"><label for="rr6">Affected systems not fully identified or downstream impact unclear</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr7" value="No communication plan — stakeholders and on-call teams not notified"><label for="rr7">No communication plan — stakeholders and on-call teams not notified</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr8" value="Monitoring / alerting not configured for post-deployment validation"><label for="rr8">Monitoring / alerting not configured for post-deployment validation</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr9" value="Downtime exceeds SLA budget — reschedule to maintenance window"><label for="rr9">Downtime exceeds SLA budget — reschedule to maintenance window</label></div>
+            <div class="rp-option"><input type="checkbox" id="rr10" value="Dependencies not resolved — blocked by upstream or parallel changes"><label for="rr10">Dependencies not resolved — blocked by upstream or parallel changes</label></div>
+            <div class="rp-other"><label style="font-size:.75rem;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px">Other Reason (optional)</label><textarea id="rrOther" placeholder="Describe additional reason not listed above..."></textarea></div>
+            <div class="rp-actions">
+                <button class="btn btn-red" onclick="submitRejection()">Confirm Rejection</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleRejectPanel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    ${cr.status!=='pending'?`<div class="card" style="border-color:${cr.status==='approved'?'var(--green-bdr)':'var(--red-bdr)'}">
+        <div class="card-title" style="color:${cr.status==='approved'?'var(--green)':'var(--red)'}">${cr.status==='approved'?'✅ APPROVED':'❌ REJECTED'}</div>
+        <div style="font-size:.85rem;color:var(--tx)">${cr.status==='approved'?'Change request approved by CAB. Cleared for deployment on scheduled date.':'Change request rejected. Address the noted concerns and resubmit.'}</div>
+        ${cr.status==='rejected'&&cr.rejectReasons&&cr.rejectReasons.length?`<div class="reject-reasons-display"><div style="font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.4px">Rejection Reasons</div>${cr.rejectReasons.map(r=>'<div class="rrd-item">'+esc(r)+'</div>').join('')}</div>`:''}</div>`:''}
+    `;
+}
+
+function getChecklist(cr){
+    const checks=[];
+    checks.push({label:'Rollback plan documented',status:cr.rollback!=='none'?'pass':'fail'});
+    checks.push({label:'Non-production testing complete',status:cr.env==='dev'||cr.type!=='emergency'?'pass':'warn'});
+    checks.push({label:'Change window scheduled',status:cr.date?'pass':'fail'});
+    checks.push({label:'Affected systems identified',status:cr.systems?'pass':'warn'});
+    checks.push({label:'Security review (if applicable)',status:cr.cat==='security'||cr.risk<45?'pass':cr.risk>=70?'fail':'warn'});
+    checks.push({label:'Communication plan for stakeholders',status:cr.env==='production'&&cr.risk>=45?'warn':'pass'});
+    checks.push({label:'Monitoring / alerting configured',status:cr.rollback==='automated'?'pass':'warn'});
+    checks.push({label:'Downtime within SLA budget',status:parseInt(cr.duration)<=120?'pass':parseInt(cr.duration)<=240?'warn':'fail'});
+    return checks;
+}
+
+function simulateVote(){
+    if(!activeCR)return;
+    BOARD.forEach((b,i)=>{
+        const threshold=b.bias - (activeCR.risk/100)*.5;
+        const roll=Math.random();
+        activeCR.votes[i]=roll<threshold?'approve':'reject';
+    });
+    const approves=Object.values(activeCR.votes).filter(v=>v==='approve').length;
+    const needed=Math.ceil(BOARD.length/2);
+    if(approves>=needed){
+        activeCR.status='approved';metrics.approved++;
+        addHistory('approved',activeCR);
+        toast(activeCR.id+' APPROVED ('+approves+'/'+BOARD.length+' votes)','success');
+    }else{
+        activeCR.status='rejected';metrics.rejected++;
+        activeCR.rejectReasons=getAutoRejectReasons(activeCR);
+        addHistory('rejected',activeCR);
+        toast(activeCR.id+' REJECTED ('+approves+'/'+BOARD.length+' votes)','error');
+    }
+    renderReview();renderQueue();renderMetrics();
+}
+
+function approveManual(){
+    if(!activeCR)return;
+    BOARD.forEach((b,i)=>{activeCR.votes[i]='approve'});
+    activeCR.status='approved';metrics.approved++;
+    addHistory('approved',activeCR);
+    toast(activeCR.id+' force-approved','success');
+    renderReview();renderQueue();renderMetrics();
+}
+function rejectManual(){
+    if(!activeCR)return;
+    BOARD.forEach((b,i)=>{activeCR.votes[i]='reject'});
+    activeCR.status='rejected';metrics.rejected++;
+    addHistory('rejected',activeCR);
+    toast(activeCR.id+' force-rejected','error');
+    renderReview();renderQueue();renderMetrics();
+}
+function toggleRejectPanel(){
+    const p=document.getElementById('rejectPanel');
+    if(p)p.classList.toggle('open');
+}
+function submitRejection(){
+    if(!activeCR)return;
+    const reasons=[];
+    for(let i=1;i<=10;i++){const cb=document.getElementById('rr'+i);if(cb&&cb.checked)reasons.push(cb.value)}
+    const other=(document.getElementById('rrOther').value||'').trim();
+    if(other)reasons.push(other);
+    if(!reasons.length){toast('Select at least one rejection reason','error');return}
+    BOARD.forEach((b,i)=>{activeCR.votes[i]='reject'});
+    activeCR.status='rejected';
+    activeCR.rejectReasons=reasons;
+    metrics.rejected++;
+    addHistory('rejected',activeCR);
+    toast(activeCR.id+' rejected with '+reasons.length+' reason(s)','error');
+    // Clear checkboxes
+    for(let i=1;i<=10;i++){const cb=document.getElementById('rr'+i);if(cb)cb.checked=false}
+    document.getElementById('rrOther').value='';
+    document.getElementById('rejectPanel').classList.remove('open');
+    renderReview();renderQueue();renderMetrics();
+}
+function getAutoRejectReasons(cr){
+    const reasons=[];
+    if(cr.rollback==='none')reasons.push('Incomplete rollback plan — no documented steps or automation');
+    if(cr.risk>=70)reasons.push('Risk too high — production impact exceeds acceptable threshold');
+    if(cr.env==='production'&&cr.risk>=45&&!cr.systems)reasons.push('Affected systems not fully identified or downstream impact unclear');
+    if(cr.cat==='security'&&cr.risk>=45)reasons.push('Missing security review — required for this change category');
+    if(parseInt(cr.duration)>240)reasons.push('Downtime exceeds SLA budget — reschedule to maintenance window');
+    if(!reasons.length)reasons.push('Board vote did not reach majority approval');
+    return reasons;
+}
+function clearReview(){activeCR=null;renderReview()}
+
+function renderBoard(){
+    document.getElementById('boardMembers').innerHTML=BOARD.map(b=>`<div class="board-member"><div class="bm-avatar" style="background:${b.color}22;color:${b.color}">${b.avatar}</div><div class="bm-info"><div class="bm-name">${b.name}</div><div class="bm-role">${b.role}</div></div></div>`).join('');
+}
+
+function renderQueue(){
+    const tb=document.getElementById('queueBody');
+    const eq=document.getElementById('emptyQueue');
+    if(!queue.length){tb.innerHTML='';eq.style.display='';return}
+    eq.style.display='none';
+    document.getElementById('queueCount').textContent='('+queue.length+')';
+    tb.innerHTML=queue.map(cr=>`<tr>
+        <td class="cr-id">${cr.id}</td>
+        <td>${esc(cr.title)}</td>
+        <td><span class="badge ${cr.type==='emergency'?'b-crit':cr.type==='normal'?'b-med':'b-low'}">${cr.type}</span></td>
+        <td><span class="badge ${riskClass(cr.risk)}">${cr.risk} — ${riskLevel(cr.risk)}</span></td>
+        <td><span class="badge b-${cr.status}">${cr.status}</span></td>
+        <td>${cr.status==='pending'?`<button class="btn btn-blue btn-sm" onclick="openReview('${cr.id}')">Review</button>`:cr.status==='approved'?'✅':cr.rejectReasons?'❌ ('+cr.rejectReasons.length+')':'❌'}</td>
+    </tr>`).join('');
+}
+
+function renderCalendar(){
+    const grid=document.getElementById('calendarGrid');
+    const days=[];const now=new Date();
+    for(let i=0;i<14;i++){
+        const d=new Date(now);d.setDate(d.getDate()+i);
+        const dow=d.getDay();
+        const ds=d.toISOString().split('T')[0];
+        const deployCount=queue.filter(c=>c.date===ds&&c.status==='approved').length;
+        const pendCount=queue.filter(c=>c.date===ds&&c.status==='pending').length;
+        let cls='open';
+        if(dow===0||dow===6)cls='blocked';
+        else if(deployCount>=2)cls='blocked';
+        else if(deployCount>=1||pendCount>=2)cls='busy';
+        days.push({date:d,ds,cls,deployCount,pendCount,dow});
+    }
+    grid.innerHTML=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem">${days.map(d=>`<div class="cal-day ${d.cls}" onclick="showCalDay('${d.ds}')" title="${d.ds}"><div style="font-size:.6rem;color:var(--tx3)">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.dow]}</div><div style="font-size:.95rem;font-weight:700">${d.date.getDate()}</div>${d.deployCount?`<div style="font-size:.55rem">🚀${d.deployCount}</div>`:''}</div>`).join('')}</div>`;
+}
+
+function showCalDay(ds){
+    const deploys=queue.filter(c=>c.date===ds);
+    const el=document.getElementById('calendarDetail');
+    if(!deploys.length){el.innerHTML=`<div class="card"><div style="font-size:.85rem;color:var(--tx2)">No changes scheduled for ${ds}</div></div>`;return}
+    el.innerHTML=`<div class="card"><div class="card-title">📅 Changes for ${ds}</div>${deploys.map(cr=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--bdr)"><div><span class="mono" style="color:var(--blue);font-size:.8rem">${cr.id}</span> ${esc(cr.title)}</div><span class="badge b-${cr.status}">${cr.status}</span></div>`).join('')}</div>`;
+}
+
+function renderMetrics(){
+    const mc=document.getElementById('metricCards');
+    const approvalRate=metrics.submitted?Math.round(metrics.approved/metrics.submitted*100):0;
+    mc.innerHTML=[
+        {label:'Submitted',val:metrics.submitted,icon:'📝',color:'var(--blue)'},
+        {label:'Approved',val:metrics.approved,icon:'✅',color:'var(--green)'},
+        {label:'Rejected',val:metrics.rejected,icon:'❌',color:'var(--red)'},
+        {label:'Approval Rate',val:approvalRate+'%',icon:'📊',color:approvalRate>=70?'var(--green)':approvalRate>=40?'var(--amber)':'var(--red)'}
+    ].map(m=>`<div class="card" style="text-align:center"><div style="font-size:1.4rem;margin-bottom:.3rem">${m.icon}</div><div style="font-size:1.6rem;font-weight:800;color:${m.color}">${m.val}</div><div style="font-size:.75rem;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.5px">${m.label}</div></div>`).join('');
+
+    const log=document.getElementById('activityLog');
+    if(!history.length){log.innerHTML='<div style="padding:1rem;color:var(--tx3);font-size:.85rem">No activity yet.</div>';return}
+    log.innerHTML=history.slice(-10).reverse().map(h=>`<div class="tl-item ${h.action}"><div class="tl-time">${new Date(h.time).toLocaleTimeString()}</div><div class="tl-text"><strong>${h.crId}</strong> ${h.action==='submitted'?'submitted for review':h.action==='approved'?'approved by CAB':'rejected by CAB'}</div><div class="tl-role">${esc(h.title)}</div></div>`).join('');
+}
+
+function addHistory(action,cr){history.push({action,crId:cr.id,title:cr.title,time:new Date().toISOString()})}
+
+function showTab(tab,el){
+    document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+    el.classList.add('active');
+    document.getElementById(tab+'Panel').style.display='';
+}
+
+function resetAll(){
+    queue=[];activeCR=null;crCounter=1000;history=[];metrics={submitted:0,approved:0,rejected:0,emergency:0};
+    renderQueue();renderReview();renderCalendar();renderMetrics();
+    toast('CAB session reset','info');
+}
+
+function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
+function toast(msg,type){const d=document.createElement('div');d.className='toast toast-'+type;d.textContent=msg;document.body.appendChild(d);setTimeout(()=>{if(document.body.contains(d))document.body.removeChild(d)},3500)}
+
+init();
+</script>
+
+<div style="max-width:1280px;margin:3rem auto 0;padding:0 1.5rem 2rem"><div style="background:rgba(245,158,11,.08);border:2px solid rgba(245,158,11,.35);border-radius:12px;padding:1.25rem 1.5rem"><div style="display:flex;align-items:flex-start;gap:.75rem"><span style="font-size:1.4rem;flex-shrink:0">⚠️</span><div><div style="color:#f59e0b;font-weight:700;font-size:.9rem;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Important Disclaimer</div><p style="color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.7;margin-bottom:.3rem"><strong style="color:rgba(255,255,255,.85)">For Demonstration & Educational Purposes Only.</strong> This CAB simulator uses sample workflows and risk scoring for training and demo purposes. Not intended for production change management.</p><p style="color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.7"><strong style="color:rgba(255,255,255,.85)">Built with AI Assistance.</strong> This tool was built with AI (Claude by Anthropic) and may contain errors. Consult your organization's ITSM policies for actual change management processes.</p></div></div></div></div>
+</body></html>

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Root Cause Analysis (RCA) Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0c111b;--bg2:#131a2b;--bg3:#182035;--bdr:#1e2a42;--bdr2:#263354;
+--tx:#e2e8f0;--tx2:#8494a7;--tx3:#5a6a82;
+--blue:#3b82f6;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;--cyan:#06b6d4;--pink:#ec4899;--orange:#f97316;
+--sev-crit:#ef4444;--sev-high:#f97316;--sev-med:#f59e0b;--sev-low:#22c55e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Layout */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:.6rem}
+.topbar h1 span{font-size:1.3rem}
+.topbar-right{display:flex;align-items:center;gap:.75rem}
+.container{max-width:1400px;margin:0 auto;padding:1.25rem}
+
+/* Tabs */
+.tabs{display:flex;gap:.2rem;margin-bottom:1.25rem;border-bottom:1px solid var(--bdr);flex-wrap:wrap}
+.tab{padding:.6rem 1.1rem;cursor:pointer;border:none;background:0 0;color:var(--tx2);font-family:inherit;font-size:.82rem;font-weight:600;border-bottom:2px solid transparent;transition:.15s}
+.tab:hover{color:var(--tx)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tp{display:none}.tp.active{display:block}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx2);margin-bottom:.75rem;display:flex;align-items:center;gap:.45rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+/* Form */
+.fg{margin-bottom:.75rem}
+.fg label{display:block;font-size:.72rem;font-weight:600;color:var(--tx2);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.4px}
+select,input[type=text],input[type=date],input[type=time],input[type=datetime-local],textarea{width:100%;padding:.5rem .7rem;background:var(--bg);border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:inherit;font-size:.84rem;transition:.15s}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue)}
+textarea{min-height:60px;resize:vertical}
+
+/* Buttons */
+.btn{padding:.55rem 1.1rem;border:none;border-radius:7px;font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:.15s}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(1.15)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{filter:brightness(1.15)}
+.btn-amber{background:var(--amber);color:#000}.btn-amber:hover{filter:brightness(1.15)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(1.15)}
+.btn-purple{background:var(--purple);color:#fff}.btn-purple:hover{filter:brightness(1.15)}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--tx2)}.btn-ghost:hover{border-color:var(--blue);color:var(--tx)}
+.btn-sm{padding:.35rem .7rem;font-size:.75rem}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .6rem;border-radius:5px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.b-crit{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.b-high{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.2)}
+.b-med{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.b-low{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.b-info{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.b-purple{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.b-open{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.b-progress{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.b-done{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.65rem;top:0;bottom:0;width:2px;background:var(--bdr)}
+.tl-item{position:relative;margin-bottom:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.4rem;top:.3rem;width:12px;height:12px;border-radius:50%;background:var(--bg2);border:2px solid var(--bdr)}
+.tl-item.sev-crit::before{background:var(--red);border-color:var(--red)}
+.tl-item.sev-high::before{background:var(--orange);border-color:var(--orange)}
+.tl-item.sev-med::before{background:var(--amber);border-color:var(--amber)}
+.tl-item.sev-low::before{background:var(--green);border-color:var(--green)}
+.tl-item.resolved::before{background:var(--green);border-color:var(--green)}
+.tl-time{font-size:.72rem;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-bottom:.15rem}
+.tl-text{font-size:.85rem}
+.tl-meta{font-size:.72rem;color:var(--tx2);margin-top:.15rem}
+
+/* 5 Why chain */
+.why-chain{counter-reset:why}
+.why-step{position:relative;padding:.75rem 1rem .75rem 3.25rem;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;margin-bottom:.5rem;transition:.15s}
+.why-step:hover{border-color:var(--blue)}
+.why-step::before{counter-increment:why;content:'Why #' counter(why);position:absolute;left:.75rem;top:.8rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--amber);font-family:'IBM Plex Mono',monospace}
+.why-step .ws-q{font-size:.85rem;font-weight:600;color:var(--tx);margin-bottom:.2rem}
+.why-step .ws-a{font-size:.84rem;color:var(--tx2)}
+.why-step .ws-root{margin-top:.35rem;padding:.3rem .6rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:5px;font-size:.78rem;color:var(--red);font-weight:600;display:inline-block}
+.why-input{display:flex;gap:.5rem;margin-top:.5rem}
+.why-input input{flex:1}
+.arrow-down{text-align:center;color:var(--tx3);font-size:1.2rem;margin:-.25rem 0}
+
+/* Fishbone */
+.fishbone-container{position:relative;padding:2rem 0;overflow-x:auto}
+.fishbone{min-width:900px;position:relative;height:420px}
+.fb-spine{position:absolute;top:50%;left:40px;right:120px;height:3px;background:var(--tx3);transform:translateY(-50%)}
+.fb-head{position:absolute;top:50%;right:40px;transform:translateY(-50%);width:80px;height:50px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff;text-align:center;padding:.25rem}
+.fb-bone{position:absolute}
+.fb-bone-line{position:absolute;width:2px;background:var(--tx3)}
+.fb-bone-label{position:absolute;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:.25rem .6rem;border-radius:5px;white-space:nowrap}
+.fb-cause{position:absolute;font-size:.75rem;padding:.25rem .5rem;background:var(--bg);border:1px solid var(--bdr);border-radius:5px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+
+/* Action items */
+.ai-card{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:.75rem;margin-bottom:.5rem;display:flex;align-items:flex-start;gap:.75rem;transition:.15s}
+.ai-card:hover{border-color:var(--blue)}
+.ai-priority{width:4px;border-radius:2px;min-height:40px;flex-shrink:0}
+.ai-body{flex:1;min-width:0}
+.ai-title{font-size:.85rem;font-weight:600}
+.ai-meta{font-size:.72rem;color:var(--tx2);display:flex;gap:.75rem;margin-top:.2rem;flex-wrap:wrap}
+.ai-actions{display:flex;gap:.3rem;flex-shrink:0}
+
+/* Stat card */
+.stat-card{text-align:center;padding:1rem}
+.stat-val{font-size:1.6rem;font-weight:800;line-height:1.2}
+.stat-label{font-size:.72rem;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:.2rem}
+
+/* Export preview */
+.export-pre{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:1rem;font-size:.82rem;line-height:1.7;max-height:400px;overflow-y:auto;white-space:pre-wrap;font-family:'IBM Plex Mono',monospace}
+
+/* Toast */
+.toast{position:fixed;top:1rem;right:1rem;padding:.7rem 1.2rem;border-radius:8px;font-weight:600;font-size:.84rem;z-index:9999;animation:si .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+@keyframes si{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+.toast-s{background:var(--green);color:#fff}.toast-e{background:var(--red);color:#fff}.toast-i{background:var(--blue);color:#fff}
+
+/* Import panel */
+.import-panel{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.import-sources{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem}
+.import-src{display:flex;align-items:center;gap:.5rem;padding:.55rem .9rem;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;cursor:pointer;transition:.15s;font-size:.84rem;font-weight:600}
+.import-src:hover{border-color:var(--blue);background:rgba(59,130,246,.05)}
+.import-src.active{border-color:var(--blue);background:rgba(59,130,246,.08)}
+.import-src .is-icon{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.import-form{display:none;margin-top:.75rem;padding:.75rem;background:var(--bg);border:1px solid var(--bdr);border-radius:8px}
+.import-form.active{display:block}
+.import-connected{display:flex;align-items:center;gap:.5rem;padding:.4rem .7rem;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:6px;font-size:.78rem;color:var(--green);font-weight:600;margin-top:.5rem}
+</style>
+</head>
+<body>
+<div class="topbar">
+    <h1><span>🔍</span> Root Cause Analysis (RCA) Builder</h1>
+    <div class="topbar-right">
+        <button class="btn btn-ghost btn-sm" onclick="loadSample()">📋 Load Sample Incident</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetAll()">↻ Reset</button>
+    </div>
+</div>
+<div class="container">
+<div class="tabs">
+    <button class="tab active" onclick="st('incident',this)">📋 Incident</button>
+    <button class="tab" onclick="st('timeline',this)">⏱️ Timeline</button>
+    <button class="tab" onclick="st('fiveWhy',this)">❓ 5 Whys</button>
+    <button class="tab" onclick="st('fishbone',this)">🐟 Fishbone</button>
+    <button class="tab" onclick="st('factors',this)">⚡ Contributing Factors</button>
+    <button class="tab" onclick="st('actions',this)">✅ Action Items</button>
+    <button class="tab" onclick="st('export',this)">📤 Export</button>
+</div>
+
+<!-- INCIDENT -->
+<div id="incidentTab" class="tp active">
+
+<!-- Import from External Source -->
+<div class="import-panel">
+    <div class="card-title">🔗 Import from External Source</div>
+    <div class="import-sources">
+        <div class="import-src" onclick="toggleImport('jira',this)">
+            <div class="is-icon" style="background:#0052CC22;color:#2684FF">🔵</div>
+            <span>Jira</span>
+            <span class="is-tag" style="background:rgba(38,132,255,.12);color:#2684FF">Ticket</span>
+        </div>
+        <div class="import-src" onclick="toggleImport('snow',this)">
+            <div class="is-icon" style="background:#81b53222;color:#81b532">🟢</div>
+            <span>ServiceNow</span>
+            <span class="is-tag" style="background:rgba(129,181,50,.12);color:#81b532">ITSM</span>
+        </div>
+        <div class="import-src" onclick="toggleImport('pager',this)">
+            <div class="is-icon" style="background:#06ac3822;color:#06ac38">📟</div>
+            <span>PagerDuty</span>
+            <span class="is-tag" style="background:rgba(6,172,56,.12);color:#06ac38">Alert</span>
+        </div>
+        <div class="import-src" onclick="toggleImport('datadog',this)">
+            <div class="is-icon" style="background:#632ca622;color:#632ca6">🐶</div>
+            <span>Datadog</span>
+            <span class="is-tag" style="background:rgba(99,44,166,.12);color:#632ca6">Monitor</span>
+        </div>
+        <div class="import-src" onclick="toggleImport('splunk',this)">
+            <div class="is-icon" style="background:#f5832222;color:#f58322">🔍</div>
+            <span>Splunk</span>
+            <span class="is-tag" style="background:rgba(245,131,34,.12);color:#f58322">Alert</span>
+        </div>
+        <div class="import-src" onclick="toggleImport('opsgenie',this)">
+            <div class="is-icon" style="background:#2684FF22;color:#2684FF">🔔</div>
+            <span>Opsgenie</span>
+            <span class="is-tag" style="background:rgba(38,132,255,.12);color:#2684FF">Alert</span>
+        </div>
+    </div>
+
+    <!-- Jira Import Form -->
+    <div class="import-form" id="importJira">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">🔵 Import from Jira</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Jira Instance URL</label><input type="text" id="jiraUrl" placeholder="e.g. yourcompany.atlassian.net"></div>
+            <div class="fg" style="margin:0"><label>Ticket Key</label><input type="text" id="jiraKey" placeholder="e.g. OPS-1234 or INC-567"></div>
+        </div>
+        <div class="fg" style="margin-bottom:.5rem"><label>API Token (optional for demo)</label><input type="text" id="jiraToken" placeholder="Paste Jira API token — leave blank for simulated import"></div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importJira()">📥 Import Ticket</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: title, priority, assignee, description, created date, components</span>
+        </div>
+    </div>
+
+    <!-- ServiceNow Import Form -->
+    <div class="import-form" id="importSnow">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">🟢 Import from ServiceNow</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>ServiceNow Instance</label><input type="text" id="snowUrl" placeholder="e.g. yourcompany.service-now.com"></div>
+            <div class="fg" style="margin:0"><label>Incident Number</label><input type="text" id="snowInc" placeholder="e.g. INC0012345"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importSnow()">📥 Import Incident</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: number, short description, severity, assignment group, opened/resolved timestamps</span>
+        </div>
+    </div>
+
+    <!-- PagerDuty Import Form -->
+    <div class="import-form" id="importPager">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">📟 Import from PagerDuty</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Incident ID or URL</label><input type="text" id="pdId" placeholder="e.g. P1A2B3C or full PagerDuty URL"></div>
+            <div class="fg" style="margin:0"><label>API Key (optional)</label><input type="text" id="pdKey" placeholder="Leave blank for simulated import"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importPD()">📥 Import Alert</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: title, urgency, service, triggered/resolved times, escalation policy</span>
+        </div>
+    </div>
+
+    <!-- Datadog Import Form -->
+    <div class="import-form" id="importDatadog">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">🐶 Import from Datadog</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Monitor ID or Event URL</label><input type="text" id="ddId" placeholder="e.g. 12345678 or Datadog event URL"></div>
+            <div class="fg" style="margin:0"><label>API Key (optional)</label><input type="text" id="ddKey" placeholder="Leave blank for simulated import"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importDD()">📥 Import Monitor Event</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: monitor name, status, tags, triggered time, affected hosts</span>
+        </div>
+    </div>
+
+    <!-- Splunk Import Form -->
+    <div class="import-form" id="importSplunk">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">🔍 Import from Splunk</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Alert ID or Saved Search</label><input type="text" id="spId" placeholder="e.g. alert-12345 or saved search name"></div>
+            <div class="fg" style="margin:0"><label>Splunk Instance</label><input type="text" id="spUrl" placeholder="e.g. splunk.yourcompany.com:8089"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importSplunk()">📥 Import Alert</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: alert name, severity, trigger time, search query, result count</span>
+        </div>
+    </div>
+
+    <!-- Opsgenie Import Form -->
+    <div class="import-form" id="importOpsgenie">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.5rem;color:var(--tx)">🔔 Import from Opsgenie</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Alert ID or URL</label><input type="text" id="ogId" placeholder="e.g. alert UUID or Opsgenie URL"></div>
+            <div class="fg" style="margin:0"><label>API Key (optional)</label><input type="text" id="ogKey" placeholder="Leave blank for simulated import"></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-blue btn-sm" onclick="importOG()">📥 Import Alert</button>
+            <span style="font-size:.72rem;color:var(--tx3)">Imports: alert message, priority, tags, created time, acknowledged by</span>
+        </div>
+    </div>
+
+    <div id="importStatus"></div>
+</div>
+
+<div class="grid2">
+<div>
+    <div class="card">
+        <div class="card-title">📋 Incident Details</div>
+        <div class="fg"><label>Incident ID</label><input type="text" id="incId" placeholder="e.g. INC-2026-0142"></div>
+        <div class="fg"><label>Title</label><input type="text" id="incTitle" placeholder="e.g. Claims processing pipeline failure in production"></div>
+        <div class="fg"><label>Severity</label>
+            <select id="incSev"><option value="critical">SEV-1 — Critical</option><option value="high">SEV-2 — High</option><option value="medium" selected>SEV-3 — Medium</option><option value="low">SEV-4 — Low</option></select>
+        </div>
+        <div class="grid2">
+            <div class="fg"><label>Start Time</label><input type="datetime-local" id="incStart"></div>
+            <div class="fg"><label>Resolved Time</label><input type="datetime-local" id="incEnd"></div>
+        </div>
+        <div class="fg"><label>Affected Systems</label><input type="text" id="incSystems" placeholder="e.g. Claims Engine, EDI Gateway, Member Portal"></div>
+        <div class="fg"><label>Impact Summary</label><textarea id="incImpact" placeholder="Describe the business impact: users affected, revenue impact, SLA breach..."></textarea></div>
+        <div class="fg"><label>Detection Method</label>
+            <select id="incDetect"><option value="monitoring">Automated Monitoring / Alert</option><option value="user">User/Customer Report</option><option value="team">Internal Team Discovery</option><option value="escalation">Escalation from Support</option></select>
+        </div>
+        <div class="fg"><label>Incident Commander</label><input type="text" id="incCommander" placeholder="e.g. Sarah Chen"></div>
+    </div>
+</div>
+<div>
+    <div class="card" id="incSummaryCard">
+        <div class="card-title">📊 Incident Summary</div>
+        <div id="incSummary" style="text-align:center;padding:2rem;color:var(--tx3)">Fill in incident details to see summary</div>
+    </div>
+    <div class="card">
+        <div class="card-title">💡 Quick Tips</div>
+        <div style="font-size:.84rem;color:var(--tx2);line-height:1.7">
+            <p style="margin-bottom:.5rem"><strong style="color:var(--tx)">1. Start with facts.</strong> Document the timeline first — what happened, when, and who noticed.</p>
+            <p style="margin-bottom:.5rem"><strong style="color:var(--tx)">2. Use 5 Whys.</strong> Ask "why" repeatedly to drill past symptoms to root cause.</p>
+            <p style="margin-bottom:.5rem"><strong style="color:var(--tx)">3. Fishbone diagram.</strong> Categorize contributing factors across People, Process, Technology, and Environment.</p>
+            <p><strong style="color:var(--tx)">4. Action items.</strong> Every root cause should have at least one corrective action with an owner and due date.</p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- TIMELINE -->
+<div id="timelineTab" class="tp">
+<div class="card">
+    <div class="card-title">⏱️ Incident Timeline</div>
+    <div class="grid2" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Timestamp</label><input type="datetime-local" id="tlTime"></div>
+        <div class="fg" style="margin:0"><label>Event Type</label>
+            <select id="tlType"><option value="detected">🔔 Detected</option><option value="escalated">📢 Escalated</option><option value="investigated">🔍 Investigated</option><option value="identified">💡 Cause Identified</option><option value="mitigated">🛡️ Mitigated</option><option value="fixed">🔧 Fix Applied</option><option value="resolved">✅ Resolved</option><option value="communicated">📣 Communicated</option></select>
+        </div>
+    </div>
+    <div class="fg"><label>Description</label><input type="text" id="tlDesc" placeholder="What happened at this point?"></div>
+    <div class="fg"><label>Person / Team</label><input type="text" id="tlPerson" placeholder="e.g. SRE On-Call, Raj Mehta"></div>
+    <button class="btn btn-blue" onclick="addTL()">+ Add to Timeline</button>
+</div>
+<div class="card">
+    <div class="card-title">📜 Event Timeline</div>
+    <div class="timeline" id="tlList"><div style="padding:1rem;color:var(--tx3);font-size:.85rem;text-align:center">No events yet. Add timeline entries above.</div></div>
+</div>
+</div>
+
+<!-- 5 WHYS -->
+<div id="fiveWhyTab" class="tp">
+<div class="card">
+    <div class="card-title">❓ 5 Whys Analysis</div>
+    <div style="font-size:.84rem;color:var(--tx2);margin-bottom:1rem">Start with the problem statement, then ask "Why?" repeatedly. Each answer becomes the basis for the next question. Stop when you reach the true root cause.</div>
+    <div class="fg"><label>Problem Statement</label><input type="text" id="whyProblem" placeholder="e.g. Claims processing pipeline failed for 4 hours on Feb 15"></div>
+</div>
+<div id="whyChain" class="why-chain"></div>
+<div id="whyInput" class="card">
+    <div class="why-input">
+        <input type="text" id="whyAnswer" placeholder="Answer: Because...">
+        <button class="btn btn-amber" onclick="addWhy()">Add Why →</button>
+    </div>
+    <div style="margin-top:.5rem;display:flex;gap:.5rem">
+        <button class="btn btn-red btn-sm" onclick="markRoot()">🎯 Mark as Root Cause</button>
+        <button class="btn btn-ghost btn-sm" onclick="undoWhy()">↩ Undo Last</button>
+    </div>
+</div>
+</div>
+
+<!-- FISHBONE -->
+<div id="fishboneTab" class="tp">
+<div class="card">
+    <div class="card-title">🐟 Fishbone (Ishikawa) Diagram</div>
+    <div style="font-size:.84rem;color:var(--tx2);margin-bottom:1rem">Add contributing causes under each category. The "head" of the fish is the problem.</div>
+    <div class="grid2" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Category</label>
+            <select id="fbCat"><option value="people">👥 People</option><option value="process">📋 Process</option><option value="technology">💻 Technology</option><option value="environment">🌐 Environment</option><option value="data">📊 Data / Information</option><option value="management">👔 Management</option></select>
+        </div>
+        <div class="fg" style="margin:0"><label>Contributing Cause</label><input type="text" id="fbCause" placeholder="e.g. No automated monitoring for pipeline lag"></div>
+    </div>
+    <button class="btn btn-blue" onclick="addFB()">+ Add Cause</button>
+</div>
+<div class="card">
+    <div class="fishbone-container"><div class="fishbone" id="fishboneDiagram"></div></div>
+</div>
+<div class="card">
+    <div class="card-title">📋 Causes by Category</div>
+    <div id="fbListView"></div>
+</div>
+</div>
+
+<!-- CONTRIBUTING FACTORS -->
+<div id="factorsTab" class="tp">
+<div class="card">
+    <div class="card-title">⚡ Contributing Factors</div>
+    <div class="grid2" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Factor</label><input type="text" id="cfFactor" placeholder="e.g. Missing retry logic in ETL pipeline"></div>
+        <div class="fg" style="margin:0"><label>Category</label>
+            <select id="cfCat"><option value="technical">Technical</option><option value="process">Process</option><option value="human">Human</option><option value="external">External</option><option value="organizational">Organizational</option></select>
+        </div>
+    </div>
+    <div class="grid2" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Impact Level</label>
+            <select id="cfImpact"><option value="critical">Critical — Primary cause</option><option value="high">High — Major contributor</option><option value="medium">Medium — Contributing factor</option><option value="low">Low — Minor factor</option></select>
+        </div>
+        <div class="fg" style="margin:0"><label>Description</label><input type="text" id="cfDesc" placeholder="Why did this contribute to the incident?"></div>
+    </div>
+    <button class="btn btn-blue" onclick="addCF()">+ Add Factor</button>
+</div>
+<div id="cfList"></div>
+</div>
+
+<!-- ACTION ITEMS -->
+<div id="actionsTab" class="tp">
+<div class="card">
+    <div class="card-title">✅ Corrective Action Items</div>
+    <div class="grid2" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Action Title</label><input type="text" id="aiTitle" placeholder="e.g. Add circuit breaker to claims pipeline"></div>
+        <div class="fg" style="margin:0"><label>Type</label>
+            <select id="aiType"><option value="corrective">🔧 Corrective — Fix the cause</option><option value="preventive">🛡️ Preventive — Prevent recurrence</option><option value="detective">🔍 Detective — Improve detection</option><option value="process">📋 Process — Update procedures</option></select>
+        </div>
+    </div>
+    <div class="grid3" style="margin-bottom:.75rem">
+        <div class="fg" style="margin:0"><label>Owner</label><input type="text" id="aiOwner" placeholder="e.g. Raj Mehta"></div>
+        <div class="fg" style="margin:0"><label>Due Date</label><input type="date" id="aiDue"></div>
+        <div class="fg" style="margin:0"><label>Priority</label>
+            <select id="aiPri"><option value="critical">P0 — Immediate</option><option value="high">P1 — This sprint</option><option value="medium" selected>P2 — Next sprint</option><option value="low">P3 — Backlog</option></select>
+        </div>
+    </div>
+    <div class="fg"><label>Description / Acceptance Criteria</label><textarea id="aiDesc" placeholder="What specifically needs to be done? How do we verify it's complete?"></textarea></div>
+    <button class="btn btn-green" onclick="addAI()">+ Add Action Item</button>
+</div>
+<div id="aiList"></div>
+<div class="card" id="aiStats" style="display:none">
+    <div class="card-title">📊 Action Item Summary</div>
+    <div class="grid4" id="aiStatsGrid"></div>
+</div>
+</div>
+
+<!-- EXPORT -->
+<div id="exportTab" class="tp">
+<div class="card">
+    <div class="card-title">📤 Export RCA Report</div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem">
+        <button class="btn btn-blue" onclick="genExport()">📄 Generate Report</button>
+        <button class="btn btn-green" onclick="copyExport()">📋 Copy to Clipboard</button>
+        <button class="btn btn-purple" onclick="downloadExport()">⬇ Download as .txt</button>
+    </div>
+    <div class="export-pre" id="exportContent">Click "Generate Report" to create the full RCA document.</div>
+</div>
+</div>
+</div>
+
+<script>
+let data={incident:{},timeline:[],whys:[],whyProblem:'',whyRootCause:'',fishbone:{people:[],process:[],technology:[],environment:[],data:[],management:[]},factors:[],actions:[]};
+
+function st(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tp').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById(t+'Tab').classList.add('active');if(t==='fishbone')renderFB();if(t==='export')genExport()}
+function v(id){return document.getElementById(id).value}
+function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
+function toast(m,t){const d=document.createElement('div');d.className='toast toast-'+t;d.textContent=m;document.body.appendChild(d);setTimeout(()=>{if(document.body.contains(d))document.body.removeChild(d)},3000)}
+
+// === IMPORT FROM EXTERNAL SOURCES ===
+function toggleImport(src,el){
+    const forms=document.querySelectorAll('.import-form');forms.forEach(f=>f.classList.remove('active'));
+    const srcs=document.querySelectorAll('.import-src');srcs.forEach(s=>s.classList.remove('active'));
+    const map={jira:'importJira',snow:'importSnow',pager:'importPager',datadog:'importDatadog',splunk:'importSplunk',opsgenie:'importOpsgenie'};
+    const form=document.getElementById(map[src]);
+    if(form){form.classList.add('active');el.classList.add('active')}
+}
+function fillIncident(d){
+    if(d.id){document.getElementById('incId').value=d.id}
+    if(d.title){document.getElementById('incTitle').value=d.title}
+    if(d.sev){document.getElementById('incSev').value=d.sev}
+    if(d.start){document.getElementById('incStart').value=d.start}
+    if(d.end){document.getElementById('incEnd').value=d.end}
+    if(d.systems){document.getElementById('incSystems').value=d.systems}
+    if(d.impact){document.getElementById('incImpact').value=d.impact}
+    if(d.detect){document.getElementById('incDetect').value=d.detect}
+    if(d.commander){document.getElementById('incCommander').value=d.commander}
+    updateSummary();
+    document.getElementById('importStatus').innerHTML='<div class="import-connected">✅ Imported successfully from '+d.source+' — fields populated below</div>';
+    setTimeout(()=>{const s=document.getElementById('importStatus');if(s)s.innerHTML=''},5000);
+}
+function importJira(){
+    const key=v('jiraKey')||'OPS-1042';
+    toast('Importing from Jira: '+key+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:'JIRA-'+key,title:'['+key+'] Production claims pipeline — DB connection pool exhaustion',sev:'critical',start:'2026-02-15T06:30',end:'2026-02-15T10:45',systems:'Claims Engine, EDI Gateway, Provider Portal',impact:'All claims processing halted. ~12,000 claims queued. Provider portal 500 errors. Imported from Jira ticket '+key+'.',detect:'monitoring',commander:'Sarah Chen (Jira Assignee)',source:'Jira ('+key+')'});
+        toast('Jira ticket '+key+' imported','s');
+    },800);
+}
+function importSnow(){
+    const inc=v('snowInc')||'INC0012345';
+    toast('Importing from ServiceNow: '+inc+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:inc,title:'Batch processing failure — Informatica ETL job timeout on claims_master table',sev:'high',start:'2026-02-14T22:15',end:'2026-02-15T03:30',systems:'Informatica PowerCenter, Claims DW, Reporting DB',impact:'Nightly batch processing failed. Morning reports delayed by 5 hours. No claims data available for downstream analytics. Imported from ServiceNow '+inc+'.',detect:'monitoring',commander:'Raj Mehta (Assignment Group Lead)',source:'ServiceNow ('+inc+')'});
+        toast('ServiceNow '+inc+' imported','s');
+    },800);
+}
+function importPD(){
+    const pid=v('pdId')||'P1X9K2M';
+    toast('Importing from PagerDuty: '+pid+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:'PD-'+pid,title:'[PagerDuty] CRITICAL: Claims Engine error rate exceeded 50% threshold',sev:'critical',start:'2026-02-15T06:28',systems:'Claims Engine (prod-claims-01, prod-claims-02)',impact:'PagerDuty alert triggered on Claims Engine service. Error rate 53% over 5-min window. Escalation policy: SRE On-Call → Engineering Lead. Imported from PagerDuty incident '+pid+'.',detect:'monitoring',commander:'SRE On-Call (PagerDuty Escalation)',source:'PagerDuty ('+pid+')'});
+        toast('PagerDuty alert '+pid+' imported','s');
+    },800);
+}
+function importDD(){
+    const mid=v('ddId')||'38291047';
+    toast('Importing from Datadog: Monitor '+mid+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:'DD-MON-'+mid,title:'[Datadog] Monitor Alert: PostgreSQL connection pool utilization > 95%',sev:'high',start:'2026-02-15T06:25',systems:'prod-db-primary (PostgreSQL 15.3), Claims Engine, Batch Processor',impact:'Datadog monitor triggered: DB connection pool at 98% utilization. Tags: env:production, service:claims-engine, team:data-ops. Affected hosts: prod-db-primary, prod-db-replica-01. Imported from Datadog monitor '+mid+'.',detect:'monitoring',source:'Datadog (Monitor #'+mid+')'});
+        toast('Datadog monitor '+mid+' imported','s');
+    },800);
+}
+function importSplunk(){
+    const sid=v('spId')||'alert-claims-error-spike';
+    toast('Importing from Splunk: '+sid+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:'SPL-'+sid.replace(/[^a-zA-Z0-9]/g,'-').toUpperCase(),title:'[Splunk] Alert: Claims processing error count exceeded 500 in 10-min window',sev:'high',start:'2026-02-15T06:32',systems:'Claims Engine, EDI Gateway, Application Logs',impact:'Splunk saved search "'+sid+'" triggered. Result count: 847 errors in 10-minute window. Top error: "java.sql.SQLException: Cannot get a connection, pool error". Source: claims-engine-prod index. Imported from Splunk alert.',detect:'monitoring',source:'Splunk ('+sid+')'});
+        toast('Splunk alert imported','s');
+    },800);
+}
+function importOG(){
+    const oid=v('ogId')||'a1b2c3d4-e5f6';
+    toast('Importing from Opsgenie: '+oid+'...','i');
+    setTimeout(()=>{
+        fillIncident({id:'OG-'+oid.substring(0,8).toUpperCase(),title:'[Opsgenie] P1: Claims pipeline health check failing across all nodes',sev:'critical',start:'2026-02-15T06:29',systems:'Claims Engine Cluster (3 nodes), Load Balancer, Health Check Endpoint',impact:'Opsgenie alert: Priority P1. Tags: production, claims, critical. Health check endpoint /health returning 503 on all 3 Claims Engine nodes. Acknowledged by SRE on-call. Imported from Opsgenie alert '+oid+'.',detect:'monitoring',commander:'SRE On-Call (Opsgenie Responder)',source:'Opsgenie ('+oid+')'});
+        toast('Opsgenie alert imported','s');
+    },800);
+}
+
+// === INCIDENT ===
+document.querySelectorAll('#incidentTab input, #incidentTab select, #incidentTab textarea').forEach(el=>{el.addEventListener('input',updateSummary)});
+function updateSummary(){
+    const id=v('incId'),title=v('incTitle'),sev=v('incSev'),start=v('incStart'),end=v('incEnd'),systems=v('incSystems'),impact=v('incImpact'),detect=v('incDetect'),cmd=v('incCommander');
+    data.incident={id,title,sev,start,end,systems,impact,detect,commander:cmd};
+    if(!title){document.getElementById('incSummary').innerHTML='<div style="padding:2rem;color:var(--tx3);text-align:center">Fill in incident details to see summary</div>';return}
+    const sevMap={critical:'SEV-1',high:'SEV-2',medium:'SEV-3',low:'SEV-4'};
+    const sevCls={critical:'b-crit',high:'b-high',medium:'b-med',low:'b-low'};
+    let dur='—';
+    if(start&&end){const ms=new Date(end)-new Date(start);const hrs=Math.floor(ms/3600000);const mins=Math.floor((ms%3600000)/60000);dur=hrs>0?hrs+'h '+mins+'m':mins+'m'}
+    document.getElementById('incSummary').innerHTML=`
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;flex-wrap:wrap">
+            <span class="mono" style="font-weight:700;color:var(--blue)">${esc(id)||'—'}</span>
+            <span class="badge ${sevCls[sev]}">${sevMap[sev]}</span>
+            <span class="badge b-info">${esc(detect)}</span>
+        </div>
+        <div style="font-size:1.05rem;font-weight:700;margin-bottom:.75rem">${esc(title)}</div>
+        <div class="grid2" style="gap:.5rem;margin-bottom:.75rem">
+            <div style="background:var(--bg);border-radius:6px;padding:.5rem;text-align:center"><div style="font-size:.65rem;color:var(--tx3);text-transform:uppercase;font-weight:600">Duration</div><div style="font-size:1.1rem;font-weight:700;color:${sev==='critical'?'var(--red)':'var(--amber)'}">${dur}</div></div>
+            <div style="background:var(--bg);border-radius:6px;padding:.5rem;text-align:center"><div style="font-size:.65rem;color:var(--tx3);text-transform:uppercase;font-weight:600">Commander</div><div style="font-size:.9rem;font-weight:600">${esc(cmd)||'—'}</div></div>
+        </div>
+        ${systems?`<div style="font-size:.8rem;color:var(--tx2);margin-bottom:.4rem"><strong style="color:var(--tx)">Systems:</strong> ${esc(systems)}</div>`:''}
+        ${impact?`<div style="font-size:.8rem;color:var(--tx2)"><strong style="color:var(--tx)">Impact:</strong> ${esc(impact)}</div>`:''}`;
+}
+
+// === TIMELINE ===
+function addTL(){
+    const time=v('tlTime'),type=v('tlType'),desc=v('tlDesc'),person=v('tlPerson');
+    if(!desc){toast('Enter event description','e');return}
+    data.timeline.push({time,type,desc,person});
+    data.timeline.sort((a,b)=>new Date(a.time)-new Date(b.time));
+    renderTL();
+    document.getElementById('tlDesc').value='';document.getElementById('tlPerson').value='';
+    toast('Timeline event added','s');
+}
+function removeTL(i){data.timeline.splice(i,1);renderTL()}
+function renderTL(){
+    const el=document.getElementById('tlList');
+    if(!data.timeline.length){el.innerHTML='<div style="padding:1rem;color:var(--tx3);font-size:.85rem;text-align:center">No events yet.</div>';return}
+    const icons={detected:'🔔',escalated:'📢',investigated:'🔍',identified:'💡',mitigated:'🛡️',fixed:'🔧',resolved:'✅',communicated:'📣'};
+    const sevCls={detected:'sev-high',escalated:'sev-crit',investigated:'sev-med',identified:'sev-med',mitigated:'sev-low',fixed:'sev-low',resolved:'resolved',communicated:'sev-low'};
+    el.innerHTML=data.timeline.map((t,i)=>`<div class="tl-item ${sevCls[t.type]||''}">
+        <div class="tl-time">${t.time?new Date(t.time).toLocaleString():''}</div>
+        <div class="tl-text">${icons[t.type]||''} ${esc(t.desc)}</div>
+        <div class="tl-meta">${esc(t.person)} · <span style="cursor:pointer;color:var(--red)" onclick="removeTL(${i})">remove</span></div>
+    </div>`).join('');
+}
+
+// === 5 WHYS ===
+function addWhy(){
+    const a=v('whyAnswer').trim();if(!a){toast('Enter an answer','e');return}
+    data.whys.push(a);
+    document.getElementById('whyAnswer').value='';
+    renderWhys();
+    if(data.whys.length>=5)toast('5 Whys complete — consider marking root cause','i');
+}
+function undoWhy(){if(data.whys.length){data.whys.pop();data.whyRootCause='';renderWhys()}}
+function markRoot(){
+    if(!data.whys.length){toast('Add at least one Why first','e');return}
+    data.whyRootCause=data.whys[data.whys.length-1];
+    toast('Root cause identified!','s');renderWhys();
+}
+function renderWhys(){
+    const el=document.getElementById('whyChain');
+    const prob=v('whyProblem');data.whyProblem=prob;
+    if(!data.whys.length){el.innerHTML='';return}
+    el.innerHTML=data.whys.map((w,i)=>{
+        const prevQ=i===0?(prob||'the problem'):data.whys[i-1];
+        const isRoot=data.whyRootCause&&i===data.whys.length-1&&w===data.whyRootCause;
+        return`<div class="arrow-down">↓</div><div class="why-step"><div class="ws-q">Why did ${i===0?'this happen':'this occur'}?</div><div class="ws-a">${esc(w)}</div>${isRoot?'<div class="ws-root">🎯 ROOT CAUSE IDENTIFIED</div>':''}</div>`;
+    }).join('');
+}
+
+// === FISHBONE ===
+function addFB(){
+    const cat=v('fbCat'),cause=v('fbCause').trim();
+    if(!cause){toast('Enter a cause','e');return}
+    data.fishbone[cat].push(cause);
+    document.getElementById('fbCause').value='';
+    renderFB();toast('Cause added to '+cat,'s');
+}
+function removeFBCause(cat,i){data.fishbone[cat].splice(i,1);renderFB()}
+function renderFB(){
+    const cats=[
+        {key:'people',label:'People',color:'var(--blue)',icon:'👥'},
+        {key:'process',label:'Process',color:'var(--amber)',icon:'📋'},
+        {key:'technology',label:'Technology',color:'var(--purple)',icon:'💻'},
+        {key:'environment',label:'Environment',color:'var(--green)',icon:'🌐'},
+        {key:'data',label:'Data',color:'var(--cyan)',icon:'📊'},
+        {key:'management',label:'Management',color:'var(--pink)',icon:'👔'}
+    ];
+    const fb=document.getElementById('fishboneDiagram');
+    const problem=data.incident.title||'Problem';
+    let html=`<div class="fb-spine"></div><div class="fb-head">${esc(problem).substring(0,40)}</div>`;
+    const topCats=cats.filter((_,i)=>i%2===0);
+    const btmCats=cats.filter((_,i)=>i%2===1);
+    const spineLeft=60,spineRight=820,spineW=spineRight-spineLeft;
+
+    topCats.forEach((c,i)=>{
+        const x=spineLeft+((i+1)/(topCats.length+1))*spineW;
+        html+=`<div class="fb-bone-line" style="left:${x}px;top:60px;height:150px;background:${c.color}"></div>`;
+        html+=`<div class="fb-bone-label" style="left:${x-40}px;top:35px;background:${c.color}22;color:${c.color};border:1px solid ${c.color}44">${c.icon} ${c.label}</div>`;
+        data.fishbone[c.key].forEach((cause,j)=>{
+            const cy=75+j*28;
+            html+=`<div class="fb-cause" style="left:${x+8}px;top:${cy}px;border-color:${c.color}44" title="${esc(cause)}">${esc(cause)}</div>`;
+        });
+    });
+    btmCats.forEach((c,i)=>{
+        const x=spineLeft+((i+1)/(btmCats.length+1))*spineW;
+        html+=`<div class="fb-bone-line" style="left:${x}px;top:210px;height:150px;background:${c.color}"></div>`;
+        html+=`<div class="fb-bone-label" style="left:${x-40}px;top:365px;background:${c.color}22;color:${c.color};border:1px solid ${c.color}44">${c.icon} ${c.label}</div>`;
+        data.fishbone[c.key].forEach((cause,j)=>{
+            const cy=225+j*28;
+            html+=`<div class="fb-cause" style="left:${x+8}px;top:${cy}px;border-color:${c.color}44" title="${esc(cause)}">${esc(cause)}</div>`;
+        });
+    });
+    fb.innerHTML=html;
+
+    // List view
+    const lv=document.getElementById('fbListView');
+    const hasCauses=cats.some(c=>data.fishbone[c.key].length>0);
+    if(!hasCauses){lv.innerHTML='<div style="padding:1rem;color:var(--tx3);font-size:.85rem;text-align:center">No causes added yet.</div>';return}
+    lv.innerHTML=cats.filter(c=>data.fishbone[c.key].length>0).map(c=>`<div style="margin-bottom:.75rem"><div style="font-size:.78rem;font-weight:700;color:${c.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">${c.icon} ${c.label} (${data.fishbone[c.key].length})</div>${data.fishbone[c.key].map((cause,j)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.3rem .5rem;background:var(--bg);border-radius:5px;margin-bottom:.25rem;font-size:.84rem"><span>${esc(cause)}</span><span style="cursor:pointer;color:var(--red);font-size:.75rem" onclick="removeFBCause('${c.key}',${j})">✗</span></div>`).join('')}</div>`).join('');
+}
+
+// === CONTRIBUTING FACTORS ===
+function addCF(){
+    const factor=v('cfFactor').trim(),cat=v('cfCat'),impact=v('cfImpact'),desc=v('cfDesc');
+    if(!factor){toast('Enter a factor','e');return}
+    data.factors.push({factor,cat,impact,desc});
+    document.getElementById('cfFactor').value='';document.getElementById('cfDesc').value='';
+    renderCF();toast('Contributing factor added','s');
+}
+function removeCF(i){data.factors.splice(i,1);renderCF()}
+function renderCF(){
+    const el=document.getElementById('cfList');
+    if(!data.factors.length){el.innerHTML='';return}
+    const impColors={critical:'var(--red)',high:'var(--orange)',medium:'var(--amber)',low:'var(--green)'};
+    el.innerHTML=data.factors.map((f,i)=>`<div class="ai-card"><div class="ai-priority" style="background:${impColors[f.impact]}"></div><div class="ai-body"><div class="ai-title">${esc(f.factor)}</div><div class="ai-meta"><span class="badge b-${f.impact==='critical'?'crit':f.impact}">${f.impact}</span><span class="badge b-info">${f.cat}</span>${f.desc?`<span>${esc(f.desc)}</span>`:''}</div></div><div class="ai-actions"><button class="btn btn-ghost btn-sm" onclick="removeCF(${i})">✗</button></div></div>`).join('');
+}
+
+// === ACTION ITEMS ===
+function addAI(){
+    const title=v('aiTitle').trim(),type=v('aiType'),owner=v('aiOwner'),due=v('aiDue'),pri=v('aiPri'),desc=v('aiDesc');
+    if(!title){toast('Enter action title','e');return}
+    data.actions.push({title,type,owner,due,pri,desc,status:'open'});
+    document.getElementById('aiTitle').value='';document.getElementById('aiDesc').value='';document.getElementById('aiOwner').value='';
+    renderAI();toast('Action item added','s');
+}
+function removeAI(i){data.actions.splice(i,1);renderAI()}
+function cycleAIStatus(i){
+    const s=data.actions[i].status;
+    data.actions[i].status=s==='open'?'progress':s==='progress'?'done':'open';
+    renderAI();
+}
+function renderAI(){
+    const el=document.getElementById('aiList');
+    if(!data.actions.length){el.innerHTML='';document.getElementById('aiStats').style.display='none';return}
+    const priColors={critical:'var(--red)',high:'var(--orange)',medium:'var(--amber)',low:'var(--green)'};
+    const typeIcons={corrective:'🔧',preventive:'🛡️',detective:'🔍',process:'📋'};
+    el.innerHTML=data.actions.map((a,i)=>`<div class="ai-card" style="${a.status==='done'?'opacity:.6':''}"><div class="ai-priority" style="background:${priColors[a.pri]}"></div><div class="ai-body"><div class="ai-title" style="${a.status==='done'?'text-decoration:line-through':''}">${typeIcons[a.type]||''} ${esc(a.title)}</div><div class="ai-meta"><span class="badge b-${a.status}">${a.status}</span><span class="badge b-${a.pri==='critical'?'crit':a.pri}">${a.pri}</span>${a.owner?`<span>👤 ${esc(a.owner)}</span>`:''}${a.due?`<span>📅 ${a.due}</span>`:''}</div>${a.desc?`<div style="font-size:.8rem;color:var(--tx2);margin-top:.25rem">${esc(a.desc)}</div>`:''}</div><div class="ai-actions"><button class="btn btn-ghost btn-sm" onclick="cycleAIStatus(${i})" title="Cycle status">${a.status==='open'?'▶':a.status==='progress'?'✓':'↻'}</button><button class="btn btn-ghost btn-sm" onclick="removeAI(${i})">✗</button></div></div>`).join('');
+
+    document.getElementById('aiStats').style.display='';
+    const open=data.actions.filter(a=>a.status==='open').length;
+    const prog=data.actions.filter(a=>a.status==='progress').length;
+    const done=data.actions.filter(a=>a.status==='done').length;
+    document.getElementById('aiStatsGrid').innerHTML=`
+        <div class="card stat-card"><div class="stat-val" style="color:var(--blue)">${data.actions.length}</div><div class="stat-label">Total</div></div>
+        <div class="card stat-card"><div class="stat-val" style="color:var(--red)">${open}</div><div class="stat-label">Open</div></div>
+        <div class="card stat-card"><div class="stat-val" style="color:var(--amber)">${prog}</div><div class="stat-label">In Progress</div></div>
+        <div class="card stat-card"><div class="stat-val" style="color:var(--green)">${done}</div><div class="stat-label">Complete</div></div>`;
+}
+
+// === EXPORT ===
+function genExport(){
+    const i=data.incident;
+    let r=`═══════════════════════════════════════════════════\n`;
+    r+=`ROOT CAUSE ANALYSIS (RCA) REPORT\n`;
+    r+=`═══════════════════════════════════════════════════\n\n`;
+    r+=`Incident ID:    ${i.id||'—'}\nTitle:          ${i.title||'—'}\nSeverity:       ${({critical:'SEV-1 Critical',high:'SEV-2 High',medium:'SEV-3 Medium',low:'SEV-4 Low'})[i.sev]||'—'}\n`;
+    r+=`Start:          ${i.start?new Date(i.start).toLocaleString():'—'}\nResolved:       ${i.end?new Date(i.end).toLocaleString():'—'}\n`;
+    if(i.start&&i.end){const ms=new Date(i.end)-new Date(i.start);r+=`Duration:       ${Math.floor(ms/3600000)}h ${Math.floor((ms%3600000)/60000)}m\n`}
+    r+=`Systems:        ${i.systems||'—'}\nDetection:      ${i.detect||'—'}\nCommander:      ${i.commander||'—'}\n\n`;
+    if(i.impact)r+=`IMPACT SUMMARY\n${'-'.repeat(40)}\n${i.impact}\n\n`;
+
+    if(data.timeline.length){
+        r+=`TIMELINE\n${'-'.repeat(40)}\n`;
+        data.timeline.forEach(t=>{r+=`[${t.time?new Date(t.time).toLocaleString():''}] ${t.desc}${t.person?' ('+t.person+')':''}\n`});
+        r+='\n';
+    }
+    if(data.whys.length){
+        r+=`5 WHYS ANALYSIS\n${'-'.repeat(40)}\n`;
+        r+=`Problem: ${data.whyProblem||data.incident.title||'—'}\n\n`;
+        data.whys.forEach((w,j)=>{r+=`Why #${j+1}: ${w}\n`});
+        if(data.whyRootCause)r+=`\n🎯 ROOT CAUSE: ${data.whyRootCause}\n`;
+        r+='\n';
+    }
+    const fbCats=['people','process','technology','environment','data','management'];
+    const hasFB=fbCats.some(c=>data.fishbone[c].length);
+    if(hasFB){
+        r+=`FISHBONE / CONTRIBUTING CAUSES\n${'-'.repeat(40)}\n`;
+        fbCats.forEach(c=>{if(data.fishbone[c].length){r+=`${c.toUpperCase()}:\n`;data.fishbone[c].forEach(x=>{r+=`  • ${x}\n`});r+='\n'}});
+    }
+    if(data.factors.length){
+        r+=`CONTRIBUTING FACTORS\n${'-'.repeat(40)}\n`;
+        data.factors.forEach((f,j)=>{r+=`${j+1}. [${f.impact.toUpperCase()}] ${f.factor} (${f.cat})${f.desc?' — '+f.desc:''}\n`});
+        r+='\n';
+    }
+    if(data.actions.length){
+        r+=`ACTION ITEMS\n${'-'.repeat(40)}\n`;
+        data.actions.forEach((a,j)=>{r+=`${j+1}. [${a.pri.toUpperCase()}] ${a.title}\n   Type: ${a.type} | Owner: ${a.owner||'—'} | Due: ${a.due||'—'} | Status: ${a.status}\n${a.desc?'   '+a.desc+'\n':''}\n`});
+    }
+    r+=`\n${'═'.repeat(50)}\nGenerated by RCA Builder · ${new Date().toLocaleString()}\n`;
+    document.getElementById('exportContent').textContent=r;
+    return r;
+}
+function copyExport(){const r=genExport();navigator.clipboard.writeText(r).then(()=>toast('Report copied to clipboard','s'))}
+function downloadExport(){
+    const r=genExport();
+    const blob=new Blob([r],{type:'text/plain'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`RCA-${data.incident.id||'report'}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();toast('Report downloaded','s');
+}
+
+// === SAMPLE ===
+function loadSample(){
+    data.incident={id:'INC-2026-0142',title:'Claims processing pipeline failure — 4hr production outage',sev:'critical',start:'2026-02-15T06:30',end:'2026-02-15T10:45',systems:'Claims Engine, EDI Gateway, Provider Portal, Batch Processor',impact:'All claims processing halted for 4+ hours. ~12,000 claims queued but unprocessed. Provider portal returned 500 errors. Downstream ERA/835 files delayed by 6 hours. Estimated revenue impact: $180K in delayed reimbursements.',detect:'monitoring',commander:'Sarah Chen'};
+    document.getElementById('incId').value=data.incident.id;
+    document.getElementById('incTitle').value=data.incident.title;
+    document.getElementById('incSev').value=data.incident.sev;
+    document.getElementById('incStart').value=data.incident.start;
+    document.getElementById('incEnd').value=data.incident.end;
+    document.getElementById('incSystems').value=data.incident.systems;
+    document.getElementById('incImpact').value=data.incident.impact;
+    document.getElementById('incDetect').value=data.incident.detect;
+    document.getElementById('incCommander').value=data.incident.commander;
+    updateSummary();
+
+    data.timeline=[
+        {time:'2026-02-15T06:30',type:'detected',desc:'PagerDuty alert: Claims Engine error rate >50% for 5 minutes',person:'Monitoring'},
+        {time:'2026-02-15T06:35',type:'escalated',desc:'SRE on-call paged. SEV-1 declared.',person:'Raj Mehta'},
+        {time:'2026-02-15T06:45',type:'investigated',desc:'Claims Engine logs show DB connection pool exhausted. All 50 connections in use.',person:'Raj Mehta'},
+        {time:'2026-02-15T07:00',type:'investigated',desc:'Traced to Informatica ETL job started at 06:15 running a full table scan on claims_master (450M rows)',person:'Dev On-Call'},
+        {time:'2026-02-15T07:15',type:'identified',desc:'Root cause: Nightly ETL job config changed from incremental to full refresh. No change ticket filed.',person:'Sarah Chen'},
+        {time:'2026-02-15T07:30',type:'communicated',desc:'Stakeholder email sent: SEV-1 active, claims processing paused, ETA 2 hours',person:'Sarah Chen'},
+        {time:'2026-02-15T08:00',type:'mitigated',desc:'Killed runaway ETL job. Connection pool recovering. Claims queue draining.',person:'Raj Mehta'},
+        {time:'2026-02-15T09:30',type:'fixed',desc:'ETL config reverted to incremental. Added connection pool limits for batch jobs.',person:'Dev On-Call'},
+        {time:'2026-02-15T10:45',type:'resolved',desc:'All queued claims processed. Provider portal healthy. ERA/835 generation resumed.',person:'Sarah Chen'}
+    ];
+    renderTL();
+
+    data.whyProblem='Claims processing pipeline failed for 4 hours on Feb 15';
+    document.getElementById('whyProblem').value=data.whyProblem;
+    data.whys=['The Claims Engine ran out of database connections','An Informatica ETL job was holding all 50 connections with a full table scan on 450M rows','The ETL job config was changed from incremental to full refresh without testing','The config change was made directly in production with no change ticket or CAB review','There is no enforced change management process for ETL configuration changes'];
+    data.whyRootCause=data.whys[4];
+    renderWhys();
+
+    data.fishbone={
+        people:['ETL developer changed config without notifying Ops','On-call had no runbook for connection pool exhaustion','No peer review required for ETL config changes'],
+        process:['No change ticket required for ETL configs','No CAB review for "minor" configuration changes','Incident communication delayed by 45 minutes'],
+        technology:['No connection pool isolation between OLTP and batch','No circuit breaker on ETL database connections','Monitoring alert threshold too high (50% vs 10%)'],
+        environment:['Production database shared between real-time and batch','No separate read replica for ETL workloads'],
+        data:['ETL switched to full refresh due to stale watermark value','No data quality check on ETL job output volume'],
+        management:['Change management process gaps for "non-code" changes','No training on change management for data engineering team']
+    };
+    renderFB();
+
+    data.factors=[
+        {factor:'No change management for ETL configuration',cat:'process',impact:'critical',desc:'Config changes bypass all review gates'},
+        {factor:'Shared connection pool between OLTP and batch',cat:'technical',impact:'critical',desc:'Batch jobs can starve real-time traffic'},
+        {factor:'Alert threshold set too high (50%)',cat:'technical',impact:'high',desc:'Detection delayed by ~15 minutes'},
+        {factor:'No runbook for connection pool exhaustion',cat:'process',impact:'medium',desc:'MTTR increased by ~30 minutes'},
+        {factor:'Developer made change without peer review',cat:'human',impact:'high',desc:'No second pair of eyes on production config'}
+    ];
+    renderCF();
+
+    data.actions=[
+        {title:'Enforce change tickets for all ETL config changes',type:'preventive',owner:'Sarah Chen',due:'2026-03-01',pri:'critical',desc:'Add CI/CD gate: ETL config deployments require approved CR in ServiceNow before merge.',status:'open'},
+        {title:'Isolate batch DB connections from OLTP pool',type:'corrective',owner:'Raj Mehta',due:'2026-03-15',pri:'critical',desc:'Separate connection pools: max 20 for batch, 30 reserved for real-time claims processing.',status:'progress'},
+        {title:'Lower monitoring alert threshold to 10% error rate',type:'detective',owner:'Raj Mehta',due:'2026-02-28',pri:'high',desc:'Update PagerDuty rules. Add secondary alert at 5% with 10-min window.',status:'done'},
+        {title:'Create runbook for DB connection pool exhaustion',type:'process',owner:'Dev On-Call',due:'2026-03-05',pri:'medium',desc:'Document triage steps, kill queries, and escalation path. Add to Confluence.',status:'open'},
+        {title:'Deploy read replica for ETL workloads',type:'preventive',owner:'Raj Mehta',due:'2026-04-01',pri:'high',desc:'Route all Informatica batch reads to Aurora read replica. Eliminates OLTP contention.',status:'open'}
+    ];
+    renderAI();
+    toast('Sample incident loaded — explore all tabs','s');
+}
+
+function resetAll(){
+    data={incident:{},timeline:[],whys:[],whyProblem:'',whyRootCause:'',fishbone:{people:[],process:[],technology:[],environment:[],data:[],management:[]},factors:[],actions:[]};
+    document.querySelectorAll('#incidentTab input, #incidentTab textarea').forEach(el=>{el.value=''});
+    document.getElementById('whyProblem').value='';
+    updateSummary();renderTL();renderWhys();renderFB();renderCF();renderAI();
+    toast('RCA reset','i');
+}
+
+updateSummary();
+</script>
+<div style="max-width:1400px;margin:3rem auto 0;padding:0 1.5rem 2rem"><div style="background:rgba(245,158,11,.08);border:2px solid rgba(245,158,11,.35);border-radius:12px;padding:1.25rem 1.5rem"><div style="display:flex;align-items:flex-start;gap:.75rem"><span style="font-size:1.4rem;flex-shrink:0">⚠️</span><div><div style="color:#f59e0b;font-weight:700;font-size:.9rem;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Important Disclaimer</div><p style="color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.7;margin-bottom:.3rem"><strong style="color:rgba(255,255,255,.85)">For Demonstration & Educational Purposes Only.</strong> This RCA builder uses sample workflows and templates for training and demonstration. Not a replacement for your organization's incident management process.</p><p style="color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.7"><strong style="color:rgba(255,255,255,.85)">Built with AI Assistance.</strong> This tool was built with AI (Claude by Anthropic). Consult your ITSM/ITIL policies and incident management frameworks for actual RCA documentation.</p></div></div></div></div>
+</body></html>
