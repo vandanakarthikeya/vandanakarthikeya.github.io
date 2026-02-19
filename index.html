@@ -453,6 +453,23 @@
         .poc-badge.premium { background: rgba(196,93,62,0.9); color: white; }
         .poc-badge.coming { background: rgba(122,138,153,0.8); color: white; }
 
+        .group-header { margin-bottom: 1.5rem; margin-top: 2.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .group-header:first-child { margin-top: 0; }
+        .group-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); margin-bottom: 0.4rem; }
+        .group-title { font-size: 1.35rem; font-weight: 700; color: white; margin-bottom: 0.3rem; }
+        .group-subtitle { font-size: 0.85rem; color: rgba(255,255,255,0.45); }
+        .group-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; font-size: 1.3rem; margin-bottom: 0.6rem; }
+        .gi-data { background: rgba(16,185,129,0.12); }
+        .gi-voice { background: rgba(139,92,246,0.12); }
+        .gi-clinical { background: rgba(6,182,212,0.12); }
+        .gi-itsm { background: rgba(245,158,11,0.12); }
+        .gi-scripture { background: rgba(236,72,153,0.12); }
+        .coming-soon-card { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; padding: 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
+        .coming-soon-card .cs-icon { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.5; }
+        .coming-soon-card .cs-title { font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.3rem; }
+        .coming-soon-card .cs-desc { font-size: 0.82rem; color: rgba(255,255,255,0.3); max-width: 280px; line-height: 1.5; }
+        .coming-soon-card .cs-badge { margin-top: 0.75rem; display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: rgba(122,138,153,0.15); color: rgba(255,255,255,0.35); border: 1px solid rgba(122,138,153,0.2); }
+
         .poc-content { padding: 1.5rem; }
         .poc-category {
             font-size: 0.7rem; font-weight: 700;
@@ -1035,29 +1052,32 @@
     </div>
 </section>
 
-<!-- AI LAB / POCs -->
+<!-- AI LAB / POCs — GROUPED -->
 <section class="section" id="pocs" style="background: var(--warm);">
     <div class="container">
         <div class="section-label fade-up">AI Lab</div>
-        <div class="section-title fade-up">Healthcare AI Tools<br>I Built From Scratch</div>
-        <div class="section-subtitle fade-up">Working applications — not wireframes. Click "Open App" to use any tool directly in your browser.</div>
+        <div class="section-title fade-up">Tools I Built From Scratch</div>
+        <div class="section-subtitle fade-up">Working applications — not wireframes. Organized by domain. Click "Open App" to use any tool directly in your browser.</div>
 
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 1: Healthcare Data Apps -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-data">📊</div>
+            <div class="group-num">Group 01</div>
+            <div class="group-title">Healthcare Data Apps</div>
+            <div class="group-subtitle">EDI claims processing, risk adjustment, interoperability, and data transformation tools</div>
+        </div>
         <div class="poc-gallery">
             <div class="poc-grid">
-
-                <!-- POC 1: EDI Validator -->
+                <!-- EDI Validator -->
                 <div class="poc-card fade-up">
                     <div class="poc-preview">
                         <div class="poc-preview-inner">
                             <div class="poc-preview-mockup">
                                 <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
                                 <div class="mockup-lines">
-                                    <div class="mockup-line long accent"></div>
-                                    <div class="mockup-line medium"></div>
-                                    <div class="mockup-line short teal-l"></div>
-                                    <div class="mockup-line long"></div>
-                                    <div class="mockup-line medium accent"></div>
-                                    <div class="mockup-line short"></div>
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
                                 </div>
                             </div>
                         </div>
@@ -1067,31 +1087,18 @@
                         <div class="poc-category">Revenue Cycle</div>
                         <div class="poc-title">837 EDI Claims Validator & Generator</div>
                         <div class="poc-desc">Full-featured EDI 837P/837I test data generator and validator with 5010 spec compliance, real-time parsing, segment-level validation, and exportable claim files.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">EDI 837</span>
-                            <span class="poc-tag">5010 Spec</span>
-                            <span class="poc-tag">Claims Processing</span>
-                            <span class="poc-tag">Validation Engine</span>
-                        </div>
-                        <div class="poc-actions">
-                            <button class="poc-btn poc-btn-get" onclick="openApp('edi')" style="flex:1;">Open App →</button>
-                        </div>
+                        <div class="poc-tags"><span class="poc-tag">EDI 837</span><span class="poc-tag">5010 Spec</span><span class="poc-tag">Claims Processing</span><span class="poc-tag">Validation Engine</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('edi')" style="flex:1;">Open App →</button></div>
                     </div>
                 </div>
-
-                <!-- POC 2: HCC Risk Calculator -->
+                <!-- HCC Risk Calculator -->
                 <div class="poc-card fade-up stagger-1">
                     <div class="poc-preview">
                         <div class="poc-preview-inner">
                             <div class="poc-preview-mockup">
                                 <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
                                 <div class="mockup-lines">
-                                    <div class="mockup-line short teal-l"></div>
-                                    <div class="mockup-line long"></div>
-                                    <div class="mockup-line medium accent"></div>
-                                    <div class="mockup-line long teal-l"></div>
-                                    <div class="mockup-line short"></div>
-                                    <div class="mockup-line medium"></div>
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
                                 </div>
                             </div>
                         </div>
@@ -1101,31 +1108,18 @@
                         <div class="poc-category">Risk Adjustment</div>
                         <div class="poc-title">HCC Risk Score Calculator — CMS V28</div>
                         <div class="poc-desc">Interactive CMS V28 HCC risk score calculator with ICD-10 to HCC mapping, RAF scoring, predicted annual cost estimation, and professional PDF report generation.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">HCC/RAF</span>
-                            <span class="poc-tag">CMS V28</span>
-                            <span class="poc-tag">Medicare Advantage</span>
-                            <span class="poc-tag">Risk Adjustment</span>
-                        </div>
-                        <div class="poc-actions">
-                            <button class="poc-btn poc-btn-get" onclick="openApp('hcc')" style="flex:1;">Open App →</button>
-                        </div>
+                        <div class="poc-tags"><span class="poc-tag">HCC/RAF</span><span class="poc-tag">CMS V28</span><span class="poc-tag">Medicare Advantage</span><span class="poc-tag">Risk Adjustment</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('hcc')" style="flex:1;">Open App →</button></div>
                     </div>
                 </div>
-
-                <!-- POC 3: HL7 FHIR Data Mapper & Validator -->
+                <!-- HL7 FHIR Mapper -->
                 <div class="poc-card fade-up stagger-2">
                     <div class="poc-preview">
                         <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a22, #238f7922);">
                             <div class="poc-preview-mockup">
                                 <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
                                 <div class="mockup-lines">
-                                    <div class="mockup-line long accent"></div>
-                                    <div class="mockup-line medium"></div>
-                                    <div class="mockup-line short teal-l"></div>
-                                    <div class="mockup-line long"></div>
-                                    <div class="mockup-line medium accent"></div>
-                                    <div class="mockup-line short"></div>
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
                                 </div>
                             </div>
                         </div>
@@ -1135,106 +1129,210 @@
                         <div class="poc-category">Interoperability</div>
                         <div class="poc-title">HL7 FHIR Data Mapper & Validator</div>
                         <div class="poc-desc">Maps legacy HL7 v2 messages to FHIR R4 resources. Side-by-side comparison, bundle validation, and JSON export for ADT, ORU, and ORM message types.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">HL7 v2</span>
-                            <span class="poc-tag">FHIR R4</span>
-                            <span class="poc-tag">Interoperability</span>
-                            <span class="poc-tag">JSON Schema</span>
-                        </div>
-                        <div class="poc-actions">
-                            <button class="poc-btn poc-btn-get" onclick="openApp('fhir')" style="flex:1;">Open App →</button>
-                        </div>
+                        <div class="poc-tags"><span class="poc-tag">HL7 v2</span><span class="poc-tag">FHIR R4</span><span class="poc-tag">Interoperability</span><span class="poc-tag">JSON Schema</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('fhir')" style="flex:1;">Open App →</button></div>
                     </div>
                 </div>
-
-                <!-- POC 4: Coming Soon - Prior Auth AI -->
-                <div class="poc-card fade-up stagger-3">
-                    <div class="poc-preview">
-                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #c45d3e11, #e8734f11);">
-                            <div class="poc-preview-mockup">
-                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
-                                <div class="mockup-lines" style="align-items:center;">
-                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q2 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="poc-badge coming">Coming Soon</span>
-                    </div>
-                    <div class="poc-content">
-                        <div class="poc-category">GenAI + Clinical Ops</div>
-                        <div class="poc-title">Prior Authorization AI Assistant</div>
-                        <div class="poc-desc">AI-powered tool analyzing prior auth requests, predicting approval likelihood, flagging denial risks, and generating supporting documentation using LLM intelligence.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">GenAI / LLM</span>
-                            <span class="poc-tag">Prior Auth</span>
-                            <span class="poc-tag">RAG Architecture</span>
-                            <span class="poc-tag">Clinical Ops</span>
-                        </div>
-                        <div class="poc-actions">
-                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- POC 5: Coming Soon - Claims Denial Predictor -->
-                <div class="poc-card fade-up stagger-4">
-                    <div class="poc-preview">
-                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a11, #c45d3e11);">
-                            <div class="poc-preview-mockup">
-                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
-                                <div class="mockup-lines" style="align-items:center;">
-                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q2 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="poc-badge coming">Coming Soon</span>
-                    </div>
-                    <div class="poc-content">
-                        <div class="poc-category">Revenue Cycle AI</div>
-                        <div class="poc-title">Claims Denial Predictor</div>
-                        <div class="poc-desc">ML-powered prediction of claim denials before submission. Identifies risk factors, suggests corrections, and tracks denial patterns across CPT/ICD-10 combinations.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">Machine Learning</span>
-                            <span class="poc-tag">Denial Prevention</span>
-                            <span class="poc-tag">Revenue Cycle</span>
-                        </div>
-                        <div class="poc-actions">
-                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- POC 6: Coming Soon - HEDIS Dashboard -->
-                <div class="poc-card fade-up stagger-4">
-                    <div class="poc-preview">
-                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a15, #238f7915);">
-                            <div class="poc-preview-mockup">
-                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
-                                <div class="mockup-lines" style="align-items:center;">
-                                    <div style="color: rgba(255,255,255,0.3); font-family: 'Outfit'; font-size: 0.9rem; text-align: center;">Coming Q1 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="poc-badge coming">Coming Soon</span>
-                    </div>
-                    <div class="poc-content">
-                        <div class="poc-category">Quality Analytics</div>
-                        <div class="poc-title">HEDIS / Stars Quality Dashboard</div>
-                        <div class="poc-desc">Interactive dashboard calculating HEDIS quality measures, Stars ratings impact, and care gap analysis with member-level drill-down and gap closure workflows.</div>
-                        <div class="poc-tags">
-                            <span class="poc-tag">HEDIS</span>
-                            <span class="poc-tag">Star Ratings</span>
-                            <span class="poc-tag">Quality Measures</span>
-                            <span class="poc-tag">D3.js</span>
-                        </div>
-                        <div class="poc-actions">
-                            <a class="poc-btn poc-btn-locked" href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website%20-%20Notify%20Me%20for%20Upcoming%20POC&body=Hi%20Vandana%2C%0A%0APlease%20notify%20me%20when%20this%20POC%20is%20available.%0A%0AName%3A%20%0ACompany%3A%20%0A%0AThank%20you!" style="text-align:center;text-decoration:none;">Notify Me When Ready →</a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 2: Healthcare Voice, Translators & IVR -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-voice">🎙️</div>
+            <div class="group-num">Group 02</div>
+            <div class="group-title">Healthcare Voice, Translators & IVR</div>
+            <div class="group-subtitle">Patient communication, multi-language translation, and interactive voice response tools</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <!-- IVR Call Flow Designer -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #8b5cf622, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">IVR & Outreach</div>
+                        <div class="poc-title">IVR Call Flow Designer & Simulator</div>
+                        <div class="poc-desc">Visual IVR tree builder with DTMF tones, TTS preview, call simulation, and healthcare outreach templates for scheduling, benefits, Rx refills, and care gap outreach.</div>
+                        <div class="poc-tags"><span class="poc-tag">IVR Design</span><span class="poc-tag">Call Simulator</span><span class="poc-tag">DTMF / TTS</span><span class="poc-tag">Outreach</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('ivr')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Multi-Language Healthcare Translator -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #10b98122, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Translation & Language</div>
+                        <div class="poc-title">Multi-Language Healthcare Translator</div>
+                        <div class="poc-desc">Medical phrase translator across 8 languages with patient intake, discharge instructions, medication directions, consent forms, and printable bilingual handouts.</div>
+                        <div class="poc-tags"><span class="poc-tag">8 Languages</span><span class="poc-tag">Medical Phrases</span><span class="poc-tag">Patient Handouts</span><span class="poc-tag">TTS Audio</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('translator')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 3: Healthcare Clinical -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-clinical">🏥</div>
+            <div class="group-num">Group 03</div>
+            <div class="group-title">Healthcare Clinical</div>
+            <div class="group-subtitle">Clinical decision support, prior authorization, care gap analysis, and quality measurement tools</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <div class="coming-soon-card fade-up">
+                    <div class="cs-icon">🩺</div>
+                    <div class="cs-title">Prior Authorization AI Assistant</div>
+                    <div class="cs-desc">AI-powered prior auth analysis, approval prediction, denial risk flagging, and automated supporting documentation generation.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+                <div class="coming-soon-card fade-up stagger-1">
+                    <div class="cs-icon">📋</div>
+                    <div class="cs-title">HEDIS / Stars Quality Dashboard</div>
+                    <div class="cs-desc">Interactive HEDIS quality measures, Stars ratings impact simulation, and care gap analysis with member-level drill-down.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+                <div class="coming-soon-card fade-up stagger-2">
+                    <div class="cs-icon">🔮</div>
+                    <div class="cs-title">Claims Denial Predictor</div>
+                    <div class="cs-desc">ML-powered prediction of claim denials before submission. Identifies risk factors and suggests corrections across CPT/ICD-10 combinations.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 4: Tech — ITSM, Incident, RCA -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-itsm">⚙️</div>
+            <div class="group-num">Group 04</div>
+            <div class="group-title">Tech — ITSM, Incident & RCA</div>
+            <div class="group-subtitle">IT service management, incident response, root cause analysis, and operational tooling</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <div class="coming-soon-card fade-up">
+                    <div class="cs-icon">🚨</div>
+                    <div class="cs-title">Incident Response Workflow Engine</div>
+                    <div class="cs-desc">Automated incident triage, severity classification, escalation routing, and real-time status dashboards for production support teams.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+                <div class="coming-soon-card fade-up stagger-1">
+                    <div class="cs-icon">🔍</div>
+                    <div class="cs-title">Root Cause Analysis (RCA) Builder</div>
+                    <div class="cs-desc">Interactive 5-Why and fishbone diagram tool with timeline reconstruction, contributing factor mapping, and action item tracking.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+                <div class="coming-soon-card fade-up stagger-2">
+                    <div class="cs-icon">📊</div>
+                    <div class="cs-title">Change Advisory Board (CAB) Simulator</div>
+                    <div class="cs-desc">Change request risk scoring, impact analysis, approval workflow simulation, and deployment calendar coordination for Ops/Eng teams.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 5: Generic — Scripture Translators & Tutors -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-scripture">🕉️</div>
+            <div class="group-num">Group 05</div>
+            <div class="group-title">Scripture Translators & Tutors</div>
+            <div class="group-subtitle">Sanskrit learning tools, Vedic chanting practice, and classical text study applications</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <!-- Rudram Learning App -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #6d28d922, #a855f722);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Vedic Learning</div>
+                        <div class="poc-title">श्री रुद्रम् — Śrī Rudram Learning App</div>
+                        <div class="poc-desc">Vedic chanting tutor with svara-marked Devanagari text, embedded reference audio, recording capability, and pronunciation practice for Sri Rudram Namakam &amp; Chamakam.</div>
+                        <div class="poc-tags"><span class="poc-tag">Sanskrit</span><span class="poc-tag">Vedic Chanting</span><span class="poc-tag">Audio Reference</span><span class="poc-tag">Svara Marks</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('rudram')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Bhagavatam Skandha 1 -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #dc262622, #f4364422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Sanskrit Scripture</div>
+                        <div class="poc-title">श्रीमद्भागवतम् — Skandha 1 Learning App</div>
+                        <div class="poc-desc">Skandha-by-skandha study with Sanskrit recitation audio, verse-level text, word-by-word meaning breakdown, and chapter parayanam from traditional recordings.</div>
+                        <div class="poc-tags"><span class="poc-tag">Bhagavatam</span><span class="poc-tag">Sanskrit</span><span class="poc-tag">Audio Recitation</span><span class="poc-tag">Verse Study</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('bhagavatam')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Sundarar Nayanar -->
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #f59e0b22, #ec489922);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Tamil Shaivite Saints</div>
+                        <div class="poc-title">Sundaramurthi Nayanar — Friend of God</div>
+                        <div class="poc-desc">Animated storytelling experience of the Tamil Shaivite saint Sundarar's life journey, with original Tamil text, transliteration, English narrative, and devotional context.</div>
+                        <div class="poc-tags"><span class="poc-tag">Nayanmars</span><span class="poc-tag">Tamil</span><span class="poc-tag">Animated Stories</span><span class="poc-tag">Shaivism</span></div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('sundarar')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 
@@ -1429,7 +1527,12 @@
     const pocFiles = {
         edi: { title: '837 EDI Claims Validator & Generator', file: 'edi-validator-generator_latest.html' },
         hcc: { title: 'HCC Risk Score Calculator — CMS V28', file: 'hcc_risk_calculator.html' },
-        fhir: { title: 'HL7 FHIR Data Mapper & Validator', file: 'hl7-fhir-mapper.html' }
+        fhir: { title: 'HL7 FHIR Data Mapper & Validator', file: 'hl7-fhir-mapper.html' },
+        ivr: { title: 'IVR Call Flow Designer & Simulator', file: 'ivr-call-flow-designer.html' },
+        translator: { title: 'Multi-Language Healthcare Translator', file: 'healthcare-translator.html' },
+        rudram: { title: 'Śrī Rudram Learning App', file: 'rudram-app.html' },
+        bhagavatam: { title: 'Bhagavatam Skandha 1 Learning App', file: 'bhagavatam-skandha1.html' },
+        sundarar: { title: 'Sundaramurthi Nayanar — Friend of God', file: 'sundarar-nayanar.html' }
     };
 
     function openApp(pocId) {
@@ -1476,6 +1579,26 @@
         if (e.key === 'Escape') { closeApp(); }
     });
 </script>
+
+<div style="max-width:1100px;margin:3rem auto 0;padding:0 1.5rem 2rem;">
+    <div style="background:rgba(245,158,11,0.1);border:2px solid rgba(245,158,11,0.4);border-radius:12px;padding:1.5rem 2rem;text-align:left;font-family:'Outfit',sans-serif;">
+        <div style="display:flex;align-items:flex-start;gap:1rem;">
+            <span style="font-size:1.6rem;flex-shrink:0;">⚠️</span>
+            <div>
+                <div style="color:#f59e0b;font-weight:700;font-size:1rem;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em;">Important Disclaimer</div>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;margin-bottom:0.5rem;">
+                    <strong style="color:rgba(255,255,255,0.9);">For Demonstration Purposes Only.</strong> All sample data, template files, mapping rules, and translations in the applications on this site use defaults based on publicly available CMS, HL7, and FHIR specifications and are intended strictly for test, demo, and educational purposes.
+                </p>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;margin-bottom:0.5rem;">
+                    <strong style="color:rgba(255,255,255,0.9);">Built with AI Assistance.</strong> These tools were built with the assistance of AI (Claude by Anthropic) and may produce errors, inaccuracies, or incomplete results. All output should be independently verified before use in any clinical, production, billing, or regulatory context.
+                </p>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;">
+                    <strong style="color:rgba(255,255,255,0.9);">Not for Real Patient Data.</strong> Do not enter real Protected Health Information (PHI), Personally Identifiable Information (PII), or actual patient data into any of these tools. These are proof-of-concept applications and are not HIPAA-compliant production systems.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVR Call Flow Designer & Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1419;
+            --bg-card: #1a1f2e;
+            --bg-hover: #242b3d;
+            --border: #2a3142;
+            --text: #e4e8f1;
+            --text-secondary: #7a8a99;
+            --primary: #8b5cf6;
+            --secondary: #a855f7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --ivr-accent: #06b6d4;
+            --ivr-warm: #f97316;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; }
+        .container { max-width:1320px; margin:0 auto; padding:0 1.5rem; }
+
+        /* Header */
+        .header { text-align:center; padding:2.5rem 0 1.5rem; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
+        .header h1 { font-size:2.4rem; font-weight:700; background:linear-gradient(135deg,var(--primary),var(--ivr-accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.4rem; }
+        .header .subtitle { color:var(--text-secondary); font-size:0.95rem; }
+        .badges { display:flex; gap:0.5rem; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
+        .badge { padding:0.3rem 0.75rem; border-radius:20px; font-size:0.72rem; font-weight:600; }
+        .badge-ivr { background:rgba(139,92,246,0.15); color:var(--primary); border:1px solid rgba(139,92,246,0.3); }
+        .badge-sim { background:rgba(6,182,212,0.15); color:var(--ivr-accent); border:1px solid rgba(6,182,212,0.3); }
+        .badge-hc { background:rgba(249,115,22,0.15); color:var(--ivr-warm); border:1px solid rgba(249,115,22,0.3); }
+
+        /* Tabs */
+        .tabs { display:flex; gap:0.25rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border); }
+        .tab { padding:0.75rem 1.5rem; cursor:pointer; border:none; background:transparent; color:var(--text-secondary); font-family:inherit; font-size:0.88rem; font-weight:600; border-bottom:2px solid transparent; transition:all 0.2s; display:flex; align-items:center; gap:0.5rem; }
+        .tab:hover { color:var(--text); }
+        .tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        /* Cards */
+        .card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+        .card h2 { font-size:1.1rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+
+        /* Grid */
+        .grid { display:grid; grid-template-columns:340px 1fr; gap:1.5rem; }
+        .grid-equal { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+        @media(max-width:900px) { .grid, .grid-equal { grid-template-columns:1fr; } }
+
+        /* Forms */
+        .form-group { margin-bottom:0.85rem; }
+        .form-group label { display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-secondary); margin-bottom:0.35rem; }
+        select, input[type="text"], input[type="number"], textarea {
+            width:100%; padding:0.6rem 0.85rem; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.83rem; transition:border-color 0.2s;
+        }
+        select:focus, input:focus, textarea:focus { outline:none; border-color:var(--primary); }
+        textarea { min-height:60px; resize:vertical; font-family:'Space Grotesk',sans-serif; }
+
+        /* Buttons */
+        .btn { padding:0.6rem 1.25rem; border:none; border-radius:8px; font-family:inherit; font-weight:600; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.45rem; transition:all 0.2s; }
+        .btn-primary { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(139,92,246,0.3); }
+        .btn-success { background:linear-gradient(135deg,var(--success),#059669); color:white; }
+        .btn-success:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(16,185,129,0.3); }
+        .btn-ivr { background:linear-gradient(135deg,var(--ivr-accent),#0891b2); color:white; }
+        .btn-ivr:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(6,182,212,0.3); }
+        .btn-warn { background:linear-gradient(135deg,var(--ivr-warm),#ea580c); color:white; }
+        .btn-warn:hover { transform:translateY(-1px); }
+        .btn-secondary { background:var(--bg); border:1px solid var(--border); color:var(--text); }
+        .btn-secondary:hover { border-color:var(--primary); background:var(--bg-hover); }
+        .btn-sm { padding:0.4rem 0.85rem; font-size:0.78rem; }
+        .btn-danger { background:rgba(239,68,68,0.15); color:var(--error); border:1px solid rgba(239,68,68,0.3); }
+        .action-buttons { display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:0.75rem; }
+
+        /* IVR Tree */
+        .ivr-tree { position:relative; padding:1rem 0; }
+        .ivr-node { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; margin-bottom:0.5rem; cursor:pointer; transition:all 0.2s; position:relative; }
+        .ivr-node:hover { border-color:var(--primary); background:var(--bg-hover); }
+        .ivr-node.active { border-color:var(--primary); box-shadow:0 0 0 2px rgba(139,92,246,0.2); }
+        .ivr-node.sim-active { border-color:var(--ivr-accent); box-shadow:0 0 0 3px rgba(6,182,212,0.3); animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 3px rgba(6,182,212,0.3)} 50%{box-shadow:0 0 0 6px rgba(6,182,212,0.1)} }
+        .ivr-node-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; }
+        .ivr-node-type { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:0.15rem 0.5rem; border-radius:6px; }
+        .type-greeting { background:rgba(139,92,246,0.15); color:var(--primary); }
+        .type-menu { background:rgba(6,182,212,0.15); color:var(--ivr-accent); }
+        .type-action { background:rgba(16,185,129,0.15); color:var(--success); }
+        .type-transfer { background:rgba(249,115,22,0.15); color:var(--ivr-warm); }
+        .type-input { background:rgba(245,158,11,0.15); color:var(--warning); }
+        .type-end { background:rgba(239,68,68,0.15); color:var(--error); }
+        .ivr-node-label { font-weight:600; font-size:0.88rem; }
+        .ivr-node-prompt { color:var(--text-secondary); font-size:0.78rem; margin-top:0.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ivr-children { margin-left:1.5rem; border-left:2px solid var(--border); padding-left:1rem; }
+        .ivr-child-key { display:inline-block; font-size:0.7rem; font-weight:700; color:var(--ivr-accent); background:rgba(6,182,212,0.1); padding:0.1rem 0.45rem; border-radius:4px; margin-bottom:0.3rem; font-family:'JetBrains Mono',monospace; }
+        .ivr-node-actions { display:flex; gap:0.3rem; }
+        .ivr-node-actions button { background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.85rem; padding:0.2rem; border-radius:4px; }
+        .ivr-node-actions button:hover { color:var(--text); background:var(--bg-hover); }
+
+        /* Templates */
+        .template-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:0.75rem; margin-bottom:1rem; }
+        .template-card { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:1rem; cursor:pointer; transition:all 0.2s; text-align:center; }
+        .template-card:hover { border-color:var(--primary); transform:translateY(-2px); }
+        .template-icon { font-size:1.8rem; margin-bottom:0.5rem; }
+        .template-name { font-weight:700; font-size:0.88rem; margin-bottom:0.2rem; }
+        .template-desc { font-size:0.75rem; color:var(--text-secondary); }
+
+        /* Simulator */
+        .sim-phone { background:#111827; border:2px solid #374151; border-radius:24px; padding:2rem 1.5rem; max-width:380px; margin:0 auto; position:relative; }
+        .sim-screen { background:#0d1117; border-radius:12px; padding:1.25rem; min-height:280px; margin-bottom:1rem; }
+        .sim-status { text-align:center; color:var(--ivr-accent); font-size:0.78rem; font-weight:600; margin-bottom:0.75rem; }
+        .sim-prompt { color:var(--text); font-size:0.92rem; line-height:1.6; margin-bottom:1rem; min-height:60px; }
+        .sim-options { display:flex; flex-direction:column; gap:0.4rem; }
+        .sim-option { background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:8px; padding:0.6rem 0.85rem; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:0.6rem; font-size:0.85rem; }
+        .sim-option:hover { background:rgba(139,92,246,0.15); border-color:var(--primary); }
+        .sim-option .key { background:var(--primary); color:white; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.82rem; flex-shrink:0; }
+        .sim-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-top:0.75rem; }
+        .sim-key { background:#1f2937; border:1px solid #374151; border-radius:10px; padding:0.65rem; text-align:center; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1rem; color:var(--text); transition:all 0.1s; user-select:none; }
+        .sim-key:hover { background:#374151; }
+        .sim-key:active { background:var(--primary); transform:scale(0.95); }
+        .sim-key .sub { display:block; font-size:0.55rem; color:var(--text-secondary); font-weight:400; letter-spacing:2px; }
+        .sim-controls { display:flex; gap:0.5rem; margin-top:0.75rem; }
+        .sim-controls .btn { flex:1; justify-content:center; }
+
+        /* Call log */
+        .call-log { max-height:300px; overflow-y:auto; }
+        .log-entry { padding:0.4rem 0; border-bottom:1px solid rgba(42,49,66,0.5); font-size:0.8rem; display:flex; gap:0.5rem; }
+        .log-entry:last-child { border-bottom:none; }
+        .log-time { color:var(--text-secondary); font-family:'JetBrains Mono',monospace; font-size:0.72rem; flex-shrink:0; min-width:50px; }
+        .log-msg { color:var(--text); }
+        .log-system { color:var(--ivr-accent); }
+        .log-user { color:var(--ivr-warm); }
+        .log-tts { color:var(--primary); font-style:italic; }
+
+        /* Export area */
+        .json-viewer { background:#0d1117; border:1px solid var(--border); border-radius:8px; padding:1rem; font-family:'JetBrains Mono',monospace; font-size:0.78rem; max-height:400px; overflow:auto; white-space:pre-wrap; line-height:1.5; }
+        .json-key { color:#7ee787; }
+        .json-string { color:#a5d6ff; }
+        .json-number { color:#ffa657; }
+        .json-bool { color:#ff7b72; }
+
+        /* Info box */
+        .info-box { background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:8px; padding:0.75rem 1rem; font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem; }
+        .info-box strong { color:var(--text); }
+
+        @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        .fade-in { animation:fadeIn 0.3s ease; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>IVR Call Flow Designer & Simulator</h1>
+        <p class="subtitle">Design, preview, and simulate Interactive Voice Response call flows for healthcare outreach</p>
+        <div class="badges">
+            <span class="badge badge-ivr">IVR Designer</span>
+            <span class="badge badge-sim">Call Simulator</span>
+            <span class="badge badge-hc">Healthcare Outreach</span>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('design',this)">🎨 Design</button>
+        <button class="tab" onclick="switchTab('simulate',this)">📞 Simulate</button>
+        <button class="tab" onclick="switchTab('export',this)">📦 Export</button>
+    </div>
+
+    <!-- DESIGN TAB -->
+    <div id="designTab" class="tab-content active">
+        <div class="card">
+            <h2>📋 Load a Template</h2>
+            <div class="template-grid">
+                <div class="template-card" onclick="loadTemplate('appointment')">
+                    <div class="template-icon">📅</div>
+                    <div class="template-name">Appointment Scheduling</div>
+                    <div class="template-desc">Schedule, reschedule, or cancel appointments</div>
+                </div>
+                <div class="template-card" onclick="loadTemplate('benefits')">
+                    <div class="template-icon">💳</div>
+                    <div class="template-name">Benefits Inquiry</div>
+                    <div class="template-desc">Check coverage, copay, deductible info</div>
+                </div>
+                <div class="template-card" onclick="loadTemplate('refill')">
+                    <div class="template-icon">💊</div>
+                    <div class="template-name">Prescription Refill</div>
+                    <div class="template-desc">Automated Rx refill request line</div>
+                </div>
+                <div class="template-card" onclick="loadTemplate('outreach')">
+                    <div class="template-icon">📣</div>
+                    <div class="template-name">Care Gap Outreach</div>
+                    <div class="template-desc">Wellness visit & screening reminders</div>
+                </div>
+                <div class="template-card" onclick="loadTemplate('priorauth')">
+                    <div class="template-icon">✅</div>
+                    <div class="template-name">Prior Auth Status</div>
+                    <div class="template-desc">Check authorization request status</div>
+                </div>
+                <div class="template-card" onclick="loadTemplate('blank')">
+                    <div class="template-icon">➕</div>
+                    <div class="template-name">Blank Template</div>
+                    <div class="template-desc">Start from scratch</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Left: Tree View -->
+            <div>
+                <div class="card">
+                    <h2>🌳 Call Flow Tree</h2>
+                    <div id="ivrTree" class="ivr-tree">
+                        <div style="text-align:center;padding:2rem;color:var(--text-secondary);">
+                            <div style="font-size:2rem;margin-bottom:0.5rem;">👆</div>
+                            <div>Select a template above to start</div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm" onclick="addNode()">+ Add Node</button>
+                        <button class="btn btn-secondary btn-sm" onclick="collapseAll()">Collapse All</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Right: Node Editor -->
+            <div>
+                <div class="card" id="nodeEditorCard">
+                    <h2>✏️ Node Editor</h2>
+                    <div id="nodeEditor">
+                        <div style="text-align:center;padding:2rem;color:var(--text-secondary);">
+                            <div style="font-size:2rem;margin-bottom:0.5rem;">🖱️</div>
+                            <div>Click a node in the tree to edit it</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIMULATE TAB -->
+    <div id="simulateTab" class="tab-content">
+        <div class="grid-equal">
+            <div>
+                <div class="card">
+                    <h2>📞 Call Simulator</h2>
+                    <div class="sim-phone">
+                        <div class="sim-screen">
+                            <div class="sim-status" id="simStatus">📞 Ready to Call</div>
+                            <div class="sim-prompt" id="simPrompt">Press the green button to start the simulated IVR call. You'll hear prompts and can navigate using the keypad or option buttons.</div>
+                            <div class="sim-options" id="simOptions"></div>
+                        </div>
+                        <div class="sim-keypad" id="simKeypad">
+                            <div class="sim-key" onclick="pressKey('1')">1<span class="sub">&nbsp;</span></div>
+                            <div class="sim-key" onclick="pressKey('2')">2<span class="sub">ABC</span></div>
+                            <div class="sim-key" onclick="pressKey('3')">3<span class="sub">DEF</span></div>
+                            <div class="sim-key" onclick="pressKey('4')">4<span class="sub">GHI</span></div>
+                            <div class="sim-key" onclick="pressKey('5')">5<span class="sub">JKL</span></div>
+                            <div class="sim-key" onclick="pressKey('6')">6<span class="sub">MNO</span></div>
+                            <div class="sim-key" onclick="pressKey('7')">7<span class="sub">PQRS</span></div>
+                            <div class="sim-key" onclick="pressKey('8')">8<span class="sub">TUV</span></div>
+                            <div class="sim-key" onclick="pressKey('9')">9<span class="sub">WXYZ</span></div>
+                            <div class="sim-key" onclick="pressKey('*')">*<span class="sub">&nbsp;</span></div>
+                            <div class="sim-key" onclick="pressKey('0')">0<span class="sub">+</span></div>
+                            <div class="sim-key" onclick="pressKey('#')">#<span class="sub">&nbsp;</span></div>
+                        </div>
+                        <div class="sim-controls">
+                            <button class="btn btn-success" id="simStartBtn" onclick="startSimulation()">📞 Start Call</button>
+                            <button class="btn btn-danger btn-sm" onclick="endSimulation()">End Call</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card">
+                    <h2>📋 Call Log</h2>
+                    <div class="call-log" id="callLog">
+                        <div style="text-align:center;padding:2rem;color:var(--text-secondary);font-size:0.85rem;">
+                            Call log will appear here once you start a simulated call.
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>📊 Call Metrics</h2>
+                    <div id="callMetrics" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                            <div style="font-size:1.4rem;font-weight:700;color:var(--primary);" id="metricDuration">0:00</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Duration</div>
+                        </div>
+                        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                            <div style="font-size:1.4rem;font-weight:700;color:var(--ivr-accent);" id="metricSteps">0</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Steps Taken</div>
+                        </div>
+                        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                            <div style="font-size:1.4rem;font-weight:700;color:var(--ivr-warm);" id="metricInputs">0</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">DTMF Inputs</div>
+                        </div>
+                        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                            <div style="font-size:1.4rem;font-weight:700;color:var(--success);" id="metricOutcome">—</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Outcome</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT TAB -->
+    <div id="exportTab" class="tab-content">
+        <div class="grid-equal">
+            <div class="card">
+                <h2>📦 Export Call Flow</h2>
+                <div class="info-box">💡 Export your IVR call flow as JSON for integration with telephony platforms like Twilio, Genesys, Amazon Connect, or Five9.</div>
+                <div class="action-buttons" style="margin-top:0;margin-bottom:1rem;">
+                    <button class="btn btn-primary" onclick="exportJSON()">📋 Copy JSON</button>
+                    <button class="btn btn-success" onclick="downloadJSON()">⬇️ Download JSON</button>
+                    <button class="btn btn-ivr" onclick="exportMermaid()">📊 Copy Mermaid Diagram</button>
+                </div>
+                <div id="exportOutput" class="json-viewer" style="min-height:300px;">Click a button above to generate export...</div>
+            </div>
+            <div class="card">
+                <h2>📊 Flow Summary</h2>
+                <div id="flowSummary">
+                    <div style="text-align:center;padding:2rem;color:var(--text-secondary);">Design a call flow first to see the summary.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let ivrFlow = { nodes: [] };
+let selectedNodeId = null;
+let simState = { active:false, currentNodeId:null, startTime:null, steps:0, inputs:0, timer:null, logEntries:[] };
+let nodeIdCounter = 0;
+
+// ============================================================
+// TEMPLATES
+// ============================================================
+const templates = {
+    appointment: {
+        nodes: [
+            { id:'n1', type:'greeting', label:'Welcome', prompt:'Thank you for calling Sunrise Health. For English, press 1. Para español, presione 2.', children:[
+                { key:'1', id:'n2', type:'menu', label:'Main Menu', prompt:'For scheduling a new appointment, press 1. To reschedule, press 2. To cancel, press 3. To speak with a representative, press 0.', children:[
+                    { key:'1', id:'n3', type:'input', label:'New Appointment', prompt:'Please enter your 10-digit member ID followed by the pound sign.', children:[
+                        { key:'#', id:'n4', type:'action', label:'Lookup Member', prompt:'Thank you. We found your record. For primary care, press 1. For specialty, press 2. For urgent care, press 3.', children:[
+                            { key:'1', id:'n5', type:'action', label:'Primary Care', prompt:'The next available appointment with Dr. Patel is Tuesday, February 25th at 10:30 AM. Press 1 to confirm, 2 for more options.', children:[
+                                { key:'1', id:'n6', type:'end', label:'Confirmed', prompt:'Your appointment has been confirmed. You will receive a text reminder 24 hours before. Thank you for calling Sunrise Health. Goodbye.' },
+                                { key:'2', id:'n7', type:'transfer', label:'More Options', prompt:'Transferring you to scheduling. Please hold.' }
+                            ]},
+                            { key:'2', id:'n8', type:'transfer', label:'Specialty', prompt:'Transferring you to specialty scheduling. Please hold.' },
+                            { key:'3', id:'n9', type:'action', label:'Urgent Care', prompt:'Our nearest urgent care is open until 8 PM at 1200 Health Blvd. No appointment needed. Press 0 for directions via text.' }
+                        ]}
+                    ]},
+                    { key:'2', id:'n10', type:'input', label:'Reschedule', prompt:'Please enter your appointment confirmation number followed by pound.', children:[
+                        { key:'#', id:'n11', type:'transfer', label:'Reschedule Agent', prompt:'Let me transfer you to a scheduling agent who can help reschedule. Please hold.' }
+                    ]},
+                    { key:'3', id:'n12', type:'action', label:'Cancel', prompt:'To cancel your appointment, please enter your confirmation number followed by pound. Note: cancellations within 24 hours may incur a fee.', children:[] },
+                    { key:'0', id:'n13', type:'transfer', label:'Representative', prompt:'Please hold while we connect you to the next available representative. Estimated wait time is 3 minutes.' }
+                ]},
+                { key:'2', id:'n14', type:'menu', label:'Menú Principal', prompt:'Para programar una cita, presione 1. Para reprogramar, presione 2. Para cancelar, presione 3.', children:[] }
+            ]}
+        ]
+    },
+    benefits: {
+        nodes: [
+            { id:'n1', type:'greeting', label:'Welcome', prompt:'Welcome to Pacific Health Plan member services. This call may be recorded for quality purposes.', children:[
+                { key:'1', id:'n2', type:'input', label:'Member Auth', prompt:'Please enter your member ID number followed by the pound key.', children:[
+                    { key:'#', id:'n3', type:'input', label:'DOB Verify', prompt:'For verification, please enter your date of birth as 2 digits for month, 2 for day, and 4 for year.', children:[
+                        { key:'#', id:'n4', type:'menu', label:'Benefits Menu', prompt:'Your identity has been verified. For coverage and benefits, press 1. For claims status, press 2. For deductible and copay information, press 3. For ID card request, press 4.', children:[
+                            { key:'1', id:'n5', type:'action', label:'Coverage Info', prompt:'You have a PPO Gold plan, active through December 31st 2026. In-network coverage is 80% after deductible. Press 1 for formulary info, 0 for a representative.', children:[] },
+                            { key:'2', id:'n6', type:'action', label:'Claims Status', prompt:'Your most recent claim from January 15th for $285.00 has been processed and paid. Your responsibility is $57.00. Press 1 for more claims, 0 for help.', children:[] },
+                            { key:'3', id:'n7', type:'action', label:'Deductible Info', prompt:'Your annual deductible is $1,500. You have met $890 so far this year, leaving $610 remaining. Your max out-of-pocket is $6,000.', children:[] },
+                            { key:'4', id:'n8', type:'end', label:'ID Card', prompt:'A new ID card will be mailed to your address on file within 7-10 business days. Thank you for calling.' }
+                        ]}
+                    ]}
+                ]}
+            ]}
+        ]
+    },
+    refill: {
+        nodes: [
+            { id:'n1', type:'greeting', label:'Welcome', prompt:'Welcome to the CareFirst pharmacy refill line. For a quick refill, press 1. To check refill status, press 2. To speak with a pharmacist, press 0.', children:[
+                { key:'1', id:'n2', type:'input', label:'Rx Number', prompt:'Please enter your prescription number, found on your bottle label, followed by the pound sign.', children:[
+                    { key:'#', id:'n3', type:'action', label:'Verify Rx', prompt:'We found prescription for Lisinopril 10mg, 90-day supply. Last filled December 15th. 2 refills remaining. Press 1 to refill for pickup, 2 for mail delivery, 3 to cancel.', children:[
+                        { key:'1', id:'n4', type:'end', label:'Pickup Refill', prompt:'Your prescription will be ready for pickup at your preferred pharmacy in approximately 2 hours. You will receive a text when ready. Thank you!' },
+                        { key:'2', id:'n5', type:'end', label:'Mail Delivery', prompt:'Your prescription will be mailed via USPS. Expected delivery in 5-7 business days. Tracking info will be texted to you. Goodbye!' },
+                        { key:'3', id:'n6', type:'end', label:'Cancelled', prompt:'Refill request cancelled. Thank you for calling. Goodbye.' }
+                    ]}
+                ]},
+                { key:'2', id:'n7', type:'input', label:'Status Check', prompt:'Enter your prescription number followed by pound to check status.', children:[
+                    { key:'#', id:'n8', type:'action', label:'Status Result', prompt:'Your prescription is currently being prepared and will be ready for pickup by 3:00 PM today. Press 0 for more help or hang up.', children:[] }
+                ]},
+                { key:'0', id:'n9', type:'transfer', label:'Pharmacist', prompt:'Transferring to a pharmacist. Estimated wait: 2 minutes.' }
+            ]}
+        ]
+    },
+    outreach: {
+        nodes: [
+            { id:'n1', type:'greeting', label:'Outreach Call', prompt:'Hello, this is an important health message from Valley Medical Group for Maria Garcia. Press 1 to continue in English, 2 para español.', children:[
+                { key:'1', id:'n2', type:'action', label:'Health Reminder', prompt:'Our records show you are due for your Annual Wellness Visit. Medicare covers this visit at no cost to you. Press 1 to schedule now, 2 for a callback, 3 to opt out of future reminders.', children:[
+                    { key:'1', id:'n3', type:'action', label:'Schedule Now', prompt:'Great! The next available wellness visit appointment is Thursday, March 6th at 2:00 PM with Dr. Chen. Press 1 to confirm, 2 for other times.', children:[
+                        { key:'1', id:'n4', type:'end', label:'Confirmed', prompt:'Your wellness visit is confirmed for March 6th at 2:00 PM. Please bring your current medications list. You will receive a reminder. Thank you and be well!' },
+                        { key:'2', id:'n5', type:'transfer', label:'Other Times', prompt:'Let me connect you with scheduling for additional options. Please hold.' }
+                    ]},
+                    { key:'2', id:'n6', type:'end', label:'Callback', prompt:'We will have a care coordinator call you within 2 business days to schedule. Thank you for your time!' },
+                    { key:'3', id:'n7', type:'end', label:'Opt Out', prompt:'You have been removed from future call reminders for this service. You can still call us anytime at 800-555-0199. Goodbye.' }
+                ]},
+                { key:'2', id:'n8', type:'action', label:'Mensaje en Español', prompt:'Nuestros registros muestran que es hora de su visita anual de bienestar. Medicare cubre esta visita sin costo. Presione 1 para programar.', children:[] }
+            ]}
+        ]
+    },
+    priorauth: {
+        nodes: [
+            { id:'n1', type:'greeting', label:'Welcome', prompt:'Thank you for calling the MedStar prior authorization status line. Press 1 to check a status, 2 to submit a new request, 0 for a representative.', children:[
+                { key:'1', id:'n2', type:'input', label:'Auth Lookup', prompt:'Please enter your 12-digit authorization reference number followed by pound.', children:[
+                    { key:'#', id:'n3', type:'action', label:'Auth Status', prompt:'Authorization PA-2026-04521 for MRI Lumbar Spine was approved on February 14th. Valid through March 14th. The approved facility is City Imaging Center. Press 1 to receive this by fax, 2 for email, 0 for help.', children:[
+                        { key:'1', id:'n4', type:'end', label:'Fax Confirm', prompt:'The approval letter will be faxed to the number on file within 30 minutes. Thank you.' },
+                        { key:'2', id:'n5', type:'end', label:'Email Confirm', prompt:'The approval letter has been sent to the email on file. Please check your inbox. Thank you.' }
+                    ]}
+                ]},
+                { key:'2', id:'n6', type:'transfer', label:'New Request', prompt:'For new prior authorization submissions, I will connect you to our clinical review team. Please have the CPT code, diagnosis, and clinical notes ready.' },
+                { key:'0', id:'n7', type:'transfer', label:'Representative', prompt:'Please hold for the next available representative. Current wait time is approximately 5 minutes.' }
+            ]}
+        ]
+    },
+    blank: { nodes: [{ id:'n1', type:'greeting', label:'Welcome', prompt:'Welcome message goes here.', children:[] }] }
+};
+
+// ============================================================
+// TEMPLATE LOADING & TREE RENDERING
+// ============================================================
+function loadTemplate(name) {
+    const t = templates[name];
+    if (!t) return;
+    ivrFlow = JSON.parse(JSON.stringify(t));
+    nodeIdCounter = 0;
+    assignIds(ivrFlow.nodes);
+    selectedNodeId = null;
+    renderTree();
+    renderEditor();
+    updateFlowSummary();
+    showNotification('Template loaded: ' + name, 'success');
+}
+
+function assignIds(nodes) {
+    nodes.forEach(n => {
+        n.id = 'n' + (++nodeIdCounter);
+        if (n.children) assignIds(n.children);
+    });
+}
+
+function renderTree() {
+    const container = document.getElementById('ivrTree');
+    container.innerHTML = renderNodes(ivrFlow.nodes, false);
+}
+
+function renderNodes(nodes, showKey) {
+    let html = '';
+    nodes.forEach(n => {
+        const isActive = n.id === selectedNodeId;
+        const isSimActive = simState.active && simState.currentNodeId === n.id;
+        html += '<div>';
+        if (n.key && showKey) html += '<div class="ivr-child-key">Press ' + n.key + '</div>';
+        html += '<div class="ivr-node' + (isActive ? ' active' : '') + (isSimActive ? ' sim-active' : '') + '" onclick="selectNode(\'' + n.id + '\')" id="treenode-' + n.id + '">';
+        html += '<div class="ivr-node-header">';
+        html += '<span class="ivr-node-type type-' + n.type + '">' + n.type + '</span>';
+        html += '<div class="ivr-node-actions">';
+        html += '<button onclick="event.stopPropagation();deleteNode(\'' + n.id + '\')" title="Delete">🗑</button>';
+        html += '</div></div>';
+        html += '<div class="ivr-node-label">' + escapeHtml(n.label) + '</div>';
+        html += '<div class="ivr-node-prompt">' + escapeHtml(n.prompt.substring(0, 80)) + (n.prompt.length > 80 ? '...' : '') + '</div>';
+        html += '</div>';
+        if (n.children && n.children.length > 0) {
+            html += '<div class="ivr-children">' + renderNodes(n.children, true) + '</div>';
+        }
+        html += '</div>';
+    });
+    return html;
+}
+
+function selectNode(id) {
+    selectedNodeId = id;
+    renderTree();
+    renderEditor();
+}
+
+// ============================================================
+// NODE EDITOR
+// ============================================================
+function renderEditor() {
+    const editor = document.getElementById('nodeEditor');
+    if (!selectedNodeId) {
+        editor.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-secondary);"><div style="font-size:2rem;margin-bottom:0.5rem;">🖱️</div><div>Click a node in the tree to edit it</div></div>';
+        return;
+    }
+    const node = findNode(selectedNodeId, ivrFlow.nodes);
+    if (!node) return;
+
+    editor.innerHTML = `
+        <div class="form-group">
+            <label>Node Type</label>
+            <select id="editType" onchange="updateNodeField('type',this.value)">
+                <option value="greeting" ${node.type==='greeting'?'selected':''}>🎙️ Greeting</option>
+                <option value="menu" ${node.type==='menu'?'selected':''}>📋 Menu</option>
+                <option value="action" ${node.type==='action'?'selected':''}>⚡ Action</option>
+                <option value="input" ${node.type==='input'?'selected':''}>⌨️ Input</option>
+                <option value="transfer" ${node.type==='transfer'?'selected':''}>📞 Transfer</option>
+                <option value="end" ${node.type==='end'?'selected':''}>🔴 End Call</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Label</label>
+            <input type="text" id="editLabel" value="${escapeAttr(node.label)}" oninput="updateNodeField('label',this.value)">
+        </div>
+        <div class="form-group">
+            <label>Prompt / TTS Script</label>
+            <textarea id="editPrompt" oninput="updateNodeField('prompt',this.value)" style="min-height:100px;">${escapeHtml(node.prompt)}</textarea>
+        </div>
+        ${node.key ? `<div class="form-group"><label>DTMF Key (from parent)</label><input type="text" value="${node.key}" maxlength="1" oninput="updateNodeField('key',this.value)"></div>` : ''}
+        <div style="margin-top:1rem;">
+            <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">Child Options (${node.children ? node.children.length : 0})</h3>
+            <div id="childList">${renderChildList(node)}</div>
+            <div class="action-buttons" style="margin-top:0.5rem;">
+                <button class="btn btn-sm btn-primary" onclick="addChildNode('${node.id}')">+ Add Option</button>
+            </div>
+        </div>
+    `;
+}
+
+function renderChildList(node) {
+    if (!node.children || node.children.length === 0) return '<div style="color:var(--text-secondary);font-size:0.82rem;padding:0.5rem;">No child nodes. Add options for caller to choose.</div>';
+    return node.children.map(c =>
+        `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;border-bottom:1px solid rgba(42,49,66,0.5);font-size:0.82rem;">
+            <span style="background:var(--primary);color:white;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;flex-shrink:0;">${c.key||'?'}</span>
+            <span style="flex:1;">${escapeHtml(c.label)}</span>
+            <span class="ivr-node-type type-${c.type}" style="font-size:0.62rem;">${c.type}</span>
+        </div>`
+    ).join('');
+}
+
+function updateNodeField(field, value) {
+    const node = findNode(selectedNodeId, ivrFlow.nodes);
+    if (node) { node[field] = value; renderTree(); updateFlowSummary(); }
+}
+
+function addChildNode(parentId) {
+    const parent = findNode(parentId, ivrFlow.nodes);
+    if (!parent) return;
+    if (!parent.children) parent.children = [];
+    const usedKeys = parent.children.map(c => c.key);
+    let nextKey = '1';
+    for (let i = 1; i <= 9; i++) { if (!usedKeys.includes(String(i))) { nextKey = String(i); break; } }
+    parent.children.push({ id: 'n' + (++nodeIdCounter), type:'action', label:'New Option', prompt:'Enter prompt text...', key:nextKey, children:[] });
+    renderTree();
+    renderEditor();
+    updateFlowSummary();
+}
+
+function addNode() {
+    ivrFlow.nodes.push({ id:'n'+(++nodeIdCounter), type:'menu', label:'New Node', prompt:'Enter prompt text...', children:[] });
+    renderTree();
+    updateFlowSummary();
+}
+
+function deleteNode(id) {
+    if (!confirm('Delete this node and all its children?')) return;
+    ivrFlow.nodes = removeNode(id, ivrFlow.nodes);
+    if (selectedNodeId === id) selectedNodeId = null;
+    renderTree();
+    renderEditor();
+    updateFlowSummary();
+}
+
+function removeNode(id, nodes) {
+    return nodes.filter(n => {
+        if (n.id === id) return false;
+        if (n.children) n.children = removeNode(id, n.children);
+        return true;
+    });
+}
+
+function findNode(id, nodes) {
+    for (const n of nodes) {
+        if (n.id === id) return n;
+        if (n.children) { const f = findNode(id, n.children); if (f) return f; }
+    }
+    return null;
+}
+
+function collapseAll() { renderTree(); }
+
+// ============================================================
+// SIMULATOR
+// ============================================================
+function startSimulation() {
+    if (ivrFlow.nodes.length === 0) { alert('Please load a template or design a flow first.'); return; }
+    simState = { active:true, currentNodeId:ivrFlow.nodes[0].id, startTime:Date.now(), steps:0, inputs:0, timer:null, logEntries:[] };
+    document.getElementById('simStartBtn').textContent = '🔄 Restart';
+    document.getElementById('simStartBtn').onclick = () => { endSimulation(); setTimeout(startSimulation, 100); };
+    addLog('system', '📞 Call connected');
+    simState.timer = setInterval(updateTimer, 1000);
+    navigateToNode(ivrFlow.nodes[0]);
+}
+
+function endSimulation() {
+    simState.active = false;
+    if (simState.timer) clearInterval(simState.timer);
+    document.getElementById('simStatus').textContent = '📞 Call Ended';
+    document.getElementById('simPrompt').textContent = 'Call has ended. Press Start to begin a new call.';
+    document.getElementById('simOptions').innerHTML = '';
+    document.getElementById('simStartBtn').textContent = '📞 Start Call';
+    document.getElementById('simStartBtn').onclick = startSimulation;
+    document.getElementById('metricOutcome').textContent = 'Ended';
+    addLog('system', '📴 Call disconnected');
+    renderTree();
+}
+
+function navigateToNode(node) {
+    if (!simState.active) return;
+    simState.currentNodeId = node.id;
+    simState.steps++;
+    document.getElementById('metricSteps').textContent = simState.steps;
+
+    // Status
+    const typeLabels = { greeting:'🎙️ Greeting', menu:'📋 Menu', action:'⚡ Action', input:'⌨️ Awaiting Input', transfer:'📞 Transferring...', end:'🔴 Call Complete' };
+    document.getElementById('simStatus').textContent = typeLabels[node.type] || node.type;
+
+    // Speak prompt
+    document.getElementById('simPrompt').textContent = node.prompt;
+    addLog('tts', '🔊 "' + node.prompt + '"');
+    speakText(node.prompt);
+
+    // Options
+    const opts = document.getElementById('simOptions');
+    opts.innerHTML = '';
+    if (node.type === 'end') {
+        document.getElementById('metricOutcome').textContent = node.label;
+        addLog('system', '✅ Call completed: ' + node.label);
+        setTimeout(() => { simState.active = false; if (simState.timer) clearInterval(simState.timer); }, 1000);
+    } else if (node.type === 'transfer') {
+        addLog('system', '📞 Call transferred to: ' + node.label);
+        document.getElementById('metricOutcome').textContent = 'Transfer';
+        setTimeout(() => { endSimulation(); }, 2000);
+    } else if (node.children && node.children.length > 0) {
+        node.children.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'sim-option';
+            div.innerHTML = '<span class="key">' + c.key + '</span>' + escapeHtml(c.label);
+            div.onclick = () => { addLog('user', '👆 Pressed ' + c.key + ' → ' + c.label); navigateToNode(c); };
+            opts.appendChild(div);
+        });
+    }
+    renderTree();
+}
+
+function pressKey(key) {
+    if (!simState.active) return;
+    simState.inputs++;
+    document.getElementById('metricInputs').textContent = simState.inputs;
+    playDTMF(key);
+    addLog('user', '🔢 DTMF: ' + key);
+
+    const current = findNode(simState.currentNodeId, ivrFlow.nodes);
+    if (!current || !current.children) return;
+    const match = current.children.find(c => c.key === key);
+    if (match) {
+        navigateToNode(match);
+    } else if (key === '#' && current.type === 'input') {
+        // For input nodes, # usually submits
+        if (current.children.length > 0) navigateToNode(current.children[0]);
+    }
+}
+
+function updateTimer() {
+    if (!simState.startTime) return;
+    const elapsed = Math.floor((Date.now() - simState.startTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    document.getElementById('metricDuration').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function addLog(type, msg) {
+    const elapsed = simState.startTime ? Math.floor((Date.now() - simState.startTime) / 1000) : 0;
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    const timeStr = m + ':' + (s < 10 ? '0' : '') + s;
+    simState.logEntries.push({ time: timeStr, type, msg });
+    const container = document.getElementById('callLog');
+    container.innerHTML = simState.logEntries.map(e =>
+        '<div class="log-entry fade-in"><span class="log-time">' + e.time + '</span><span class="log-msg log-' + e.type + '">' + escapeHtml(e.msg) + '</span></div>'
+    ).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+// ============================================================
+// AUDIO (Web Audio API for DTMF, SpeechSynthesis for TTS)
+// ============================================================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const dtmfFreqs = {
+    '1':[697,1209],'2':[697,1336],'3':[697,1477],
+    '4':[770,1209],'5':[770,1336],'6':[770,1477],
+    '7':[852,1209],'8':[852,1336],'9':[852,1477],
+    '*':[941,1209],'0':[941,1336],'#':[941,1477]
+};
+
+function playDTMF(key) {
+    const freqs = dtmfFreqs[key];
+    if (!freqs) return;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc1.frequency.value = freqs[0];
+    osc2.frequency.value = freqs[1];
+    gain.gain.value = 0.15;
+    osc1.connect(gain); osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc1.start(); osc2.start();
+    setTimeout(() => { osc1.stop(); osc2.stop(); }, 150);
+}
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95; u.pitch = 1.0;
+        window.speechSynthesis.speak(u);
+    }
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportJSON() {
+    const json = JSON.stringify(buildExportFlow(), null, 2);
+    document.getElementById('exportOutput').innerHTML = syntaxHighlight(json);
+    navigator.clipboard.writeText(json).then(() => showNotification('JSON copied!', 'success'));
+}
+
+function downloadJSON() {
+    const json = JSON.stringify(buildExportFlow(), null, 2);
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'ivr_callflow_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showNotification('Downloaded!', 'success');
+}
+
+function exportMermaid() {
+    let lines = ['graph TD'];
+    function walk(nodes, parentId) {
+        nodes.forEach(n => {
+            const safe = n.id;
+            const label = n.label.replace(/"/g,"'");
+            if (n.type === 'end') lines.push('    ' + safe + '((' + label + '))');
+            else if (n.type === 'transfer') lines.push('    ' + safe + '>' + label + ']');
+            else lines.push('    ' + safe + '[' + label + ']');
+            if (parentId) lines.push('    ' + parentId + ' -->|' + (n.key||'') + '| ' + safe);
+            if (n.children) walk(n.children, safe);
+        });
+    }
+    walk(ivrFlow.nodes, null);
+    const mermaid = lines.join('\n');
+    document.getElementById('exportOutput').textContent = mermaid;
+    navigator.clipboard.writeText(mermaid).then(() => showNotification('Mermaid diagram copied!', 'success'));
+}
+
+function buildExportFlow() {
+    return {
+        name: "IVR Call Flow",
+        version: "1.0",
+        created: new Date().toISOString(),
+        description: "Generated by IVR Call Flow Designer",
+        entryNode: ivrFlow.nodes.length > 0 ? ivrFlow.nodes[0].id : null,
+        nodes: flattenNodes(ivrFlow.nodes)
+    };
+}
+
+function flattenNodes(nodes) {
+    const flat = {};
+    function walk(list) {
+        list.forEach(n => {
+            flat[n.id] = { type: n.type, label: n.label, prompt: n.prompt, transitions: {} };
+            if (n.children) {
+                n.children.forEach(c => { flat[n.id].transitions[c.key] = c.id; });
+                walk(n.children);
+            }
+        });
+    }
+    walk(nodes);
+    return flat;
+}
+
+function updateFlowSummary() {
+    let totalNodes = 0, types = {};
+    function count(nodes) {
+        nodes.forEach(n => {
+            totalNodes++;
+            types[n.type] = (types[n.type]||0) + 1;
+            if (n.children) count(n.children);
+        });
+    }
+    count(ivrFlow.nodes);
+
+    const maxDepth = getMaxDepth(ivrFlow.nodes);
+    const endNodes = types['end'] || 0;
+    const transfers = types['transfer'] || 0;
+
+    document.getElementById('flowSummary').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                <div style="font-size:1.6rem;font-weight:700;color:var(--primary);">${totalNodes}</div>
+                <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Total Nodes</div>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                <div style="font-size:1.6rem;font-weight:700;color:var(--ivr-accent);">${maxDepth}</div>
+                <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Max Depth</div>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                <div style="font-size:1.6rem;font-weight:700;color:var(--success);">${endNodes}</div>
+                <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">End Points</div>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.85rem;text-align:center;">
+                <div style="font-size:1.6rem;font-weight:700;color:var(--ivr-warm);">${transfers}</div>
+                <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;">Transfers</div>
+            </div>
+        </div>
+        <div style="margin-top:1rem;">
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:0.5rem;">Node Types:</div>
+            ${Object.entries(types).map(([t,c]) => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:0.2rem 0;"><span class="ivr-node-type type-'+t+'" style="font-size:0.65rem;">'+t+'</span><span>'+c+'</span></div>').join('')}
+        </div>
+    `;
+}
+
+function getMaxDepth(nodes, depth) {
+    depth = depth || 1;
+    let max = depth;
+    nodes.forEach(n => {
+        if (n.children && n.children.length > 0) {
+            const d = getMaxDepth(n.children, depth + 1);
+            if (d > max) max = d;
+        }
+    });
+    return max;
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function switchTab(tab, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(tab + 'Tab').classList.add('active');
+}
+
+function escapeHtml(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function escapeAttr(s) { return s ? s.replace(/"/g,'&quot;').replace(/'/g,'&#39;') : ''; }
+
+function syntaxHighlight(json) {
+    return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(m) {
+            var c = 'json-number';
+            if (/^"/.test(m)) c = /:$/.test(m) ? 'json-key' : 'json-string';
+            else if (/true|false/.test(m)) c = 'json-bool';
+            return '<span class="' + c + '">' + m + '</span>';
+        });
+}
+
+function showNotification(msg, type) {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:1.5rem;right:1.5rem;background:'+(type==='success'?'var(--success)':'var(--error)')+';color:white;padding:0.7rem 1.2rem;border-radius:8px;font-weight:600;font-size:0.88rem;z-index:10000;animation:fadeIn 0.3s ease;font-family:Space Grotesk,sans-serif;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ if(document.body.contains(t)) document.body.removeChild(t); }, 2500);
+}
+</script>
+
+<div style="max-width:1320px;margin:3rem auto 0;padding:0 1.5rem 2rem;">
+    <div style="background:rgba(245,158,11,0.08);border:2px solid rgba(245,158,11,0.35);border-radius:12px;padding:1.25rem 1.5rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+            <span style="font-size:1.4rem;flex-shrink:0;">⚠️</span>
+            <div>
+                <div style="color:#f59e0b;font-weight:700;font-size:0.9rem;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Important Disclaimer</div>
+                <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.7;margin-bottom:0.3rem;">
+                    <strong style="color:var(--text);">For Demonstration Purposes Only.</strong> All IVR templates use sample healthcare scenarios and are intended strictly for test/demo/educational use. Do not deploy to production telephony systems without independent verification.
+                </p>
+                <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.7;">
+                    <strong style="color:var(--text);">Built with AI Assistance.</strong> This tool was built with the assistance of AI (Claude by Anthropic) and may contain errors or inaccuracies. All call flow designs should be reviewed by qualified professionals before production use.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
