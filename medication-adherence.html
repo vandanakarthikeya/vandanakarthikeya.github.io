@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Medication Adherence Tracker — PDC Calculator & Stars Impact</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#f8fafb;--bg2:#fff;--bg3:#f1f5f9;--bdr:#e2e8f0;--bdr2:#cbd5e1;
+--tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;
+--pri:#0d9488;--pri-bg:#0d948812;--pri-bdr:#0d948830;
+--blue:#2563eb;--blue-bg:#2563eb0c;--blue-bdr:#2563eb20;
+--green:#16a34a;--green-bg:#16a34a0c;--green-bdr:#16a34a25;
+--amber:#d97706;--amber-bg:#d9770608;--amber-bdr:#d9770620;
+--red:#dc2626;--red-bg:#dc26260c;--red-bdr:#dc262620;
+--purple:#7c3aed;--purple-bg:#7c3aed0c;--purple-bdr:#7c3aed20;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:.7rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.topbar h1{font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:.5rem;color:var(--pri)}
+.topbar h1 span{font-size:1.2rem}
+.topbar-r{display:flex;gap:.6rem;align-items:center}
+.ctn{max-width:1360px;margin:0 auto;padding:1.25rem}
+
+/* Tabs */
+.tabs{display:flex;gap:.15rem;margin-bottom:1.25rem;background:var(--bg3);border-radius:10px;padding:.25rem;width:fit-content}
+.tab{padding:.5rem 1rem;cursor:pointer;border:none;background:0 0;color:var(--tx2);font-family:inherit;font-size:.8rem;font-weight:600;border-radius:8px;transition:.15s}
+.tab:hover{color:var(--tx)}.tab.active{background:var(--bg2);color:var(--pri);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tp{display:none}.tp.active{display:block}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.card-t{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+/* Forms */
+.fg{margin-bottom:.7rem}
+.fg label{display:block;font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.3px}
+select,input[type=text],input[type=number],input[type=date],textarea{width:100%;padding:.5rem .7rem;background:var(--bg);border:1px solid var(--bdr);border-radius:7px;color:var(--tx);font-family:inherit;font-size:.84rem}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--pri)}
+
+/* Buttons */
+.btn{padding:.5rem 1rem;border:none;border-radius:7px;font-family:inherit;font-weight:600;font-size:.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;transition:.15s}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{filter:brightness(1.1)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(1.1)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{filter:brightness(1.1)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(1.1)}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--tx2)}.btn-ghost:hover{border-color:var(--pri);color:var(--pri)}
+.btn-sm{padding:.35rem .65rem;font-size:.72rem}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:.2rem;padding:.15rem .55rem;border-radius:5px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.b-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.b-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
+.b-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr)}
+.b-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bdr)}
+.b-pri{background:var(--pri-bg);color:var(--pri);border:1px solid var(--pri-bdr)}
+.b-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bdr)}
+
+/* Stat cards */
+.stat{text-align:center;padding:1rem .75rem}
+.stat-icon{font-size:1.5rem;margin-bottom:.3rem}
+.stat-val{font-size:1.7rem;font-weight:800;line-height:1.2}
+.stat-lbl{font-size:.68rem;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:.15rem}
+
+/* PDC Ring */
+.pdc-ring{width:100px;height:100px;position:relative;margin:0 auto .3rem}
+.pdc-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pdc-ring .bg-r{fill:none;stroke:var(--bg3);stroke-width:8}
+.pdc-ring .fg-r{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.pdc-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.3rem;font-weight:800;line-height:1}
+.pdc-lbl{text-align:center;font-size:.72rem;color:var(--tx2);font-weight:600}
+
+/* Calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-hdr{font-size:.6rem;font-weight:700;color:var(--tx3);text-align:center;padding:.3rem 0;text-transform:uppercase}
+.cal-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;cursor:default;border:1px solid transparent;transition:.1s}
+.cal-cell.covered{background:var(--green-bg);color:var(--green);border-color:var(--green-bdr)}
+.cal-cell.gap{background:var(--red-bg);color:var(--red);border-color:var(--red-bdr)}
+.cal-cell.partial{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bdr)}
+.cal-cell.empty{color:var(--tx3)}
+.cal-cell.today{box-shadow:0 0 0 2px var(--pri);font-weight:800}
+
+/* Med card */
+.med-card{background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:.75rem;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:flex-start;transition:.15s}
+.med-card:hover{border-color:var(--pri);box-shadow:0 2px 8px rgba(13,148,136,.06)}
+.med-pill{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.med-body{flex:1;min-width:0}
+.med-name{font-size:.88rem;font-weight:700}
+.med-meta{font-size:.72rem;color:var(--tx2);display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.15rem}
+.med-pdc{text-align:right;flex-shrink:0}
+.med-pdc-val{font-size:1.1rem;font-weight:800}
+
+/* Patient row */
+.pt-row{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;margin-bottom:.4rem;transition:.15s;cursor:pointer}
+.pt-row:hover{border-color:var(--pri);background:var(--pri-bg)}
+.pt-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.pt-info{flex:1;min-width:0}
+.pt-name{font-size:.84rem;font-weight:600}
+.pt-sub{font-size:.7rem;color:var(--tx2)}
+
+/* Progress bar */
+.pbar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.pbar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+
+/* Outreach log */
+.ol-item{display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--bg3);font-size:.82rem;align-items:flex-start}
+.ol-item:last-child{border-bottom:none}
+.ol-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+
+/* Toast */
+.toast{position:fixed;top:1rem;right:1rem;padding:.65rem 1.1rem;border-radius:8px;font-weight:600;font-size:.82rem;z-index:9999;animation:si .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+@keyframes si{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.toast-s{background:var(--green);color:#fff}.toast-e{background:var(--red);color:#fff}.toast-i{background:var(--blue);color:#fff}
+</style>
+</head>
+<body>
+<div class="topbar">
+    <h1><span>💊</span> Medication Adherence Tracker</h1>
+    <div class="topbar-r">
+        <span class="badge b-pri mono">PDC Calculator</span>
+        <button class="btn btn-ghost btn-sm" onclick="loadDemo()">📋 Load Demo Data</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetAll()">↻ Reset</button>
+    </div>
+</div>
+<div class="ctn">
+<div class="tabs">
+    <button class="tab active" onclick="st('dash',this)">📊 Dashboard</button>
+    <button class="tab" onclick="st('meds',this)">💊 Medications</button>
+    <button class="tab" onclick="st('patients',this)">👥 Patient Cohort</button>
+    <button class="tab" onclick="st('calendar',this)">📅 Adherence Calendar</button>
+    <button class="tab" onclick="st('outreach',this)">📞 Outreach</button>
+    <button class="tab" onclick="st('stars',this)">⭐ Stars Impact</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashTab" class="tp active">
+    <div class="grid4" id="dashStats"></div>
+    <div class="grid2">
+        <div class="card">
+            <div class="card-t">📊 PDC by Measure Class</div>
+            <div id="dashMeasures"></div>
+        </div>
+        <div class="card">
+            <div class="card-t">🚨 Non-Adherent Patients (PDC &lt; 80%)</div>
+            <div id="dashAlerts"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MEDICATIONS -->
+<div id="medsTab" class="tp">
+    <div class="card">
+        <div class="card-t">💊 Add Medication Fill</div>
+        <div class="grid3" style="margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Patient</label><select id="mfPatient"></select></div>
+            <div class="fg" style="margin:0"><label>Medication</label><input type="text" id="mfMed" placeholder="e.g. Metformin 500mg"></div>
+            <div class="fg" style="margin:0"><label>Measure Class</label>
+                <select id="mfClass"><option value="diabetes">Diabetes (D14)</option><option value="rasa">RAS Antagonists (D12)</option><option value="statins">Statins (D10)</option><option value="antidepressant">Antidepressants</option><option value="antihypertensive">Antihypertensives</option><option value="other">Other</option></select>
+            </div>
+        </div>
+        <div class="grid4" style="margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Fill Date</label><input type="date" id="mfDate"></div>
+            <div class="fg" style="margin:0"><label>Days Supply</label><input type="number" id="mfDays" value="30" min="1" max="365"></div>
+            <div class="fg" style="margin:0"><label>Quantity</label><input type="number" id="mfQty" value="30" min="1"></div>
+            <div class="fg" style="margin:0"><label>Pharmacy</label><input type="text" id="mfPharm" placeholder="e.g. CVS #4521"></div>
+        </div>
+        <button class="btn btn-pri" onclick="addFill()">+ Add Fill Record</button>
+    </div>
+    <div class="card">
+        <div class="card-t">📋 Medication Fill History</div>
+        <div id="fillList"></div>
+    </div>
+</div>
+
+<!-- PATIENTS -->
+<div id="patientsTab" class="tp">
+    <div class="card">
+        <div class="card-t">👤 Add Patient</div>
+        <div class="grid4" style="margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Name</label><input type="text" id="ptName" placeholder="e.g. Maria Santos"></div>
+            <div class="fg" style="margin:0"><label>Member ID</label><input type="text" id="ptId" placeholder="e.g. MBR-0012345"></div>
+            <div class="fg" style="margin:0"><label>DOB</label><input type="date" id="ptDob"></div>
+            <div class="fg" style="margin:0"><label>Plan</label>
+                <select id="ptPlan"><option value="MA-HMO">MA HMO</option><option value="MA-PPO">MA PPO</option><option value="MAPD">MAPD</option><option value="Commercial">Commercial</option></select>
+            </div>
+        </div>
+        <button class="btn btn-pri" onclick="addPatient()">+ Add Patient</button>
+    </div>
+    <div class="card">
+        <div class="card-t">👥 Patient Cohort</div>
+        <div id="ptList"></div>
+    </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarTab" class="tp">
+    <div class="card">
+        <div class="card-t">📅 Adherence Calendar</div>
+        <div class="grid2" style="margin-bottom:.75rem">
+            <div class="fg" style="margin:0"><label>Patient</label><select id="calPatient" onchange="renderCal()"></select></div>
+            <div class="fg" style="margin:0"><label>Measure Class</label>
+                <select id="calClass" onchange="renderCal()"><option value="all">All Classes</option><option value="diabetes">Diabetes</option><option value="rasa">RAS Antagonists</option><option value="statins">Statins</option></select>
+            </div>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-bottom:.75rem;font-size:.72rem;color:var(--tx2)">
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:12px;height:12px;border-radius:3px;background:var(--green-bg);border:1px solid var(--green-bdr)"></span> Covered</span>
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:12px;height:12px;border-radius:3px;background:var(--red-bg);border:1px solid var(--red-bdr)"></span> Gap</span>
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:12px;height:12px;border-radius:3px;background:var(--amber-bg);border:1px solid var(--amber-bdr)"></span> Last 5 days of supply</span>
+        </div>
+        <div id="calGrid"></div>
+        <div id="calSummary" style="margin-top:1rem"></div>
+    </div>
+</div>
+
+<!-- OUTREACH -->
+<div id="outreachTab" class="tp">
+    <div class="card">
+        <div class="card-t">📞 Log Outreach Attempt</div>
+        <div class="grid3" style="margin-bottom:.5rem">
+            <div class="fg" style="margin:0"><label>Patient</label><select id="orPatient"></select></div>
+            <div class="fg" style="margin:0"><label>Channel</label>
+                <select id="orChannel"><option value="phone">📞 Phone Call</option><option value="sms">💬 SMS / Text</option><option value="email">📧 Email</option><option value="mail">📬 Mailed Letter</option><option value="ivr">🤖 IVR Outreach</option><option value="pharmacy">💊 Pharmacy Coordination</option></select>
+            </div>
+            <div class="fg" style="margin:0"><label>Outcome</label>
+                <select id="orOutcome"><option value="reached">✅ Reached — Agreed to refill</option><option value="voicemail">📱 Voicemail left</option><option value="noanswer">❌ No answer</option><option value="declined">🚫 Declined</option><option value="wrong">⚠️ Wrong number</option><option value="refilled">💊 Confirmed refill completed</option></select>
+            </div>
+        </div>
+        <div class="fg"><label>Notes</label><input type="text" id="orNotes" placeholder="Optional notes about the outreach attempt"></div>
+        <button class="btn btn-blue" onclick="addOutreach()">+ Log Outreach</button>
+    </div>
+    <div class="card">
+        <div class="card-t">📋 Outreach History</div>
+        <div id="orList"></div>
+    </div>
+</div>
+
+<!-- STARS IMPACT -->
+<div id="starsTab" class="tp">
+    <div class="card">
+        <div class="card-t">⭐ Medicare Stars Quality Measures — Medication Adherence</div>
+        <div style="font-size:.84rem;color:var(--tx2);margin-bottom:1rem">CMS evaluates health plans on three medication adherence measures using PDC ≥ 80% as the threshold. These measures contribute to Part D Star Ratings and affect plan revenue through quality bonuses.</div>
+        <div id="starsGrid"></div>
+    </div>
+    <div class="card">
+        <div class="card-t">💰 Revenue Impact Simulator</div>
+        <div class="grid3" style="margin-bottom:.75rem">
+            <div class="fg" style="margin:0"><label>Total Enrolled Members</label><input type="number" id="revMembers" value="25000"></div>
+            <div class="fg" style="margin:0"><label>Per-Member Monthly Revenue</label><input type="number" id="revPmpm" value="1200"></div>
+            <div class="fg" style="margin:0"><label>Quality Bonus %</label><input type="number" id="revBonus" value="5" step="0.5"></div>
+        </div>
+        <button class="btn btn-pri" onclick="calcRevenue()">💰 Calculate Revenue Impact</button>
+        <div id="revResult" style="margin-top:.75rem"></div>
+    </div>
+</div>
+</div>
+<script>
+const CIRC=2*Math.PI*44;
+let patients=[],fills=[],outreach=[];
+
+function st(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tp').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById(t+'Tab').classList.add('active');refresh()}
+function v(id){return document.getElementById(id).value}
+function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
+function toast(m,t){const d=document.createElement('div');d.className='toast toast-'+t;d.textContent=m;document.body.appendChild(d);setTimeout(()=>{if(document.body.contains(d))document.body.removeChild(d)},3000)}
+
+function pdcColor(p){return p>=80?'var(--green)':p>=60?'var(--amber)':'var(--red)'}
+function pdcBadge(p){return p>=80?'b-green':p>=60?'b-amber':'b-red'}
+function pdcLabel(p){return p>=80?'Adherent':p>=60?'At Risk':'Non-Adherent'}
+
+// PDC Calculation
+function calcPDC(patientId,measureClass,year){
+    const yr=year||new Date().getFullYear();
+    const start=new Date(yr,0,1),end=new Date();
+    const totalDays=Math.ceil((end-start)/(1000*60*60*24))+1;
+    let pf=fills.filter(f=>f.patient===patientId&&(measureClass==='all'||f.cls===measureClass));
+    if(!pf.length)return{pdc:0,covered:0,total:totalDays,fills:0};
+    // Build coverage array
+    const coverage=new Array(totalDays).fill(false);
+    pf.forEach(f=>{
+        const fd=new Date(f.date);
+        const dayOffset=Math.ceil((fd-start)/(1000*60*60*24));
+        for(let d=0;d<f.days;d++){
+            const idx=dayOffset+d;
+            if(idx>=0&&idx<totalDays)coverage[idx]=true;
+        }
+    });
+    const covered=coverage.filter(Boolean).length;
+    return{pdc:Math.round(covered/totalDays*100),covered,total:totalDays,fills:pf.length};
+}
+
+function addPatient(){
+    const name=v('ptName').trim(),id=v('ptId').trim()||'MBR-'+String(1000+patients.length).padStart(7,'0'),dob=v('ptDob'),plan=v('ptPlan');
+    if(!name){toast('Enter patient name','e');return}
+    patients.push({name,id,dob,plan});
+    document.getElementById('ptName').value='';document.getElementById('ptId').value='';
+    refresh();toast(name+' added','s');
+}
+function removePatient(i){
+    const pid=patients[i].id;
+    fills=fills.filter(f=>f.patient!==pid);
+    outreach=outreach.filter(o=>o.patient!==pid);
+    patients.splice(i,1);refresh();
+}
+
+function addFill(){
+    const patient=v('mfPatient'),med=v('mfMed').trim(),cls=v('mfClass'),date=v('mfDate'),days=parseInt(v('mfDays'))||30,qty=parseInt(v('mfQty'))||30,pharm=v('mfPharm');
+    if(!patient){toast('Select a patient','e');return}
+    if(!med){toast('Enter medication name','e');return}
+    if(!date){toast('Enter fill date','e');return}
+    fills.push({patient,med,cls,date,days,qty,pharm,id:'RX-'+Date.now()});
+    document.getElementById('mfMed').value='';
+    refresh();toast('Fill recorded: '+med,'s');
+}
+function removeFill(i){fills.splice(i,1);refresh()}
+
+function addOutreach(){
+    const patient=v('orPatient'),channel=v('orChannel'),outcome=v('orOutcome'),notes=v('orNotes');
+    if(!patient){toast('Select a patient','e');return}
+    outreach.push({patient,channel,outcome,notes,date:new Date().toISOString()});
+    document.getElementById('orNotes').value='';
+    refresh();toast('Outreach logged','s');
+}
+
+function refresh(){
+    updateSelects();renderDash();renderFills();renderPatients();renderCal();renderOutreach();renderStars();
+}
+
+function updateSelects(){
+    const opts=patients.map(p=>`<option value="${p.id}">${esc(p.name)} (${p.id})</option>`).join('');
+    ['mfPatient','calPatient','orPatient'].forEach(id=>{
+        const el=document.getElementById(id);if(el){const cv=el.value;el.innerHTML=opts;if(cv)el.value=cv}
+    });
+}
+
+function renderDash(){
+    // Stats
+    const totalPt=patients.length;
+    const totalFills=fills.length;
+    const measures=['diabetes','rasa','statins'];
+    let adherentCount=0,totalMeasured=0;
+    patients.forEach(p=>{
+        measures.forEach(m=>{
+            const pdc=calcPDC(p.id,m);
+            if(pdc.fills>0){totalMeasured++;if(pdc.pdc>=80)adherentCount++}
+        });
+    });
+    const overallRate=totalMeasured?Math.round(adherentCount/totalMeasured*100):0;
+    const orCount=outreach.length;
+    document.getElementById('dashStats').innerHTML=[
+        {icon:'👥',val:totalPt,lbl:'Patients',color:'var(--pri)'},
+        {icon:'💊',val:totalFills,lbl:'Fill Records',color:'var(--blue)'},
+        {icon:'📊',val:overallRate+'%',lbl:'Adherence Rate',color:pdcColor(overallRate)},
+        {icon:'📞',val:orCount,lbl:'Outreach Attempts',color:'var(--purple)'}
+    ].map(s=>`<div class="card stat"><div class="stat-icon">${s.icon}</div><div class="stat-val" style="color:${s.color}">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+
+    // Measures
+    const mEl=document.getElementById('dashMeasures');
+    const mNames={diabetes:'Diabetes (D14)',rasa:'RAS Antagonists (D12)',statins:'Statins (D10)'};
+    if(!patients.length){mEl.innerHTML='<div style="padding:1rem;text-align:center;color:var(--tx3);font-size:.84rem">Add patients and fill records to see PDC measures.</div>';
+    }else{
+        mEl.innerHTML=measures.map(m=>{
+            let sum=0,cnt=0;
+            patients.forEach(p=>{const r=calcPDC(p.id,m);if(r.fills>0){sum+=r.pdc;cnt++}});
+            const avg=cnt?Math.round(sum/cnt):0;
+            return`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--bg3)">
+                <div class="pdc-ring" style="width:56px;height:56px"><svg viewBox="0 0 100 100"><circle class="bg-r" cx="50" cy="50" r="44"/><circle class="fg-r" cx="50" cy="50" r="44" style="stroke:${pdcColor(avg)};stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC-(avg/100)*CIRC}"/></svg><div class="pdc-val" style="font-size:.85rem;color:${pdcColor(avg)}">${avg}%</div></div>
+                <div style="flex:1"><div style="font-size:.88rem;font-weight:700">${mNames[m]}</div><div style="font-size:.72rem;color:var(--tx2)">${cnt} patients measured</div></div>
+                <span class="badge ${pdcBadge(avg)}">${pdcLabel(avg)}</span>
+            </div>`;
+        }).join('');
+    }
+
+    // Non-adherent alerts
+    const aEl=document.getElementById('dashAlerts');
+    const alerts=[];
+    patients.forEach(p=>{
+        measures.forEach(m=>{
+            const r=calcPDC(p.id,m);
+            if(r.fills>0&&r.pdc<80)alerts.push({name:p.name,id:p.id,measure:mNames[m]||m,pdc:r.pdc});
+        });
+    });
+    if(!alerts.length){aEl.innerHTML='<div style="padding:1rem;text-align:center;color:var(--green);font-size:.84rem">✅ All measured patients are adherent (PDC ≥ 80%)</div>';
+    }else{
+        aEl.innerHTML=alerts.sort((a,b)=>a.pdc-b.pdc).map(a=>`<div class="pt-row" style="cursor:default"><div class="pt-avatar" style="background:var(--red-bg);color:var(--red)">!</div><div class="pt-info"><div class="pt-name">${esc(a.name)}</div><div class="pt-sub">${a.measure}</div></div><div style="font-weight:800;color:${pdcColor(a.pdc)}">${a.pdc}%</div></div>`).join('');
+    }
+}
+
+function renderFills(){
+    const el=document.getElementById('fillList');
+    if(!fills.length){el.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--tx3);font-size:.84rem">No fill records yet. Add medications above.</div>';return}
+    const pillColors={diabetes:'var(--blue)',rasa:'var(--pri)',statins:'var(--purple)',antidepressant:'var(--amber)',antihypertensive:'var(--red)',other:'var(--tx3)'};
+    const clsNames={diabetes:'Diabetes',rasa:'RAS Antagonists',statins:'Statins',antidepressant:'Antidepressant',antihypertensive:'Antihypertensive',other:'Other'};
+    const pMap={};patients.forEach(p=>{pMap[p.id]=p.name});
+    el.innerHTML=fills.slice().reverse().map((f,ri)=>{
+        const i=fills.length-1-ri;
+        return`<div class="med-card"><div class="med-pill" style="background:${pillColors[f.cls]}15;color:${pillColors[f.cls]}">💊</div><div class="med-body"><div class="med-name">${esc(f.med)}</div><div class="med-meta"><span>👤 ${esc(pMap[f.patient]||f.patient)}</span><span>📅 ${f.date}</span><span>${f.days}-day supply</span><span class="badge b-blue">${clsNames[f.cls]||f.cls}</span>${f.pharm?`<span>🏥 ${esc(f.pharm)}</span>`:''}</div></div><button class="btn btn-ghost btn-sm" onclick="removeFill(${i})">✗</button></div>`;
+    }).join('');
+}
+
+function renderPatients(){
+    const el=document.getElementById('ptList');
+    if(!patients.length){el.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--tx3);font-size:.84rem">No patients. Add one above or load demo data.</div>';return}
+    el.innerHTML=patients.map((p,i)=>{
+        const pdc=calcPDC(p.id,'all');
+        const colors=['var(--pri)','var(--blue)','var(--purple)','var(--amber)','var(--red)'];
+        return`<div class="pt-row"><div class="pt-avatar" style="background:${colors[i%5]}15;color:${colors[i%5]}">${p.name.split(' ').map(w=>w[0]).join('').substring(0,2)}</div><div class="pt-info"><div class="pt-name">${esc(p.name)}</div><div class="pt-sub">${p.id} · ${p.plan}${p.dob?' · DOB: '+p.dob:''}</div><div class="pbar"><div class="pbar-fill" style="width:${pdc.pdc}%;background:${pdcColor(pdc.pdc)}"></div></div></div><div style="text-align:right"><div style="font-weight:800;font-size:1rem;color:${pdcColor(pdc.pdc)}">${pdc.fills?pdc.pdc+'%':'—'}</div><div style="font-size:.65rem;color:var(--tx3)">${pdc.fills} fills</div></div><button class="btn btn-ghost btn-sm" onclick="removePatient(${i})">✗</button></div>`;
+    }).join('');
+}
+
+function renderCal(){
+    const grid=document.getElementById('calGrid');
+    const summary=document.getElementById('calSummary');
+    const pid=document.getElementById('calPatient')?.value;
+    const cls=document.getElementById('calClass')?.value||'all';
+    if(!pid||!patients.length){grid.innerHTML='<div style="padding:2rem;text-align:center;color:var(--tx3)">Select a patient to view adherence calendar.</div>';if(summary)summary.innerHTML='';return}
+    const yr=new Date().getFullYear();
+    const now=new Date();
+    const start=new Date(yr,0,1);
+    const totalDays=Math.ceil((now-start)/(1000*60*60*24))+1;
+    // Build coverage
+    const coverage=new Array(totalDays).fill(0);
+    const pf=fills.filter(f=>f.patient===pid&&(cls==='all'||f.cls===cls));
+    pf.forEach(f=>{
+        const fd=new Date(f.date);
+        const offset=Math.ceil((fd-start)/(1000*60*60*24));
+        for(let d=0;d<f.days;d++){const idx=offset+d;if(idx>=0&&idx<totalDays){coverage[idx]=f.days-d<=5?2:1}}
+    });
+    // Render month by month
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const today=new Date();
+    let html='';
+    for(let m=0;m<=today.getMonth();m++){
+        const daysInMonth=new Date(yr,m+1,0).getDate();
+        const firstDow=new Date(yr,m,1).getDay();
+        html+=`<div style="margin-bottom:1rem"><div style="font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--tx2)">${months[m]} ${yr}</div><div class="cal"><div class="cal-hdr">S</div><div class="cal-hdr">M</div><div class="cal-hdr">T</div><div class="cal-hdr">W</div><div class="cal-hdr">T</div><div class="cal-hdr">F</div><div class="cal-hdr">S</div>`;
+        for(let e=0;e<firstDow;e++)html+=`<div class="cal-cell empty"></div>`;
+        for(let d=1;d<=daysInMonth;d++){
+            const dt=new Date(yr,m,d);
+            if(dt>today){html+=`<div class="cal-cell empty">${d}</div>`;continue}
+            const idx=Math.ceil((dt-start)/(1000*60*60*24));
+            const c=coverage[idx]||0;
+            const isToday=dt.toDateString()===today.toDateString();
+            html+=`<div class="cal-cell ${c===1?'covered':c===2?'partial':'gap'} ${isToday?'today':''}">${d}</div>`;
+        }
+        html+=`</div></div>`;
+    }
+    grid.innerHTML=html;
+    // Summary
+    const pdc=calcPDC(pid,cls);
+    const pName=patients.find(p=>p.id===pid)?.name||pid;
+    summary.innerHTML=`<div class="card"><div style="display:flex;align-items:center;gap:1rem"><div class="pdc-ring"><svg viewBox="0 0 100 100"><circle class="bg-r" cx="50" cy="50" r="44"/><circle class="fg-r" cx="50" cy="50" r="44" style="stroke:${pdcColor(pdc.pdc)};stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC-(pdc.pdc/100)*CIRC}"/></svg><div class="pdc-val" style="color:${pdcColor(pdc.pdc)}">${pdc.pdc}%</div></div><div><div style="font-size:1rem;font-weight:700">${esc(pName)}</div><div style="font-size:.82rem;color:var(--tx2)">${pdc.covered} of ${pdc.total} days covered · ${pdc.fills} fills</div><div style="margin-top:.3rem"><span class="badge ${pdcBadge(pdc.pdc)}">${pdcLabel(pdc.pdc)} — PDC ${pdc.pdc}%</span></div></div></div></div>`;
+}
+
+function renderOutreach(){
+    const el=document.getElementById('orList');
+    if(!outreach.length){el.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--tx3);font-size:.84rem">No outreach logged yet.</div>';return}
+    const pMap={};patients.forEach(p=>{pMap[p.id]=p.name});
+    const chIcons={phone:'📞',sms:'💬',email:'📧',mail:'📬',ivr:'🤖',pharmacy:'💊'};
+    const outIcons={reached:'✅',voicemail:'📱',noanswer:'❌',declined:'🚫',wrong:'⚠️',refilled:'💊'};
+    el.innerHTML=outreach.slice().reverse().map(o=>`<div class="ol-item"><div class="ol-icon" style="background:var(--blue-bg);color:var(--blue)">${chIcons[o.channel]||'📞'}</div><div style="flex:1"><div style="font-size:.84rem"><strong>${esc(pMap[o.patient]||o.patient)}</strong> — ${o.channel} ${outIcons[o.outcome]||''} ${o.outcome}</div>${o.notes?`<div style="font-size:.75rem;color:var(--tx2)">${esc(o.notes)}</div>`:''}<div style="font-size:.68rem;color:var(--tx3);font-family:'JetBrains Mono',monospace">${new Date(o.date).toLocaleString()}</div></div></div>`).join('');
+}
+
+function renderStars(){
+    const measures=[
+        {key:'diabetes',name:'Medication Adherence for Diabetes Medications (D14)',desc:'PDC ≥ 80% for oral diabetes medications (biguanides, sulfonylureas, TZDs, DPP-4, SGLT2, meglitinides)',weight:3},
+        {key:'rasa',name:'Medication Adherence for RAS Antagonists (D12)',desc:'PDC ≥ 80% for ACE inhibitors, ARBs, and direct renin inhibitors',weight:3},
+        {key:'statins',name:'Medication Adherence for Statins (D10)',desc:'PDC ≥ 80% for HMG-CoA reductase inhibitors (statins)',weight:3}
+    ];
+    const el=document.getElementById('starsGrid');
+    el.innerHTML=measures.map(m=>{
+        let adherent=0,total=0;
+        patients.forEach(p=>{const r=calcPDC(p.id,m.key);if(r.fills>0){total++;if(r.pdc>=80)adherent++}});
+        const rate=total?Math.round(adherent/total*100):0;
+        const stars=rate>=90?5:rate>=80?4:rate>=70?3:rate>=60?2:1;
+        return`<div class="card" style="border-left:3px solid ${pdcColor(rate)}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">
+                <div><div style="font-size:.92rem;font-weight:700">${m.name}</div><div style="font-size:.75rem;color:var(--tx2);margin-top:.2rem">${m.desc}</div></div>
+                <div style="text-align:right"><div style="font-size:1.3rem;font-weight:800;color:${pdcColor(rate)}">${rate}%</div><div style="font-size:.85rem;color:var(--amber)">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div></div>
+            </div>
+            <div style="display:flex;gap:1rem;font-size:.78rem;color:var(--tx2)">
+                <span>${adherent} of ${total} adherent</span>
+                <span>Weight: ${m.weight}×</span>
+                <span>Threshold: PDC ≥ 80%</span>
+                <span class="badge ${pdcBadge(rate)}">${stars} Star${stars!==1?'s':''}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function calcRevenue(){
+    const members=parseInt(v('revMembers'))||25000;
+    const pmpm=parseInt(v('revPmpm'))||1200;
+    const bonus=parseFloat(v('revBonus'))||5;
+    const annualRev=members*pmpm*12;
+    const bonusRev=annualRev*(bonus/100);
+    // Calculate current stars
+    const measures=['diabetes','rasa','statins'];
+    let totalStars=0,measuredCount=0;
+    measures.forEach(m=>{
+        let ad=0,tot=0;
+        patients.forEach(p=>{const r=calcPDC(p.id,m);if(r.fills>0){tot++;if(r.pdc>=80)ad++}});
+        const rate=tot?Math.round(ad/tot*100):0;
+        totalStars+=(rate>=90?5:rate>=80?4:rate>=70?3:rate>=60?2:1);
+        measuredCount++;
+    });
+    const avgStars=measuredCount?Math.round(totalStars/measuredCount*10)/10:0;
+    document.getElementById('revResult').innerHTML=`<div class="card" style="border-left:3px solid var(--pri)"><div class="grid3"><div class="stat"><div class="stat-val" style="color:var(--pri)">$${(annualRev/1e6).toFixed(1)}M</div><div class="stat-lbl">Annual Revenue</div></div><div class="stat"><div class="stat-val" style="color:var(--green)">$${(bonusRev/1e6).toFixed(1)}M</div><div class="stat-lbl">Quality Bonus (${bonus}%)</div></div><div class="stat"><div class="stat-val" style="color:var(--amber)">${avgStars} ★</div><div class="stat-lbl">Avg Adherence Stars</div></div></div><div style="font-size:.82rem;color:var(--tx2);text-align:center;margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--bdr)">Each 1-star improvement in adherence measures ≈ <strong style="color:var(--pri)">$${(bonusRev/5/1e6).toFixed(2)}M</strong> additional annual revenue</div></div>`;
+}
+
+function loadDemo(){
+    patients=[
+        {name:'Maria Santos',id:'MBR-0001234',dob:'1952-03-14',plan:'MA-HMO'},
+        {name:'James Wilson',id:'MBR-0001235',dob:'1948-11-22',plan:'MAPD'},
+        {name:'Priya Patel',id:'MBR-0001236',dob:'1955-07-09',plan:'MA-PPO'},
+        {name:'Robert Chen',id:'MBR-0001237',dob:'1960-01-30',plan:'MA-HMO'},
+        {name:'Dorothy Hayes',id:'MBR-0001238',dob:'1950-05-18',plan:'MAPD'}
+    ];
+    const yr=new Date().getFullYear();
+    fills=[
+        // Maria - diabetes adherent, statins gap
+        {patient:'MBR-0001234',med:'Metformin 500mg',cls:'diabetes',date:yr+'-01-05',days:90,qty:90,pharm:'CVS #4521',id:'RX-1'},
+        {patient:'MBR-0001234',med:'Metformin 500mg',cls:'diabetes',date:yr+'-04-03',days:90,qty:90,pharm:'CVS #4521',id:'RX-2'},
+        {patient:'MBR-0001234',med:'Atorvastatin 20mg',cls:'statins',date:yr+'-01-10',days:30,qty:30,pharm:'CVS #4521',id:'RX-3'},
+        // James - all adherent
+        {patient:'MBR-0001235',med:'Glipizide 5mg',cls:'diabetes',date:yr+'-01-02',days:90,qty:90,pharm:'Walgreens',id:'RX-4'},
+        {patient:'MBR-0001235',med:'Glipizide 5mg',cls:'diabetes',date:yr+'-04-01',days:90,qty:90,pharm:'Walgreens',id:'RX-5'},
+        {patient:'MBR-0001235',med:'Lisinopril 10mg',cls:'rasa',date:yr+'-01-02',days:90,qty:90,pharm:'Walgreens',id:'RX-6'},
+        {patient:'MBR-0001235',med:'Lisinopril 10mg',cls:'rasa',date:yr+'-04-01',days:90,qty:90,pharm:'Walgreens',id:'RX-7'},
+        {patient:'MBR-0001235',med:'Rosuvastatin 10mg',cls:'statins',date:yr+'-01-02',days:90,qty:90,pharm:'Walgreens',id:'RX-8'},
+        {patient:'MBR-0001235',med:'Rosuvastatin 10mg',cls:'statins',date:yr+'-04-01',days:90,qty:90,pharm:'Walgreens',id:'RX-9'},
+        // Priya - non-adherent diabetes
+        {patient:'MBR-0001236',med:'Sitagliptin 100mg',cls:'diabetes',date:yr+'-01-15',days:30,qty:30,pharm:'RiteAid',id:'RX-10'},
+        {patient:'MBR-0001236',med:'Sitagliptin 100mg',cls:'diabetes',date:yr+'-03-20',days:30,qty:30,pharm:'RiteAid',id:'RX-11'},
+        {patient:'MBR-0001236',med:'Losartan 50mg',cls:'rasa',date:yr+'-01-15',days:90,qty:90,pharm:'RiteAid',id:'RX-12'},
+        {patient:'MBR-0001236',med:'Losartan 50mg',cls:'rasa',date:yr+'-04-14',days:90,qty:90,pharm:'RiteAid',id:'RX-13'},
+        // Robert - statins only, adherent
+        {patient:'MBR-0001237',med:'Atorvastatin 40mg',cls:'statins',date:yr+'-01-08',days:90,qty:90,pharm:'Express Scripts',id:'RX-14'},
+        {patient:'MBR-0001237',med:'Atorvastatin 40mg',cls:'statins',date:yr+'-04-06',days:90,qty:90,pharm:'Express Scripts',id:'RX-15'},
+        // Dorothy - non-adherent across all
+        {patient:'MBR-0001238',med:'Empagliflozin 10mg',cls:'diabetes',date:yr+'-01-20',days:30,qty:30,pharm:'CVS Mail',id:'RX-16'},
+        {patient:'MBR-0001238',med:'Valsartan 80mg',cls:'rasa',date:yr+'-02-01',days:30,qty:30,pharm:'CVS Mail',id:'RX-17'},
+        {patient:'MBR-0001238',med:'Simvastatin 20mg',cls:'statins',date:yr+'-01-20',days:30,qty:30,pharm:'CVS Mail',id:'RX-18'}
+    ];
+    outreach=[
+        {patient:'MBR-0001234',channel:'phone',outcome:'reached',notes:'Agreed to refill statins. Will call pharmacy.',date:new Date(Date.now()-86400000*3).toISOString()},
+        {patient:'MBR-0001236',channel:'sms',outcome:'voicemail',notes:'Sent refill reminder for Sitagliptin.',date:new Date(Date.now()-86400000*5).toISOString()},
+        {patient:'MBR-0001238',channel:'phone',outcome:'noanswer',notes:'First attempt. Will retry in 48 hours.',date:new Date(Date.now()-86400000*2).toISOString()},
+        {patient:'MBR-0001238',channel:'mail',outcome:'reached',notes:'Mailed gap closure letter with pre-addressed pharmacy form.',date:new Date(Date.now()-86400000*7).toISOString()}
+    ];
+    refresh();toast('Demo data loaded — 5 patients, 18 fills, 4 outreach records','s');
+}
+
+function resetAll(){patients=[];fills=[];outreach=[];refresh();toast('All data cleared','i')}
+refresh();
+</script>
+<div style="max-width:1360px;margin:3rem auto 0;padding:0 1.5rem 2rem"><div style="background:rgba(217,119,6,.06);border:2px solid rgba(217,119,6,.25);border-radius:12px;padding:1.25rem 1.5rem"><div style="display:flex;align-items:flex-start;gap:.75rem"><span style="font-size:1.4rem;flex-shrink:0">⚠️</span><div><div style="color:#d97706;font-weight:700;font-size:.9rem;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Important Disclaimer</div><p style="color:var(--tx2);font-size:.85rem;line-height:1.7;margin-bottom:.3rem"><strong style="color:var(--tx)">For Demonstration & Educational Purposes Only.</strong> This tool uses sample data and simplified PDC calculations. Not intended for clinical decision-making, member outreach, or regulatory reporting.</p><p style="color:var(--tx2);font-size:.85rem;line-height:1.7"><strong style="color:var(--tx)">Built with AI Assistance.</strong> Built with Claude by Anthropic. PDC methodology is simplified for demonstration. Actual CMS Star Ratings calculations involve additional complexity, exclusions, and adjustment factors.</p></div></div></div></div>
+</body></html>
