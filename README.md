@@ -2,7 +2,7 @@
 
 **Live Site:** [vandanakarthikeya.github.io](https://vandanakarthikeya.github.io/)
 
-VP-level Engineering, Data & Ops leader with 26+ years scaling healthcare SaaS platforms, integrated delivery systems, and enterprise technology. This repository hosts my portfolio website and a growing collection of interactive tools I've built from scratch.
+VP-level Engineering, Data & Ops leader with 26+ years solving real-world business problems across healthcare providers, payors, and care delivery systems. Specializes in technology rationalization through mergers & acquisitions, platform modernization, and operational efficiency. This repository hosts my portfolio website and a growing collection of interactive tools I've built from scratch.
 
 ---
 
