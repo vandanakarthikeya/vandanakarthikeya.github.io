@@ -1506,8 +1506,8 @@
             <div class="donate-banner fade-up">
                 <div class="donate-icon">☕</div>
                 <div class="donate-text">
-                    <h3>These Free Tools Cost Real Money to Build</h3>
-                    <p>Every app on this site runs on compute, tooling, and countless hours of development. If you found these tools useful and want to support continued development of free healthcare AI tools, kindly consider donating.</p>
+                    <h3>Enjoyed these tools? Buy me a coffee! ☕</h3>
+                    <p>All 12+ apps on this site are <strong>100% free</strong> — no logins, no paywalls, no ads. They were built from scratch using real healthcare expertise and hundreds of hours of hands-on development. If these tools saved you time, sparked an idea, or helped you learn something new, a small contribution goes a long way toward keeping them live and building more. Every coffee counts! 🙏</p>
                 </div>
                 <a href="https://paypal.me/VandanaKarthikeya" target="_blank" class="donate-btn">☕ Buy Me a Coffee</a>
             </div>
@@ -1745,7 +1745,7 @@
     function toggleUpvote(btn, appId) {
         const votes = getVotes();
         const counts = getCounts();
-        if (!counts[appId]) counts[appId] = Math.floor(Math.random() * 30) + 5; // seed
+        if (!counts[appId]) counts[appId] = 0;
         if (votes[appId]) {
             delete votes[appId];
             counts[appId] = Math.max(0, counts[appId] - 1);
@@ -1767,7 +1767,7 @@
         const counts = getCounts();
         document.querySelectorAll('.uv-count').forEach(el => {
             const id = el.id.replace('uv-', '');
-            if (!counts[id]) counts[id] = Math.floor(Math.random() * 30) + 5;
+            if (!counts[id]) counts[id] = 0;
             el.textContent = counts[id];
         });
         document.querySelectorAll('.upvote-btn').forEach(btn => {
