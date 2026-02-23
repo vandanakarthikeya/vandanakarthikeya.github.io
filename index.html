@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vandana Karthikeya — Healthcare AI & Engineering Leader</title>
-    <meta name="description" content="VP Engineering & Data Management with close to 30 years solving business problems across healthcare providers, payors, and care delivery systems. Technology rationalization, M&A, platform modernization.">
+    <title>Vandana Karthikeya — Technology & Engineering Leader</title>
+    <meta name="description" content="VP Engineering & Technology Leader with close to 30 years solving business problems across healthcare, fintech, and enterprise technology. Platform modernization, AI/ML, data operations, M&A integration.">
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -69,35 +69,65 @@
         nav.scrolled { box-shadow: var(--shadow-sm); }
         .nav-inner {
             max-width: 1200px; margin: 0 auto; padding: 0 2rem;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex; align-items: center; gap: 2.5rem;
             height: 64px;
         }
         .nav-logo {
             font-family: 'DM Serif Display', serif;
-            font-size: 1.3rem; color: var(--ink);
+            font-size: 1.05rem; color: var(--ink);
             text-decoration: none;
             letter-spacing: -0.02em;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .nav-logo span { color: var(--accent); }
-        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; flex: 1; }
         .nav-links a {
             text-decoration: none; color: var(--slate);
             font-size: 0.88rem; font-weight: 500;
             letter-spacing: 0.02em;
             transition: color 0.2s;
+            white-space: nowrap;
         }
         .nav-links a:hover { color: var(--accent); }
+        .nav-links a.nav-active { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
+        /* prevent active style from applying to the AI Lab pill */
+        .nav-links a.nav-ailab.nav-active { border-bottom: none; padding-bottom: 0; }
+
+        /* AI Lab highlight in nav */
+        .nav-ailab {
+            background: var(--gradient-warm) !important;
+            color: white !important;
+            padding: 0.35rem 1rem !important;
+            border-radius: 20px !important;
+            font-weight: 700 !important;
+            font-size: 0.82rem !important;
+            letter-spacing: 0.03em !important;
+            box-shadow: 0 2px 10px rgba(196,93,62,0.3) !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            animation: pulse-nav 3s ease-in-out infinite;
+        }
+        .nav-ailab:hover { transform: translateY(-1px) !important; box-shadow: 0 4px 16px rgba(196,93,62,0.4) !important; color: white !important; }
+        @keyframes pulse-nav {
+            0%, 100% { box-shadow: 0 2px 10px rgba(196,93,62,0.3); }
+            50% { box-shadow: 0 2px 18px rgba(196,93,62,0.55); }
+        }
+
         .nav-cta {
             background: var(--gradient-teal) !important;
             color: white !important; padding: 0.5rem 1.2rem;
             border-radius: 8px;
             font-weight: 600 !important;
             transition: transform 0.2s, box-shadow 0.2s !important;
+            margin-left: auto;
+            flex-shrink: 0;
         }
         .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.3); }
 
-        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; margin-left: auto; }
         .mobile-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; transition: 0.3s; border-radius: 1px; }
+
+
 
         /* ========== HERO ========== */
         .hero {
@@ -908,31 +938,34 @@
 <!-- NAV -->
 <nav id="mainNav">
     <div class="nav-inner">
-        <a href="#" class="nav-logo">VK<span>.</span></a>
+        <a href="#home" class="nav-logo">Vandana Karthikeya<span>.</span></a>
         <div class="nav-links" id="navLinks">
+            <a href="#home">Home</a>
             <a href="#about">About</a>
             <a href="#experience">Experience</a>
-            <a href="#pocs">AI Lab</a>
+            <a href="#pocs" class="nav-ailab">✦ AI Lab</a>
             <a href="#access">Access</a>
             <a href="#ideas">Roadmap</a>
-            <a href="#contact" class="nav-cta">Let's Talk</a>
         </div>
+        <a href="#contact" class="nav-cta">Let's Talk</a>
         <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
             <span></span><span></span><span></span>
         </button>
     </div>
 </nav>
 
+
+
 <!-- HERO -->
 <section class="hero" id="home">
     <div class="container">
         <div class="hero-grid">
             <div class="fade-up">
-                <div class="hero-tag">Healthcare AI & Engineering</div>
-                <h1>Building the <em>Future</em> of Healthcare Technology</h1>
+                <div class="hero-tag">Technology & Engineering Leadership</div>
+                <h1>Building Technology that <em>Scales</em> and Delivers</h1>
                 <p class="hero-desc">
-                    VP-level engineering leader with close to 30 years solving real-world business problems across healthcare providers, payors, and care delivery systems. 
-                    I specialize in technology rationalization through mergers &amp; acquisitions, platform modernization, and driving operational efficiency at scale. As a recent hobby, I picked up vibe coding to generate small usable tools and MVPs, clean up messy data, and explore new possibilities.
+                    VP-level engineering leader with close to 30 years solving real-world business problems across healthcare, fintech, and enterprise technology. 
+                    I specialize in platform modernization, technology rationalization through mergers &amp; acquisitions, data operations at scale, and building high-performing engineering teams that ship.
                 </p>
                 <div class="hero-stats">
                     <div>
@@ -967,20 +1000,20 @@
                         </div>
                     </div>
                     <div class="hero-card-logos">
-                        <span class="logo-pill">Healthcare Data Ops</span>
-                        <span class="logo-pill">Business Process Optimization</span>
                         <span class="logo-pill">Platform Modernization</span>
+                        <span class="logo-pill">Data & AI Engineering</span>
+                        <span class="logo-pill">Business Process Optimization</span>
                         <span class="logo-pill">ITSM & SRE</span>
                     </div>
                     <div class="hero-card-domains">
-                        <div class="domain-item"><span class="domain-dot teal"></span>Healthcare Data Ops</div>
-                        <div class="domain-item"><span class="domain-dot accent"></span>Business Process Optimization</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Healthcare Tech (Deep Expertise)</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>FinTech & Enterprise IT</div>
                         <div class="domain-item"><span class="domain-dot teal"></span>Platform / Tech Modernization</div>
                         <div class="domain-item"><span class="domain-dot accent"></span>ITSM & Incident Management</div>
-                        <div class="domain-item"><span class="domain-dot teal"></span>Metrics & Quality Analytics</div>
-                        <div class="domain-item"><span class="domain-dot accent"></span>Application Rationalization</div>
-                        <div class="domain-item"><span class="domain-dot teal"></span>Post-Acquisition Tech Integration</div>
-                        <div class="domain-item"><span class="domain-dot accent"></span>Platform Tech Support</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Data Ops & AI/ML</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>M&A Tech Integration</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Engineering Team Leadership</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>Cloud & DevOps</div>
                     </div>
                 </div>
                 <div class="floating-badge top-right">🤖 AI-Powered</div>
@@ -998,22 +1031,32 @@
         <div class="about-grid">
             <div class="about-text fade-up">
                 <p>
-                    I'm a hands-on technology leader who has spent the last decade at the intersection of healthcare and engineering — building and scaling data operations for organizations serving millions of patients.
+                    I'm a hands-on technology leader with close to 30 years of experience building, scaling, and modernizing technology organizations — across healthcare, fintech, and large enterprise IT. I bring equal comfort in the boardroom and the codebase, with a track record of turning complex technical challenges into measurable business outcomes.
                 </p>
                 <p>
                     Most recently as <strong>VP of Engineering, Data & Ops at a healthcare analytics SaaS startup</strong>, I built the entire engineering and data operations function from scratch. I led an AI-powered integration technology replacement — migrating from legacy tooling to industry-standard platforms, completing a complex tech migration with less than 2% issues post production go-live. The new stack was also successfully leveraged for the 2026 Annual Enrollment Period (AEP).
                 </p>
-                <div class="about-highlight">
-                    <p>"I don't just talk about AI in healthcare — I build production-grade tools that solve real problems. Every POC in my AI Lab is a working application, not a slide deck."</p>
+
+                <!-- Healthcare highlight box -->
+                <div style="background: linear-gradient(135deg, rgba(26,107,90,0.07) 0%, rgba(26,107,90,0.03) 100%); border-left: 3px solid var(--teal); border-radius: 0 var(--radius) var(--radius) 0; padding: 1.5rem; margin: 1.75rem 0;">
+                    <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.6rem;">🏥 Healthcare — A Defining Chapter</div>
+                    <p style="color: var(--slate); font-size: 0.97rem; margin-bottom: 0;">
+                        A significant portion of my career has been spent at the forefront of healthcare technology — spanning payers, providers, and care delivery. From managing a $30M portfolio at a Fortune 50 health insurer and co-leading an EPIC EMR rollout across 43+ clinics, to building EDI processing systems and AI-driven payer analytics platforms, healthcare is where much of my deepest domain expertise lives. I understand the regulatory landscape, the interoperability challenges, and the human stakes that make getting it right non-negotiable.
+                    </p>
                 </div>
+
+                <div class="about-highlight">
+                    <p>"These tools show what's possible. I know the domain deeply enough to design the right solution, and I can build fast enough to prototype it in days. The path from here to production is an architecture and engineering conversation."</p>
+                </div>
+
                 <p>
-                    Previously, I served as <strong>Sr. Director of IT at a Fortune 50 health insurer</strong>, managing a $30M portfolio and 43+ clinics serving 100K+ patients. Before that, I <strong>built IT shared services at one of the nation's largest integrated health systems</strong>, scaling across 10 departments. I carry an MS in Computer Science from BITS Pilani, leadership credentials from MIT Sloan, and a PG Diploma in AI/ML from UT Austin.
+                    Previously, I served as <strong>Sr. Director of IT at a Fortune 50 health insurer</strong>, managing a $30M portfolio and 43+ clinics serving 100K+ patients. Before that, I <strong>built IT shared services at one of the nation's largest integrated health systems</strong>, and prior to healthcare, I led cloud transformation and enterprise platform initiatives at a <strong>global FinTech leader</strong> across US and UK operations. I carry an MS in Computer Science from BITS Pilani, leadership credentials from MIT Sloan, and a PG Diploma in AI/ML from UT Austin.
                 </p>
                 <p>
                     Beyond technology, I'm deeply passionate about <strong>mentoring and growing people</strong>. Throughout my career I've helped engineers, managers, and individual contributors find their path — whether that's stepping into their first leadership role, pivoting into healthcare tech, or discovering strengths they didn't know they had. Several people I've mentored have gone on to Director and VP-level roles. I believe great teams are built by investing in people first, and the best technology outcomes follow naturally from that.
                 </p>
                 <p>
-                    I'm currently open to <strong>VP+ Engineering, Data, and Consulting roles</strong> at mid-size healthcare companies that are scaling and offer equity participation. I bring the rare combination of deep healthcare domain knowledge, engineering leadership at scale, hands-on AI building capability, and a track record of developing high-performing teams.
+                    I'm currently open to <strong>VP+ Engineering, Data, and Consulting roles</strong> at mid-size companies that are scaling and offer equity participation — in healthcare or adjacent industries where deep technical and operational expertise creates a real advantage.
                 </p>
             </div>
             <div class="about-sidebar fade-up stagger-2">
@@ -1027,7 +1070,7 @@
                 </div>
                 <div class="about-fact">
                     <div class="about-fact-label">Domain Expertise</div>
-                    <div class="about-fact-value">Payer Analytics • EDI Processing<br>Risk Adjustment (HCC/RAF)<br>HEDIS/Stars Quality<br>Value-Based Care</div>
+                    <div class="about-fact-value">Healthcare Tech (Payer/Provider)<br>FinTech & Enterprise IT<br>Platform Modernization<br>Data Ops & AI/ML</div>
                 </div>
                 <div class="about-fact">
                     <div class="about-fact-label">Tech Stack</div>
@@ -1050,8 +1093,8 @@
 <section class="section" id="experience">
     <div class="container">
         <div class="section-label fade-up">Career</div>
-        <div class="section-title fade-up">26 Years of Scaling <br>Technology Organizations</div>
-        <div class="section-subtitle fade-up">From startups to Fortune 50 — I build teams, systems, and cultures that ship.</div>
+        <div class="section-title fade-up">28 Years of Scaling <br>Technology Organizations</div>
+        <div class="section-subtitle fade-up">From startups to Fortune 50 — across healthcare, fintech, and enterprise tech — I build teams, systems, and cultures that ship.</div>
 
         <div class="timeline">
             <div class="timeline-item fade-up">
@@ -1122,7 +1165,31 @@
     <div class="container">
         <div class="section-label fade-up">AI Lab</div>
         <div class="section-title fade-up">Tools I Built From Scratch</div>
-        <div class="section-subtitle fade-up">Working applications — not wireframes. Organized by domain. Click "Open App" to use any tool directly in your browser.</div>
+        <div class="section-subtitle fade-up">Working prototypes — not production software. Organized by domain. Click "Open App" to explore any tool directly in your browser.</div>
+
+        <!-- Honest framing -->
+        <div class="fade-up" style="margin-top: 2rem; max-width: 860px; background: linear-gradient(135deg, #0a0f1a 0%, #1a2a3a 100%); border-radius: var(--radius); padding: 2rem 2.5rem; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #c45d3e, #e8734f, #1a6b5a);"></div>
+            <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #e8734f; margin-bottom: 1rem;">What This Lab Actually Is</div>
+            <p style="font-size: 1.05rem; color: #ffffff; line-height: 1.75; font-family: 'DM Serif Display', serif; font-style: italic; margin-bottom: 1.5rem;">
+                "These tools show what's possible. I know the domain deeply enough to design the right solution, and I can build fast enough to prototype it in days. The path from here to production is an architecture and engineering conversation."
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                <div style="border-left: 2px solid #c45d3e; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.3rem;">What They Demonstrate</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Domain expertise, workflow design, and the ability to translate complex requirements into working interfaces — fast.</div>
+                </div>
+                <div style="border-left: 2px solid #1a6b5a; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4db6a0; margin-bottom: 0.3rem;">What They Are Not</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Production software. These run on synthetic or sample data in a browser. No live integrations, no real patient or claims data.</div>
+                </div>
+                <div style="border-left: 2px solid #7a8a99; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #b0bec5; margin-bottom: 0.3rem;">The Next Conversation</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Taking any of these to production involves real architecture — infrastructure, security, compliance, and scale. That's the conversation I want to have.</div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- ═══════════════════════════════════════════════ -->
         <!-- GROUP 1: Healthcare Data Apps -->
@@ -1405,11 +1472,36 @@
             <div class="group-icon gi-scripture">🕉️</div>
             <div class="group-num">Group 05</div>
             <div class="group-title">Passion Projects</div>
-            <div class="group-subtitle">Sanskrit learning tools, Vedic chanting practice, and scripture study applications</div>
+            <div class="group-subtitle">Personal data insights from wearables, Sanskrit learning tools, Vedic chanting practice, and scripture study applications</div>
         </div>
         <div class="poc-gallery">
             <div class="poc-grid">
-                <!-- Rudram Learning App -->
+
+                <!-- Personal Health Dashboard - Oura + Apple Health -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #0ea5e922, #06b6d422, #10b98122);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long teal-l"></div><div class="mockup-line medium accent"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long accent"></div><div class="mockup-line medium teal-l"></div><div class="mockup-line short accent"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Personal Health Analytics</div>
+                        <div class="poc-title">What Really Drives Energy, Heart Health & Recovery</div>
+                        <div class="poc-desc">An 89-day personal health study combining Oura Ring and Apple Health data — 495,063 source records, 18 correlations across HRV, exercise intensity, sleep, respiration, sedentary patterns, and resilience. Real insights from real wearable data.</div>
+                        <div class="poc-tags"><span class="poc-tag">Oura Ring</span><span class="poc-tag">Apple Health</span><span class="poc-tag">HRV & Recovery</span><span class="poc-tag">Personal Analytics</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'health')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-health">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('health','Personal Health Dashboard')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('health')" style="flex:1;">Open Dashboard →</button></div>
+                    </div>
+                </div>
                 <div class="poc-card fade-up">
                     <div class="poc-preview">
                         <div class="poc-preview-inner" style="background: linear-gradient(135deg, #6d28d922, #a855f722);">
@@ -1532,9 +1624,11 @@
     <div class="container">
         <div class="section-label fade-up">Roadmap</div>
         <div class="section-title fade-up">What I'm Building Next</div>
-        <div class="section-subtitle fade-up">AI-powered healthcare tools targeting the biggest pain points in value-based care.</div>
+        <div class="section-subtitle fade-up">A mix of AI tools, tech experiments, and passion projects across healthcare, engineering, and personal curiosity.</div>
 
         <div class="ideas-grid">
+
+            <!-- Healthcare (kept) -->
             <div class="idea-card fade-up">
                 <div class="idea-num">01</div>
                 <div class="idea-title">Medical Coding AI Assistant</div>
@@ -1542,55 +1636,106 @@
                 <div class="idea-impact">🔥🔥🔥🔥🔥</div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'coding-ai')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-coding-ai">0</span></button><button class="feedback-link" onclick="openFeedback('coding-ai','Medical Coding AI')">💬 Suggest</button></div>
             </div>
+
+            <!-- Tech - Engineering -->
             <div class="idea-card fade-up stagger-1">
                 <div class="idea-num">02</div>
+                <div class="idea-title">AI-Powered SRE Runbook Generator</div>
+                <div class="idea-desc">Auto-generate incident runbooks from past RCA data, Slack threads, and monitoring alerts. Reduces MTTR and onboarding time for on-call engineers.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'sre-runbook')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-sre-runbook">0</span></button><button class="feedback-link" onclick="openFeedback('sre-runbook','SRE Runbook Gen')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Tech - Data -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">03</div>
+                <div class="idea-title">Data Pipeline Health Monitor</div>
+                <div class="idea-desc">Visual dashboard for monitoring ETL job health, data freshness, row count anomalies, and schema drift — with AI-generated triage summaries on failure.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'pipeline-mon')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-pipeline-mon">0</span></button><button class="feedback-link" onclick="openFeedback('pipeline-mon','Pipeline Monitor')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Tech - ITSM -->
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">04</div>
+                <div class="idea-title">Tech Debt Visualizer</div>
+                <div class="idea-desc">Scan codebases and Jira backlogs to surface, categorize, and prioritize technical debt. Generate executive-ready heat maps and remediation ROI estimates.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'tech-debt')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-tech-debt">0</span></button><button class="feedback-link" onclick="openFeedback('tech-debt','Tech Debt Viz')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Healthcare (kept) -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">05</div>
                 <div class="idea-title">SDOH Risk Screener</div>
                 <div class="idea-desc">Social Determinants of Health screening with Z-code mapping, community resource referrals, and population analytics dashboard.</div>
                 <div class="idea-impact">🔥🔥🔥🔥</div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'sdoh')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-sdoh">0</span></button><button class="feedback-link" onclick="openFeedback('sdoh','SDOH Screener')">💬 Suggest</button></div>
             </div>
-            <div class="idea-card fade-up stagger-2">
-                <div class="idea-num">03</div>
-                <div class="idea-title">Care Gap Closure Engine</div>
-                <div class="idea-desc">Intelligent gap identification, AI-prioritized outreach lists, and closure tracking with Stars impact simulation.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
-                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'care-gap')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-care-gap">0</span></button><button class="feedback-link" onclick="openFeedback('care-gap','Care Gap Engine')">💬 Suggest</button></div>
-            </div>
-            <div class="idea-card fade-up stagger-3">
-                <div class="idea-num">04</div>
-                <div class="idea-title">Medication Adherence Tracker</div>
-                <div class="idea-desc">PDC calculation, non-adherent patient identification, AI-generated personalized outreach, and quality score impact analysis.</div>
-                <div class="idea-impact">🔥🔥🔥</div>
-                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'med-adherence')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-med-adherence">0</span></button><button class="feedback-link" onclick="openFeedback('med-adherence','Med Adherence Tracker')">💬 Suggest</button></div>
-            </div>
-            <div class="idea-card fade-up">
-                <div class="idea-num">05</div>
-                <div class="idea-title">270/271 Eligibility Checker</div>
-                <div class="idea-desc">Real-time insurance eligibility verification simulator. Parses EDI 271 responses into human-readable benefit summaries.</div>
-                <div class="idea-impact">🔥🔥🔥</div>
-                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'eligibility')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-eligibility">0</span></button><button class="feedback-link" onclick="openFeedback('eligibility','Eligibility Checker')">💬 Suggest</button></div>
-            </div>
+
+            <!-- Tech - AI/LLM -->
             <div class="idea-card fade-up stagger-1">
                 <div class="idea-num">06</div>
+                <div class="idea-title">Meeting Intelligence Summarizer</div>
+                <div class="idea-desc">Upload call transcripts or meeting recordings and get AI-generated summaries, action items, decision logs, and follow-up drafts — organized by stakeholder.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'meet-intel')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-meet-intel">0</span></button><button class="feedback-link" onclick="openFeedback('meet-intel','Meeting Intelligence')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Passion Project -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">07</div>
+                <div class="idea-title">Personal Wearables AI Coach</div>
+                <div class="idea-desc">Extend my Oura + Apple Health dashboard into a conversational AI coach — ask questions about your own health data, get personalized insights and weekly trend summaries.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'wearable-ai')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-wearable-ai">0</span></button><button class="feedback-link" onclick="openFeedback('wearable-ai','Wearables AI Coach')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Passion Project - Sanskrit -->
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">08</div>
+                <div class="idea-title">Vedic Text Semantic Search</div>
+                <div class="idea-desc">Search across Upanishads, Bhagavatam, and Stotra texts by meaning and concept — not just keyword. AI-powered semantic indexing with multilingual support (Sanskrit, Tamil, English).</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vedic-search')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vedic-search">0</span></button><button class="feedback-link" onclick="openFeedback('vedic-search','Vedic Search')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Tech - M&A -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">09</div>
+                <div class="idea-title">M&A Tech Integration Playbook Builder</div>
+                <div class="idea-desc">AI-assisted tool to generate post-acquisition technology integration roadmaps — mapping systems, identifying redundancies, estimating migration effort and risk.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'ma-playbook')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-ma-playbook">0</span></button><button class="feedback-link" onclick="openFeedback('ma-playbook','M&A Playbook')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Passion Project - Personal Finance -->
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">10</div>
+                <div class="idea-title">Personal Finance Pattern Analyzer</div>
+                <div class="idea-desc">Upload bank/credit card exports and get AI-generated spending pattern analysis, anomaly detection, savings opportunity highlights, and month-over-month trend charts.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'finance-ai')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-finance-ai">0</span></button><button class="feedback-link" onclick="openFeedback('finance-ai','Finance Analyzer')">💬 Suggest</button></div>
+            </div>
+
+            <!-- Healthcare (kept) -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">11</div>
                 <div class="idea-title">Star Ratings Impact Calculator</div>
                 <div class="idea-desc">Input measure scores, simulate improvement scenarios, and calculate the revenue impact of Stars rating changes.</div>
                 <div class="idea-impact">🔥🔥🔥🔥</div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'star-calc')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-star-calc">0</span></button><button class="feedback-link" onclick="openFeedback('star-calc','Star Ratings Calc')">💬 Suggest</button></div>
             </div>
-            <div class="idea-card fade-up stagger-2">
-                <div class="idea-num">07</div>
-                <div class="idea-title">Population Health Registry</div>
-                <div class="idea-desc">Chronic disease registry with AI risk stratification, intervention ROI modeling, and care management dashboards.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
-                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'pop-health')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-pop-health">0</span></button><button class="feedback-link" onclick="openFeedback('pop-health','Population Health')">💬 Suggest</button></div>
-            </div>
+
+            <!-- Tech - Dev Productivity -->
             <div class="idea-card fade-up stagger-3">
-                <div class="idea-num">08</div>
-                <div class="idea-title">CPT Bundling Checker</div>
-                <div class="idea-desc">NCCI edit validation for CPT code combinations. Prevent claim denials from incorrect bundling before submission.</div>
-                <div class="idea-impact">🔥🔥🔥</div>
-                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'cpt-bundle')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-cpt-bundle">0</span></button><button class="feedback-link" onclick="openFeedback('cpt-bundle','CPT Bundling')">💬 Suggest</button></div>
+                <div class="idea-num">12</div>
+                <div class="idea-title">Engineering Metrics Dashboard</div>
+                <div class="idea-desc">DORA metrics tracker (deploy frequency, lead time, MTTR, change failure rate) with team-level benchmarking, trend analysis, and AI-generated improvement recommendations.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'eng-metrics')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-eng-metrics">0</span></button><button class="feedback-link" onclick="openFeedback('eng-metrics','Eng Metrics')">💬 Suggest</button></div>
             </div>
+
         </div>
     </div>
 </section>
@@ -1685,10 +1830,23 @@
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // Nav scroll effect
-    window.addEventListener('scroll', () => {
+    // Nav scroll effect + active section tracking
+    const sections = ['home','about','experience','pocs','access','ideas','contact'];
+    const topLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+
+    function updateActiveSection() {
         document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
-    });
+        let current = 'home';
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && window.scrollY >= el.offsetTop - 120) current = id;
+        });
+        topLinks.forEach(link => {
+            const href = link.getAttribute('href').replace('#','');
+            link.classList.toggle('nav-active', href === current);
+        });
+    }
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
 
     // App viewer
     // Place your POC HTML files in the SAME folder as this website file
@@ -1703,7 +1861,8 @@
         sundarar: { title: 'Sundaramurthi Nayanar — Friend of God', file: 'sundarar-nayanar.html' },
         cab: { title: 'Change Advisory Board (CAB) Simulator', file: 'cab-simulator.html' },
         rca: { title: 'Root Cause Analysis (RCA) Builder', file: 'rca-builder.html' },
-        adherence: { title: 'Medication Adherence Tracker', file: 'medication-adherence.html' }
+        adherence: { title: 'Medication Adherence Tracker', file: 'medication-adherence.html' },
+        health: { title: 'What Really Drives Your Energy, Heart Health & Recovery', file: 'health_correlations_v2.html' }
     };
 
     function openApp(pocId) {
@@ -1926,17 +2085,23 @@
 </script>
 
 <div style="max-width:1100px;margin:3rem auto 0;padding:0 1.5rem 2rem;">
-    <div style="background:rgba(245,158,11,0.1);border:2px solid rgba(245,158,11,0.4);border-radius:12px;padding:1.5rem 2rem;text-align:left;font-family:'Outfit',sans-serif;">
-        <div style="display:flex;align-items:flex-start;gap:1rem;">
-            <span style="font-size:1.6rem;flex-shrink:0;">⚠️</span>
-            <div>
-                <div style="color:#f59e0b;font-weight:700;font-size:1rem;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em;">Important Disclaimer</div>
-                <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;margin-bottom:0.5rem;">
-                    <strong style="color:rgba(255,255,255,0.9);">For Demonstration Purposes Only.</strong> All sample data, template files, mapping rules, and translations in the applications on this site use defaults based on publicly available CMS, HL7, and FHIR specifications and are intended strictly for test, demo, and educational purposes.
-                </p>
-                <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.8;">
-                    This tool is not intended for use in production clinical or billing environments without proper configuration, validation, and compliance review by a qualified healthcare professional.
-                </p>
+    <div style="background:#fff8ee;border:2px solid rgba(245,158,11,0.35);border-radius:12px;padding:1.5rem 2rem;font-family:'Outfit',sans-serif;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+            <span style="font-size:1.4rem;">⚠️</span>
+            <div style="color:#b45309;font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;">Important Disclaimer</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">Demo & Training Only</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">All apps use synthetic or publicly available sample data. Not intended for clinical, billing, or operational use without proper validation and compliance review.</p>
+            </div>
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">Not Production-Ready</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">These POCs are prototypes. Taking any tool to enterprise scale requires infrastructure design, reliability engineering, security hardening, and cost architecture.</p>
+            </div>
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">AI Governance</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">AI governance is a rapidly evolving field. Use these tools with caution and always apply appropriate human oversight before acting on any outputs.</p>
             </div>
         </div>
     </div>
