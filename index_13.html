@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vandana Karthikeya — Technology & Engineering Leader</title>
+    <meta name="description" content="VP Engineering & Technology Leader with close to 30 years solving business problems across healthcare, fintech, and enterprise technology. Platform modernization, AI/ML, data operations, M&A integration.">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #0a0f1a;
+            --paper: #faf9f7;
+            --warm: #f5f0ea;
+            --accent: #c45d3e;
+            --accent-light: #e8734f;
+            --teal: #1a6b5a;
+            --teal-light: #238f79;
+            --slate: #3d4f5f;
+            --muted: #7a8a99;
+            --border: #d8cfc4;
+            --card-bg: #ffffff;
+            --gradient-warm: linear-gradient(135deg, #c45d3e 0%, #e8734f 50%, #d4956b 100%);
+            --gradient-teal: linear-gradient(135deg, #1a6b5a 0%, #238f79 100%);
+            --shadow-sm: 0 1px 3px rgba(10,15,26,0.06);
+            --shadow-md: 0 4px 20px rgba(10,15,26,0.08);
+            --shadow-lg: 0 12px 40px rgba(10,15,26,0.12);
+            --radius: 12px;
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== TEXTURE ========== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ========== UTILITY ========== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+        .section { padding: 5rem 0; }
+        .serif { font-family: 'DM Serif Display', serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+        .text-accent { color: var(--accent); }
+        .text-teal { color: var(--teal); }
+        .text-muted { color: var(--muted); }
+
+        /* ========== NAV ========== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(250,249,247,0.85);
+            backdrop-filter: blur(20px) saturate(1.5);
+            border-bottom: 1px solid rgba(216,207,196,0.5);
+            transition: all 0.3s;
+        }
+        nav.scrolled { box-shadow: var(--shadow-sm); }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; gap: 2.5rem;
+            height: 64px;
+        }
+        .nav-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.05rem; color: var(--ink);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .nav-logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; flex: 1; }
+        .nav-links a {
+            text-decoration: none; color: var(--slate);
+            font-size: 0.88rem; font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+            white-space: nowrap;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.nav-active { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
+        /* prevent active style from applying to the AI Lab pill */
+        .nav-links a.nav-ailab.nav-active { border-bottom: none; padding-bottom: 0; }
+
+        /* AI Lab highlight in nav */
+        .nav-ailab {
+            background: var(--gradient-warm) !important;
+            color: white !important;
+            padding: 0.35rem 1rem !important;
+            border-radius: 20px !important;
+            font-weight: 700 !important;
+            font-size: 0.82rem !important;
+            letter-spacing: 0.03em !important;
+            box-shadow: 0 2px 10px rgba(196,93,62,0.3) !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            animation: pulse-nav 3s ease-in-out infinite;
+        }
+        .nav-ailab:hover { transform: translateY(-1px) !important; box-shadow: 0 4px 16px rgba(196,93,62,0.4) !important; color: white !important; }
+        @keyframes pulse-nav {
+            0%, 100% { box-shadow: 0 2px 10px rgba(196,93,62,0.3); }
+            50% { box-shadow: 0 2px 18px rgba(196,93,62,0.55); }
+        }
+
+        .nav-cta {
+            background: var(--gradient-teal) !important;
+            color: white !important; padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.3); }
+
+        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; margin-left: auto; }
+        .mobile-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; transition: 0.3s; border-radius: 1px; }
+
+
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center;
+            padding-top: 64px;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(196,93,62,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(26,107,90,0.05) 0%, transparent 50%);
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1.5rem;
+        }
+        .hero-tag::before {
+            content: ''; display: block; width: 24px; height: 2px;
+            background: var(--teal);
+        }
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--slate);
+            max-width: 520px;
+            margin-bottom: 2rem;
+        }
+        .hero-stats {
+            display: flex; gap: 2.5rem; margin-bottom: 2.5rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .hero-stat-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            margin-top: 0.3rem;
+        }
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.85rem 1.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--gradient-warm);
+            color: white;
+            box-shadow: 0 4px 14px rgba(196,93,62,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(196,93,62,0.35); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--slate);
+        }
+        .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* Hero visual */
+        .hero-visual {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .hero-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(216,207,196,0.4);
+            width: 100%; max-width: 420px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--gradient-warm);
+        }
+        .hero-card-header {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .hero-avatar {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: var(--gradient-teal);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            color: white; font-size: 1.4rem;
+        }
+        .hero-card-name { font-weight: 700; font-size: 1.1rem; }
+        .hero-card-title { color: var(--muted); font-size: 0.82rem; }
+        .hero-card-logos {
+            display: flex; gap: 0.75rem; flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .logo-pill {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            background: var(--warm);
+            color: var(--slate);
+            border: 1px solid var(--border);
+        }
+        .hero-card-domains {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .domain-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.82rem; color: var(--slate);
+            font-weight: 500;
+        }
+        .domain-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .domain-dot.teal { background: var(--teal); }
+        .domain-dot.accent { background: var(--accent); }
+
+        .floating-badge {
+            position: absolute;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(216,207,196,0.3);
+            font-size: 0.78rem;
+            font-weight: 600;
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-badge.top-right { top: -20px; right: -20px; animation-delay: -2s; }
+        .floating-badge.bottom-left { bottom: -15px; left: -15px; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-label {
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+        }
+
+        /* ========== ABOUT ========== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 4rem;
+            margin-top: 3rem;
+        }
+        .about-text p {
+            margin-bottom: 1.25rem;
+            color: var(--slate);
+            font-size: 1.05rem;
+        }
+        .about-highlight {
+            background: var(--warm);
+            border-left: 3px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 2rem 0;
+        }
+        .about-highlight p {
+            font-weight: 500;
+            color: var(--ink);
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+        }
+        .about-sidebar {
+            display: flex; flex-direction: column; gap: 1.25rem;
+        }
+        .about-fact {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        .about-fact-label {
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.4rem;
+        }
+        .about-fact-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* ========== EXPERIENCE TIMELINE ========== */
+        .timeline { margin-top: 3rem; position: relative; }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), var(--teal), var(--border));
+        }
+        .timeline-item {
+            padding-left: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        .timeline-dot {
+            position: absolute; left: -5px; top: 8px;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--accent);
+        }
+        .timeline-item:nth-child(even) .timeline-dot { border-color: var(--teal); }
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        .timeline-role {
+            font-weight: 700; font-size: 1.15rem;
+            margin-bottom: 0.15rem;
+        }
+        .timeline-company { color: var(--teal); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .timeline-desc { color: var(--slate); font-size: 0.9rem; max-width: 600px; }
+        .timeline-metrics {
+            display: flex; gap: 1.5rem; margin-top: 0.75rem;
+        }
+        .timeline-metric {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 500;
+            background: rgba(196,93,62,0.08);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        /* ========== POC GALLERY ========== */
+        .poc-gallery { margin-top: 3rem; }
+        .poc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.75rem;
+        }
+        .poc-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .poc-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(196,93,62,0.3);
+        }
+        .poc-preview {
+            height: 200px;
+            background: var(--ink);
+            position: relative;
+            overflow: hidden;
+        }
+        .poc-preview-inner {
+            position: absolute; inset: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .poc-preview-mockup {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            padding: 1rem;
+        }
+        .mockup-bar {
+            display: flex; gap: 4px; margin-bottom: 0.75rem;
+        }
+        .mockup-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .mockup-dot:nth-child(1) { background: #ef4444; }
+        .mockup-dot:nth-child(2) { background: #f59e0b; }
+        .mockup-dot:nth-child(3) { background: #10b981; }
+        .mockup-lines { flex: 1; display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+        .mockup-line {
+            height: 3px; border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .mockup-line.short { width: 40%; }
+        .mockup-line.medium { width: 65%; }
+        .mockup-line.long { width: 85%; }
+        .mockup-line.accent { background: rgba(196,93,62,0.4); }
+        .mockup-line.teal-l { background: rgba(26,107,90,0.4); }
+
+        .poc-badge {
+            position: absolute; top: 12px; right: 12px;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .poc-badge.free { background: rgba(16,185,129,0.9); color: white; }
+        .poc-badge.premium { background: rgba(196,93,62,0.9); color: white; }
+        .poc-badge.coming { background: rgba(122,138,153,0.8); color: white; }
+
+        .group-header { margin-bottom: 1.5rem; margin-top: 3rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(0,0,0,0.1); }
+        .group-header:first-child { margin-top: 0; }
+        .group-num { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c45d3e; margin-bottom: 0.4rem; }
+        .group-title { font-size: 1.4rem; font-weight: 800; color: #111827; margin-bottom: 0.35rem; }
+        .group-subtitle { font-size: 0.88rem; color: #4b5563; line-height: 1.5; }
+        .group-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; font-size: 1.3rem; margin-bottom: 0.6rem; }
+        .gi-data { background: rgba(16,185,129,0.12); }
+        .gi-voice { background: rgba(139,92,246,0.12); }
+        .gi-clinical { background: rgba(6,182,212,0.12); }
+        .gi-itsm { background: rgba(245,158,11,0.12); }
+        .gi-scripture { background: rgba(236,72,153,0.12); }
+        .coming-soon-card { background: rgba(0,0,0,0.05); border: 2px dashed rgba(0,0,0,0.18); border-radius: 16px; padding: 2rem 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; transition: all 0.2s; }
+        .coming-soon-card:hover { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.3); }
+        .coming-soon-card .cs-icon { font-size: 2.4rem; margin-bottom: 0.75rem; }
+        .coming-soon-card .cs-title { font-size: 1.05rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem; }
+        .coming-soon-card .cs-desc { font-size: 0.84rem; color: #374151; max-width: 300px; line-height: 1.65; }
+        .coming-soon-card .cs-badge { margin-top: 0.9rem; display: inline-block; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: #c45d3e; color: white; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        .poc-content { padding: 1.5rem; }
+        .poc-category {
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+        }
+        .poc-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem; }
+        .poc-desc { color: var(--muted); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .poc-tags {
+            display: flex; gap: 0.4rem; flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .poc-tag {
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--warm);
+            color: var(--slate);
+        }
+        /* UPVOTE + FEEDBACK ROW */
+        .card-engagement { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+        .upvote-btn { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.7rem; border-radius: 20px; border: 1.5px solid var(--border); background: var(--warm); color: var(--slate); font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s; user-select: none; }
+        .upvote-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(196,93,62,0.08); }
+        .upvote-btn.voted { border-color: var(--accent); color: white; background: var(--accent); }
+        .upvote-btn .uv-icon { font-size: 0.9rem; transition: transform 0.2s; }
+        .upvote-btn:hover .uv-icon { transform: translateY(-1px); }
+        .upvote-btn .uv-count { font-variant-numeric: tabular-nums; }
+        .feedback-link { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.7rem; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 0.76rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .feedback-link:hover { border-color: var(--teal); color: var(--teal); background: rgba(26,107,90,0.06); }
+        /* Coming soon card engagement */
+        .cs-engagement { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+
+        /* FEEDBACK MODAL */
+        .fb-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(10,15,26,0.6); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; }
+        .fb-overlay.active { display: flex; }
+        .fb-modal { background: white; border-radius: 16px; width: 90%; max-width: 520px; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative; }
+        .fb-modal h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .fb-modal .fb-app { font-size: 0.82rem; color: var(--teal); font-weight: 600; margin-bottom: 1rem; }
+        .fb-modal label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--slate); margin-bottom: 0.35rem; }
+        .fb-modal textarea { width: 100%; min-height: 120px; padding: 0.75rem; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; resize: vertical; transition: border-color 0.2s; }
+        .fb-modal textarea:focus { outline: none; border-color: var(--teal); }
+        .fb-warning { display: none; margin-top: 0.6rem; padding: 0.7rem 1rem; border-radius: 10px; background: rgba(244,63,94,0.08); border: 1.5px solid rgba(244,63,94,0.3); font-size: 0.82rem; color: #be123c; line-height: 1.5; }
+        .fb-warning.show { display: block; }
+        .fb-warning strong { display: block; margin-bottom: 0.2rem; }
+        .fb-highlighted { background: rgba(244,63,94,0.15); border-color: var(--rose); }
+        .fb-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .fb-btn { flex: 1; padding: 0.65rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; transition: all 0.2s; }
+        .fb-btn-cancel { background: var(--warm); color: var(--slate); }
+        .fb-btn-cancel:hover { background: var(--border); }
+        .fb-btn-send { background: var(--gradient-teal); color: white; }
+        .fb-btn-send:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.25); }
+        .fb-btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .fb-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); }
+        .fb-success { display: none; text-align: center; padding: 2rem 1rem; }
+        .fb-success.show { display: block; }
+        .fb-success .fb-check { font-size: 3rem; margin-bottom: 0.5rem; }
+        .fb-success p { color: var(--muted); font-size: 0.9rem; }
+
+        /* DONATE SECTION */
+        .donate-banner { background: linear-gradient(135deg, rgba(196,93,62,0.08), rgba(26,107,90,0.08)); border: 1.5px solid rgba(196,93,62,0.2); border-radius: 16px; padding: 2rem 2.5rem; display: flex; align-items: center; gap: 2rem; margin-top: 2.5rem; }
+        .donate-icon { font-size: 2.5rem; flex-shrink: 0; }
+        .donate-text h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; }
+        .donate-text p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+        .donate-btn { flex-shrink: 0; padding: 0.7rem 1.5rem; border-radius: 10px; background: var(--gradient-warm); color: white; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .donate-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(196,93,62,0.3); }
+        @media (max-width: 700px) { .donate-banner { flex-direction: column; text-align: center; padding: 1.5rem; } }
+
+        .poc-actions { display: flex; gap: 0.75rem; }
+        .poc-btn {
+            flex: 1;
+            padding: 0.65rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .poc-btn-preview {
+            background: var(--warm);
+            color: var(--slate);
+        }
+        .poc-btn-preview:hover { background: var(--border); }
+        .poc-btn-get {
+            background: var(--gradient-teal);
+            color: white;
+        }
+        .poc-btn-get:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,90,0.25); }
+        .poc-btn-locked {
+            background: var(--warm);
+            color: var(--muted);
+            cursor: default;
+        }
+
+        /* ========== PRICING ========== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        .price-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .price-card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(196,93,62,0.15);
+        }
+        .price-card.featured::before {
+            content: 'Most Popular';
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--gradient-warm);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .price-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .price-amount {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.8rem;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        .price-period { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+        .price-features { list-style: none; text-align: left; margin-bottom: 2rem; }
+        .price-features li {
+            padding: 0.4rem 0;
+            font-size: 0.88rem;
+            color: var(--slate);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .price-features li::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+        .price-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .price-btn-primary {
+            background: var(--gradient-warm);
+            color: white;
+        }
+        .price-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(196,93,62,0.3); }
+        .price-btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--slate);
+        }
+        .price-btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* ========== IDEAS SECTION ========== */
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 3rem;
+        }
+        .idea-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .idea-card:hover { border-color: var(--teal); }
+        .idea-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--border);
+            margin-bottom: 0.5rem;
+        }
+        .idea-title { font-weight: 700; margin-bottom: 0.4rem; }
+        .idea-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .idea-impact {
+            display: flex; gap: 0.25rem;
+        }
+        .idea-fire { font-size: 0.85rem; }
+
+        /* ========== CONTACT ========== */
+        .contact-section {
+            background: var(--ink);
+            color: white;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(196,93,62,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(26,107,90,0.1) 0%, transparent 60%);
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        .contact-section .section-label { color: var(--accent-light); }
+        .contact-section .section-title { color: white; }
+        .contact-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+        .contact-link {
+            display: flex; align-items: center; gap: 1rem;
+            text-decoration: none;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .contact-link:hover { color: var(--accent-light); }
+        .contact-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .contact-form {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 0.4rem;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        .form-submit {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            background: var(--gradient-warm);
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .form-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(196,93,62,0.4); }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--ink);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 2rem 0;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.82rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(10,15,26,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center; align-items: center;
+            padding: 2rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none;
+            font-size: 1.5rem;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .modal h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .modal p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* ========== PREVIEW MODAL ========== */
+        .preview-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(10,15,26,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        .preview-overlay.active { display: flex; }
+        .preview-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem;
+            color: white;
+        }
+        .preview-header h3 { font-family: 'DM Serif Display', serif; }
+        .preview-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .preview-frame {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+        .preview-frame iframe {
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* ========== ANIMATIONS ========== */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .about-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px; left: 0; right: 0;
+                background: var(--paper);
+                padding: 1.5rem 2rem;
+                border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow-md);
+            }
+        }
+        @media (max-width: 600px) {
+            .section { padding: 3rem 0; }
+            .container { padding: 0 1.25rem; }
+            .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+            .poc-grid { grid-template-columns: 1fr; }
+        }
+    
+        /* FLOATING COFFEE WIDGET */
+        #floatDonate { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #floatDonate.active { opacity: 1; pointer-events: auto; }
+        #floatDonateCard { background: white; border: 1.5px solid rgba(196,93,62,0.3); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 0.9rem; width: 300px; }
+        #floatDonateCard.hidden { display: none; }
+        #floatDonate .fd-icon { font-size: 1.8rem; flex-shrink: 0; margin-top: 2px; }
+        #floatDonate .fd-body { flex: 1; }
+        #floatDonate .fd-body h4 { font-size: 0.88rem; font-weight: 700; margin: 0 0 0.25rem 0; color: #1a1a2e; }
+        #floatDonate .fd-body p { font-size: 0.76rem; color: #666; margin: 0 0 0.6rem 0; line-height: 1.45; }
+        #floatDonate .fd-btn { display: inline-block; padding: 0.45rem 1rem; border-radius: 8px; background: linear-gradient(135deg,#c45d3e,#b54e30); color: white; font-weight: 700; font-size: 0.78rem; text-decoration: none; }
+        #floatDonate .fd-dismiss { display: block; margin-top: 0.4rem; font-size: 0.7rem; color: #999; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; }
+        #floatDonateTab { background: linear-gradient(135deg,#c45d3e,#b54e30); color: white; border: none; border-radius: 50px; padding: 0.55rem 1.2rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(196,93,62,0.35); display: none; align-items: center; gap: 0.4rem; }
+        #floatDonateTab.visible { display: inline-flex; }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+    <div class="nav-inner">
+        <a href="#home" class="nav-logo">Vandana Karthikeya<span>.</span></a>
+        <div class="nav-links" id="navLinks">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#experience">Experience</a>
+            <a href="#pocs" class="nav-ailab">✦ AI Lab</a>
+            <a href="#access">Access</a>
+            <a href="#consulting">Consulting</a>
+            <a href="#ideas">Roadmap</a>
+        </div>
+        <a href="#contact" class="nav-cta">Let's Talk</a>
+        <button class="mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+
+
+<!-- HERO -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="fade-up">
+                <div class="hero-tag">Technology & Engineering Leadership</div>
+                <h1>Building Technology that <em>Scales</em> and Delivers</h1>
+                <p class="hero-desc">
+                    VP-level engineering leader with close to 30 years solving real-world business problems across healthcare, fintech, and enterprise technology. 
+                    I specialize in platform modernization, technology rationalization through mergers &amp; acquisitions, data operations at scale, and building high-performing engineering teams that ship.
+                </p>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">~30</div>
+                        <div class="hero-stat-label">Years in Tech</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">$30M+</div>
+                        <div class="hero-stat-label">Portfolio Managed</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">100+</div>
+                        <div class="hero-stat-label">Engineers Led</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">$20M+</div>
+                        <div class="hero-stat-label">Cost Savings</div>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <a href="#pocs" class="btn btn-primary">Explore AI Lab →</a>
+                    <a href="#contact" class="btn btn-outline">Let's Connect</a>
+                </div>
+            </div>
+            <div class="hero-visual fade-up stagger-2">
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <div class="hero-avatar">VK</div>
+                        <div>
+                            <div class="hero-card-name">Vandana Karthikeya</div>
+                            <div class="hero-card-title">VP Engineering, Data & Ops</div>
+                        </div>
+                    </div>
+                    <div class="hero-card-logos">
+                        <span class="logo-pill">Platform Modernization</span>
+                        <span class="logo-pill">Data & AI Engineering</span>
+                        <span class="logo-pill">Business Process Optimization</span>
+                        <span class="logo-pill">ITSM & SRE</span>
+                    </div>
+                    <div class="hero-card-domains">
+                        <div class="domain-item"><span class="domain-dot teal"></span>Healthcare Tech (Deep Expertise)</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>FinTech & Enterprise IT</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Platform / Tech Modernization</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>ITSM & Incident Management</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Data Ops & AI/ML</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>M&A Tech Integration</div>
+                        <div class="domain-item"><span class="domain-dot teal"></span>Engineering Team Leadership</div>
+                        <div class="domain-item"><span class="domain-dot accent"></span>Cloud & DevOps</div>
+                    </div>
+                </div>
+                <div class="floating-badge top-right">🤖 AI-Powered</div>
+                <div class="floating-badge bottom-left">💼 Open to Roles</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">About</div>
+        <div class="section-title fade-up">Where Domain Expertise <br>Meets Engineering Execution</div>
+        <div class="about-grid">
+            <div class="about-text fade-up">
+                <p>
+                    I'm a hands-on technology leader with close to 30 years of experience building, scaling, and modernizing technology organizations — across healthcare, fintech, and large enterprise IT. I bring equal comfort in the boardroom and the codebase, with a track record of turning complex technical challenges into measurable business outcomes.
+                </p>
+                <p>
+                    Most recently as <strong>VP of Engineering, Data & Ops at a healthcare analytics SaaS startup</strong>, I built the entire engineering and data operations function from scratch. I led an AI-powered integration technology replacement — migrating from legacy tooling to industry-standard platforms, completing a complex tech migration with less than 2% issues post production go-live. The new stack was also successfully leveraged for the 2026 Annual Enrollment Period (AEP).
+                </p>
+
+                <!-- Healthcare highlight box -->
+                <div style="background: linear-gradient(135deg, rgba(26,107,90,0.07) 0%, rgba(26,107,90,0.03) 100%); border-left: 3px solid var(--teal); border-radius: 0 var(--radius) var(--radius) 0; padding: 1.5rem; margin: 1.75rem 0;">
+                    <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.6rem;">🏥 Healthcare — A Defining Chapter</div>
+                    <p style="color: var(--slate); font-size: 0.97rem; margin-bottom: 0;">
+                        A significant portion of my career has been spent at the forefront of healthcare technology — spanning payers, providers, and care delivery. From managing a $30M portfolio at a Fortune 50 health insurer and co-leading an EPIC EMR rollout across 43+ clinics, to building EDI processing systems and AI-driven payer analytics platforms, healthcare is where much of my deepest domain expertise lives. I understand the regulatory landscape, the interoperability challenges, and the human stakes that make getting it right non-negotiable.
+                    </p>
+                </div>
+
+                <div class="about-highlight">
+                    <p>"These tools show what's possible. I know the domain deeply enough to design the right solution, and I can build fast enough to prototype it in days. The path from here to production is an architecture and engineering conversation."</p>
+                </div>
+
+                <p>
+                    Previously, I served as <strong>Sr. Director of IT at a Fortune 50 health insurer</strong>, managing a $30M portfolio and 43+ clinics serving 100K+ patients. Before that, I <strong>built IT shared services at one of the nation's largest integrated health systems</strong>, and prior to healthcare, I led cloud transformation and enterprise platform initiatives at a <strong>global FinTech leader</strong> across US and UK operations. I carry an MS in Computer Science from BITS Pilani, leadership credentials from MIT Sloan, and a PG Diploma in AI/ML from UT Austin.
+                </p>
+                <p>
+                    Beyond technology, I'm deeply passionate about <strong>mentoring and growing people</strong>. Throughout my career I've helped engineers, managers, and individual contributors find their path — whether that's stepping into their first leadership role, pivoting into healthcare tech, or discovering strengths they didn't know they had. Several people I've mentored have gone on to Director and VP-level roles. I believe great teams are built by investing in people first, and the best technology outcomes follow naturally from that.
+                </p>
+                <p>
+                    I'm currently open to <strong>VP+ Engineering, Data, and Consulting roles</strong> at mid-size companies that are scaling and offer equity participation — in healthcare or adjacent industries where deep technical and operational expertise creates a real advantage.
+                </p>
+            </div>
+            <div class="about-sidebar fade-up stagger-2">
+                <div class="about-fact">
+                    <div class="about-fact-label">Education</div>
+                    <div class="about-fact-value">MS Computer Science, BITS Pilani<br>MIT Sloan Leadership<br>AI/ML PG, UT Austin</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Certifications</div>
+                    <div class="about-fact-value">SAFe Agilist 5.1<br>SAFe POPM 5.1<br>AI/ML Post-Graduate</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Domain Expertise</div>
+                    <div class="about-fact-value">Healthcare Tech (Payer/Provider)<br>FinTech & Enterprise IT<br>Platform Modernization<br>Data Ops & AI/ML</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Tech Stack</div>
+                    <div class="about-fact-value">Python • Java • C++<br>MuleSoft • SSIS • Mirth<br>AI/ML • GenAI/LLMs<br>AWS • Azure • DevOps</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Mentorship</div>
+                    <div class="about-fact-value">Mentored engineers into<br>Director & VP roles<br>Women in Tech advocate<br>DEI champion</div>
+                </div>
+                <div class="about-fact">
+                    <div class="about-fact-label">Based In</div>
+                    <div class="about-fact-value">Cerritos, California 🌴</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section" id="experience">
+    <div class="container">
+        <div class="section-label fade-up">Career</div>
+        <div class="section-title fade-up">28 Years of Scaling <br>Technology Organizations</div>
+        <div class="section-subtitle fade-up">From startups to Fortune 50 — across healthcare, fintech, and enterprise tech — I build teams, systems, and cultures that ship.</div>
+
+        <div class="timeline">
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Jun 2024 – Present</div>
+                <div class="timeline-role">VP Engineering, Data & Ops</div>
+                <div class="timeline-company">Healthcare Analytics SaaS Startup — B2B Platform</div>
+                <div class="timeline-desc">Built engineering & data ops from scratch. Led AI-powered integration technology replacement from legacy to industry-standard tooling with &lt;2% post-production issues. Successfully leveraged for 2026 AEP. Supported AI platform for payer and provider clients.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">~15 Direct Reports</span>
+                    <span class="timeline-metric">$15M Portfolio</span>
+                    <span class="timeline-metric">$100K+ Saved/Customer</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Sep 2022 – May 2024</div>
+                <div class="timeline-role">Sr. Director IT</div>
+                <div class="timeline-company">Fortune 50 Health Insurer — Care Delivery Division</div>
+                <div class="timeline-desc">Led technical vision for Care Delivery products, co-led EPIC EMR rollout, merged two data centers, and managed infrastructure for 43+ clinics serving 100K+ patients across the US.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">~30 Engineers</span>
+                    <span class="timeline-metric">$30M Portfolio</span>
+                    <span class="timeline-metric">$1.2B Revenue Supported</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Dec 2015 – Sep 2022</div>
+                <div class="timeline-role">Director IT</div>
+                <div class="timeline-company">Top 5 US Integrated Health System — 12.5M+ Members</div>
+                <div class="timeline-desc">Built IT shared services across 10 departments. Led Pharmacy, TeleHealth, and Care at Home strategy. Consolidated legacy apps saving $5M+.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">17 Engineers</span>
+                    <span class="timeline-metric">$10-15M Portfolio</span>
+                    <span class="timeline-metric">$5M Saved</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Oct 2009 – Nov 2015</div>
+                <div class="timeline-role">Sr. Tech Manager, Projects</div>
+                <div class="timeline-company">Global FinTech Leader — US & UK Operations</div>
+                <div class="timeline-desc">Led cloud transformation, enterprise monitoring as a service, and ServiceNow rollout across US and UK locations.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">10 Engineers</span>
+                    <span class="timeline-metric">$8-10M Portfolio</span>
+                    <span class="timeline-metric">20% IT Cost Reduction</span>
+                </div>
+            </div>
+            <div class="timeline-item fade-up">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">1998 – 2009</div>
+                <div class="timeline-role">Early Career — Tech Lead to Manager</div>
+                <div class="timeline-company">Fortune 500 IT Services & Product Companies</div>
+                <div class="timeline-desc">Architected crew management system for a major aerospace manufacturer, led ITSM tooling rollouts, enterprise product management, and large-scale application development across US and India.</div>
+                <div class="timeline-metrics">
+                    <span class="timeline-metric">11 Years</span>
+                    <span class="timeline-metric">3 Companies</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI LAB / POCs — GROUPED -->
+<section class="section" id="pocs" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">AI Lab</div>
+        <div class="section-title fade-up">Tools I Built From Scratch</div>
+        <div class="section-subtitle fade-up">Working prototypes — not production software. Organized by domain. Click "Open App" to explore any tool directly in your browser.</div>
+
+        <!-- Honest framing -->
+        <div class="fade-up" style="margin-top: 2rem; max-width: 860px; background: linear-gradient(135deg, #0a0f1a 0%, #1a2a3a 100%); border-radius: var(--radius); padding: 2rem 2.5rem; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #c45d3e, #e8734f, #1a6b5a);"></div>
+            <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #e8734f; margin-bottom: 1rem;">What This Lab Actually Is</div>
+            <p style="font-size: 1.05rem; color: #ffffff; line-height: 1.75; font-family: 'DM Serif Display', serif; font-style: italic; margin-bottom: 1.5rem;">
+                "These tools show what's possible. I know the domain deeply enough to design the right solution, and I can build fast enough to prototype it in days. The path from here to production is an architecture and engineering conversation."
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                <div style="border-left: 2px solid #c45d3e; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.3rem;">What They Demonstrate</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Domain expertise, workflow design, and the ability to translate complex requirements into working interfaces — fast.</div>
+                </div>
+                <div style="border-left: 2px solid #1a6b5a; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4db6a0; margin-bottom: 0.3rem;">What They Are Not</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Production software. These run on synthetic or sample data in a browser. No live integrations, no real patient or claims data.</div>
+                </div>
+                <div style="border-left: 2px solid #7a8a99; padding-left: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #b0bec5; margin-bottom: 0.3rem;">The Next Conversation</div>
+                    <div style="font-size: 0.85rem; color: #b0bec5; line-height: 1.6;">Taking any of these to production involves real architecture — infrastructure, security, compliance, and scale. That's the conversation I want to have.</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 1: Healthcare Data Apps -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-data">📊</div>
+            <div class="group-num">Group 01</div>
+            <div class="group-title">Healthcare Data Apps</div>
+            <div class="group-subtitle">EDI claims processing, risk adjustment, interoperability, and data transformation tools</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <!-- EDI Validator -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Revenue Cycle</div>
+                        <div class="poc-title">837 EDI Claims Validator & Generator</div>
+                        <div class="poc-desc">Full-featured EDI 837P/837I test data generator and validator with 5010 spec compliance, real-time parsing, segment-level validation, and exportable claim files.</div>
+                        <div class="poc-tags"><span class="poc-tag">EDI 837</span><span class="poc-tag">5010 Spec</span><span class="poc-tag">Claims Processing</span><span class="poc-tag">Validation Engine</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'edi')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-edi">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('edi','837 EDI Claims Validator')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('edi')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- HCC Risk Calculator -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Risk Adjustment</div>
+                        <div class="poc-title">HCC Risk Score Calculator — CMS V28</div>
+                        <div class="poc-desc">Interactive CMS V28 HCC risk score calculator with ICD-10 to HCC mapping, RAF scoring, predicted annual cost estimation, and professional PDF report generation.</div>
+                        <div class="poc-tags"><span class="poc-tag">HCC/RAF</span><span class="poc-tag">CMS V28</span><span class="poc-tag">Medicare Advantage</span><span class="poc-tag">Risk Adjustment</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'hcc')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-hcc">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('hcc','HCC Risk Score Calculator')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('hcc')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- HL7 FHIR Mapper -->
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #1a6b5a22, #238f7922);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Interoperability</div>
+                        <div class="poc-title">HL7 FHIR Data Mapper & Validator</div>
+                        <div class="poc-desc">Maps legacy HL7 v2 messages to FHIR R4 resources. Side-by-side comparison, bundle validation, and JSON export for ADT, ORU, and ORM message types.</div>
+                        <div class="poc-tags"><span class="poc-tag">HL7 v2</span><span class="poc-tag">FHIR R4</span><span class="poc-tag">Interoperability</span><span class="poc-tag">JSON Schema</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'fhir')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-fhir">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('fhir','HL7 FHIR Data Mapper')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('fhir')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 2: Healthcare Voice, Translators & IVR -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-voice">🎙️</div>
+            <div class="group-num">Group 02</div>
+            <div class="group-title">Healthcare Voice, Translators & IVR</div>
+            <div class="group-subtitle">Patient communication, multi-language translation, and interactive voice response tools</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <!-- IVR Call Flow Designer -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #8b5cf622, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">IVR & Outreach</div>
+                        <div class="poc-title">IVR Call Flow Designer & Simulator</div>
+                        <div class="poc-desc">Visual IVR tree builder with DTMF tones, TTS preview, call simulation, and healthcare outreach templates for scheduling, benefits, Rx refills, and care gap outreach.</div>
+                        <div class="poc-tags"><span class="poc-tag">IVR Design</span><span class="poc-tag">Call Simulator</span><span class="poc-tag">DTMF / TTS</span><span class="poc-tag">Outreach</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'ivr')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-ivr">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('ivr','IVR Call Flow Designer')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('ivr')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Multi-Language Healthcare Translator -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #10b98122, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Translation & Language</div>
+                        <div class="poc-title">Multi-Language Healthcare Translator</div>
+                        <div class="poc-desc">Medical phrase translator across 8 languages with patient intake, discharge instructions, medication directions, consent forms, and printable bilingual handouts.</div>
+                        <div class="poc-tags"><span class="poc-tag">8 Languages</span><span class="poc-tag">Medical Phrases</span><span class="poc-tag">Patient Handouts</span><span class="poc-tag">TTS Audio</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'translator')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-translator">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('translator','Healthcare Translator')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('translator')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 3: Healthcare Clinical -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-clinical">🏥</div>
+            <div class="group-num">Group 03</div>
+            <div class="group-title">Healthcare Clinical</div>
+            <div class="group-subtitle">Clinical decision support, prior authorization, care gap analysis, and quality measurement tools</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <div class="coming-soon-card fade-up">
+                    <div class="cs-icon">🩺</div>
+                    <div class="cs-title">Prior Authorization AI Assistant</div>
+                    <div class="cs-desc">AI-powered prior auth analysis, approval prediction, denial risk flagging, and automated supporting documentation generation.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'prior-auth')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-prior-auth">0</span></button><button class="feedback-link" onclick="openFeedback('prior-auth','Prior Auth AI')">💬 Feedback</button></div>
+                </div>
+                <div class="coming-soon-card fade-up stagger-1">
+                    <div class="cs-icon">📋</div>
+                    <div class="cs-title">HEDIS / Stars Quality Dashboard</div>
+                    <div class="cs-desc">Interactive HEDIS quality measures, Stars ratings impact simulation, and care gap analysis with member-level drill-down.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'hedis')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-hedis">0</span></button><button class="feedback-link" onclick="openFeedback('hedis','HEDIS Dashboard')">💬 Feedback</button></div>
+                </div>
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #0d948822, #16a34a22);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Quality & Adherence</div>
+                        <div class="poc-title">Medication Adherence Tracker — PDC & Stars</div>
+                        <div class="poc-desc">PDC calculator with patient cohort management, fill tracking, adherence calendar, non-adherent alerts, outreach logging, and Medicare Stars revenue impact simulator.</div>
+                        <div class="poc-tags"><span class="poc-tag">PDC / Adherence</span><span class="poc-tag">Stars Impact</span><span class="poc-tag">Gap Closure</span><span class="poc-tag">Outreach</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'adherence')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-adherence">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('adherence','Medication Adherence Tracker')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('adherence')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 4: Tech — ITSM, Incident, RCA -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-itsm">⚙️</div>
+            <div class="group-num">Group 04</div>
+            <div class="group-title">Tech — ITSM, Incident & RCA</div>
+            <div class="group-subtitle">IT service management, incident response, root cause analysis, and operational tooling</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+                <div class="coming-soon-card fade-up">
+                    <div class="cs-icon">🚨</div>
+                    <div class="cs-title">Incident Response Workflow Engine</div>
+                    <div class="cs-desc">Automated incident triage, severity classification, escalation routing, and real-time status dashboards for production support teams.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'incident')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-incident">0</span></button><button class="feedback-link" onclick="openFeedback('incident','Incident Response')">💬 Feedback</button></div>
+                </div>
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #3b82f622, #a78bfa22);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Incident Management</div>
+                        <div class="poc-title">Root Cause Analysis (RCA) Builder</div>
+                        <div class="poc-desc">Interactive RCA tool with incident timeline, 5 Whys drill-down, fishbone (Ishikawa) diagrams, contributing factor analysis, action item tracking, and exportable RCA reports.</div>
+                        <div class="poc-tags"><span class="poc-tag">RCA / 5 Whys</span><span class="poc-tag">Fishbone</span><span class="poc-tag">Action Tracking</span><span class="poc-tag">Report Export</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'rca')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-rca">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('rca','RCA Builder')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('rca')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <div class="poc-card fade-up stagger-2">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #f59e0b22, #06b6d422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Change Management</div>
+                        <div class="poc-title">Change Advisory Board (CAB) Simulator</div>
+                        <div class="poc-desc">Interactive CAB workflow with change request submission, risk scoring, board voting simulation, pre-deployment checklists, deployment calendar, and approval metrics dashboard.</div>
+                        <div class="poc-tags"><span class="poc-tag">ITSM</span><span class="poc-tag">CAB Workflow</span><span class="poc-tag">Risk Scoring</span><span class="poc-tag">Change Mgmt</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'cab')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-cab">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('cab','CAB Simulator')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('cab')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 5: Passion Projects -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-scripture">🕉️</div>
+            <div class="group-num">Group 05</div>
+            <div class="group-title">Passion Projects</div>
+            <div class="group-subtitle">Personal data insights from wearables, Sanskrit learning tools, Vedic chanting practice, and scripture study applications</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+
+                <!-- Personal Health Dashboard - Oura + Apple Health -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #0ea5e922, #06b6d422, #10b98122);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long teal-l"></div><div class="mockup-line medium accent"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long accent"></div><div class="mockup-line medium teal-l"></div><div class="mockup-line short accent"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Personal Health Analytics</div>
+                        <div class="poc-title">What Really Drives Energy, Heart Health & Recovery</div>
+                        <div class="poc-desc">An 89-day personal health study combining Oura Ring and Apple Health data — 495,063 source records, 18 correlations across HRV, exercise intensity, sleep, respiration, sedentary patterns, and resilience. Real insights from real wearable data.</div>
+                        <div class="poc-tags"><span class="poc-tag">Oura Ring</span><span class="poc-tag">Apple Health</span><span class="poc-tag">HRV & Recovery</span><span class="poc-tag">Personal Analytics</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'health')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-health">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('health','Personal Health Dashboard')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('health')" style="flex:1;">Open Dashboard →</button></div>
+                    </div>
+                </div>
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #6d28d922, #a855f722);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Vedic Learning</div>
+                        <div class="poc-title">श्री रुद्रम् — Śrī Rudram Learning App</div>
+                        <div class="poc-desc">Vedic chanting tutor with svara-marked Devanagari text, embedded reference audio, recording capability, and pronunciation practice for Sri Rudram Namakam &amp; Chamakam.</div>
+                        <div class="poc-tags"><span class="poc-tag">Sanskrit</span><span class="poc-tag">Vedic Chanting</span><span class="poc-tag">Audio Reference</span><span class="poc-tag">Svara Marks</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'rudram')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-rudram">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('rudram','Śrī Rudram Learning App')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('rudram')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Bhagavatam Skandha 1 -->
+                <div class="poc-card fade-up stagger-1">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #dc262622, #f4364422);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line long teal-l"></div><div class="mockup-line short"></div><div class="mockup-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Sanskrit Scripture</div>
+                        <div class="poc-title">श्रीमद्भागवतम् — Skandha 1 Learning App</div>
+                        <div class="poc-desc">Skandha-by-skandha study with Sanskrit recitation audio, verse-level text, word-by-word meaning breakdown, and chapter parayanam from traditional recordings.</div>
+                        <div class="poc-tags"><span class="poc-tag">Bhagavatam</span><span class="poc-tag">Sanskrit</span><span class="poc-tag">Audio Recitation</span><span class="poc-tag">Verse Study</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'bhagavatam')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-bhagavatam">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('bhagavatam','Bhagavatam Skandha 1')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('bhagavatam')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+                <!-- Sundarar Nayanar (hidden from site, still in repo) -->
+                <div class="poc-card fade-up stagger-2" style="display:none;">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #f59e0b22, #ec489922);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long accent"></div><div class="mockup-line medium"></div><div class="mockup-line short teal-l"></div><div class="mockup-line long"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">Tamil Shaivite Saints</div>
+                        <div class="poc-title">Sundaramurthi Nayanar — Friend of God</div>
+                        <div class="poc-desc">Animated storytelling experience of the Tamil Shaivite saint Sundarar's life journey, with original Tamil text, transliteration, English narrative, and devotional context.</div>
+                        <div class="poc-tags"><span class="poc-tag">Nayanmars</span><span class="poc-tag">Tamil</span><span class="poc-tag">Animated Stories</span><span class="poc-tag">Shaivism</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'sundarar')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-sundarar">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('sundarar','Sundaramurthi Nayanar')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><button class="poc-btn poc-btn-get" onclick="openApp('sundarar')" style="flex:1;">Open App →</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ACCESS -->
+<section class="section" id="access">
+    <div class="container">
+        <div style="text-align: center;">
+            <div class="section-label fade-up">Access</div>
+            <div class="section-title fade-up">Use These Tools — Free & Open</div>
+            <div class="section-subtitle fade-up" style="margin: 0 auto;">All apps are fully interactive and available directly on this site. For consulting, custom builds, or to discuss working together — reach out.</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <div class="price-card fade-up" style="text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🚀</div>
+                <div class="price-name">Use the Apps</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">All AI tools are fully interactive. Open any app and start using it — no login, no paywall, no strings attached.</p>
+                <button class="price-btn price-btn-outline" onclick="document.getElementById('pocs').scrollIntoView({behavior:'smooth'})">Browse AI Lab</button>
+            </div>
+            <div class="price-card fade-up stagger-1" style="text-align: center; border-color: var(--accent);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏗️</div>
+                <div class="price-name">AI → Production</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Have an AI prototype that needs to go to production? I assess the gap, design the architecture, and help you get there.</p>
+                <a class="price-btn price-btn-primary" style="display:block;text-decoration:none;color:white;" href="#consulting">See Consulting →</a>
+            </div>
+            <div class="price-card fade-up stagger-2" style="text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">💼</div>
+                <div class="price-name">Full-Time Roles</div>
+                <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Open to VP+ Engineering or Data leadership roles at scaling companies — healthcare, fintech, or adjacent industries with equity.</p>
+                <a class="price-btn price-btn-outline" style="display:block;text-decoration:none;" href="mailto:Vandana_karthik@yahoo.com?subject=VP+%20Role%20Inquiry">Get in Touch →</a>
+            </div>
+        </div>
+        <div class="donate-banner fade-up" style="margin-top:2rem; max-width:900px; margin-left:auto; margin-right:auto;">
+            <div class="donate-icon">☕</div>
+            <div class="donate-text">
+                <h3>Enjoyed these tools? Buy me a coffee! ☕</h3>
+                <p>All 12+ apps on this site are <strong>100% free</strong> — no logins, no paywalls, no ads. Built from scratch with real domain expertise and hundreds of hours of development. If these tools saved you time or sparked an idea, a small contribution keeps them live and growing. Every coffee counts! 🙏</p>
+            </div>
+            <a href="https://paypal.me/VandanaKarthikeya" target="_blank" class="donate-btn">☕ Buy Me a Coffee</a>
+        </div>
+    </div>
+</section>
+<!-- CONSULTING -->
+<section class="section" id="consulting" style="background: #0a0f1a; color: white;">
+    <div class="container">
+        <div class="section-label fade-up" style="color: #e8734f;">Consulting</div>
+        <div class="section-title fade-up" style="color: #ffffff;">AI Prototype → Production Reality</div>
+        <div class="section-subtitle fade-up" style="color: rgba(255,255,255,0.6); max-width: 680px;">
+            Every organization is building AI. Most of those builds will fail to reach production. I help bridge that gap — with 28 years of real systems, real stakes, and real delivery behind every assessment.
+        </div>
+
+        <!-- Core value prop -->
+        <div class="fade-up" style="margin-top: 2.5rem; background: rgba(196,93,62,0.18); border: 1px solid rgba(196,93,62,0.4); border-radius: 16px; padding: 2rem 2.5rem; max-width: 820px;">
+            <div style="font-size: 1.15rem; color: #ffffff; font-family: 'DM Serif Display', serif; font-style: italic; line-height: 1.75;">
+                "You built an AI thing. Now the question is: can it actually go to production — and what would that take? That's the conversation I'm built for."
+            </div>
+        </div>
+
+        <!-- 5 service offerings -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 3rem; max-width: 780px;">
+
+            <div class="fade-up" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">🔬</div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.5rem;">AI Readiness Assessment</div>
+                <div style="font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.6rem;">Is your AI prototype production-ready?</div>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.65; margin: 0;">I review what you've built — architecture, data, governance, compliance posture — and give you an honest assessment of the gap and what it takes to close it.</p>
+            </div>
+
+            <div class="fade-up stagger-1" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">🏛️</div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.5rem;">AI Governance Framework</div>
+                <div style="font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.6rem;">Who owns your AI decisions?</div>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.65; margin: 0;">Model registries, audit trails, drift monitoring, explainability, and regulatory alignment (EU AI Act, FDA, CMS). Built for boards and ops teams, not just engineers.</p>
+            </div>
+
+            <div class="fade-up" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">📉</div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.5rem;">IT Cost Rationalization</div>
+                <div style="font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.6rem;">Fund AI by cutting what you don't need</div>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.65; margin: 0;">Application rationalization, vendor consolidation, cloud cost governance, and Opex reduction modeling — grounded in $20M+ of delivered savings across healthcare and enterprise IT.</p>
+            </div>
+
+            <div class="fade-up stagger-1" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">🔗</div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.5rem;">M&A Tech Integration</div>
+                <div style="font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.6rem;">Post-acquisition systems don't merge themselves</div>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.65; margin: 0;">System mapping, redundancy analysis, phased integration roadmaps, and data center consolidation playbooks — from someone who's done it at multi-million dollar scale.</p>
+            </div>
+
+            <!-- Featured - spans full width -->
+            <div class="fade-up" style="grid-column: 1 / -1; background: rgba(196,93,62,0.15); border: 1px solid rgba(196,93,62,0.4); border-radius: 14px; padding: 1.75rem; display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: center;">
+                <div style="font-size: 2.5rem;">🎯</div>
+                <div>
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8734f; margin-bottom: 0.4rem;">Fractional VP Engineering — Featured Offering</div>
+                    <div style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">Senior engineering leadership without the full-time cost</div>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.65; margin: 0;">For startups and growth-stage companies building AI-powered products that need engineering leadership, team structure, and production discipline — without a full-time VP hire yet. Typically 2–3 days per week, outcome-oriented engagement.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="fade-up" style="margin-top: 3rem; text-align: center;">
+            <div style="font-size: 1rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem;">All engagements start with a no-obligation conversation about your situation.</div>
+            <a href="mailto:Vandana_karthik@yahoo.com?subject=Consulting%20Inquiry&body=Hi%20Vandana%2C%0A%0AI%20found%20your%20site%20and%20would%20like%20to%20discuss%20a%20consulting%20engagement.%0A%0ACompany%3A%20%0AChallenge%3A%20%0ATimeline%3A%20%0A%0AThank%20you!" style="display: inline-block; background: #c45d3e; color: white; padding: 0.9rem 2.5rem; border-radius: 50px; font-weight: 700; font-size: 0.95rem; text-decoration: none; letter-spacing: 0.03em;">Start the Conversation →</a>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="ideas" style="background: var(--warm);">
+    <div class="container">
+        <div class="section-label fade-up">Roadmap</div>
+        <div class="section-title fade-up">What I'm Building Next</div>
+        <div class="section-subtitle fade-up">A mix of AI tools, tech experiments, and passion projects across healthcare, engineering, and personal curiosity.</div>
+
+        <div class="ideas-grid">
+
+            <!-- From resume: EVE™ / AI data normalization at Reveleer -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">01</div>
+                <div class="idea-title">AI Data Normalization Engine</div>
+                <div class="idea-desc">Reusable AI pipeline to normalize messy structured and unstructured healthcare data across EDI, claims, and enrollment — modeled on the 40% speed-to-market gains achieved at Reveleer.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'data-norm')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-data-norm">0</span></button><button class="feedback-link" onclick="openFeedback('data-norm','Data Normalization Engine')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: 10K+ security vulnerabilities resolved, DevSecOps -->
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">02</div>
+                <div class="idea-title">Security Vulnerability Triage Dashboard</div>
+                <div class="idea-desc">AI-assisted tool to ingest CVE/vulnerability scanner output, auto-prioritize by risk and blast radius, assign remediation owners, and track closure — inspired by resolving 10K+ vulnerabilities in under a year.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'sec-triage')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-sec-triage">0</span></button><button class="feedback-link" onclick="openFeedback('sec-triage','Security Triage')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: SaFE Agile, 100+ engineers, team scaling -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">03</div>
+                <div class="idea-title">Engineering Team Scaling Playbook</div>
+                <div class="idea-desc">Interactive tool for engineering leaders to model team growth — headcount planning, SAFe Agile squad structuring, role gap analysis, and hiring sequencing — from 1 to 100+ engineers.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'team-scale')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-team-scale">0</span></button><button class="feedback-link" onclick="openFeedback('team-scale','Team Scaling Playbook')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: M&A - CareMore/Aspire integration, two data centers -->
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">04</div>
+                <div class="idea-title">M&A Tech Integration Playbook Builder</div>
+                <div class="idea-desc">AI-assisted tool to map post-acquisition systems, identify redundancies, and generate a phased integration roadmap — modeled on real integrations including data center consolidations and EMR migrations.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'ma-playbook')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-ma-playbook">0</span></button><button class="feedback-link" onclick="openFeedback('ma-playbook','M&A Playbook')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: Medical Coding AI, Risk 2.0, ~98% accuracy -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">05</div>
+                <div class="idea-title">Risk Adjustment Coding Assistant</div>
+                <div class="idea-desc">NLP-powered ICD-10/HCC coding suggestion from clinical notes with confidence scoring — building on retrospective risk adjustment work that achieved ~98% coding accuracy at Reveleer.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'risk-coding')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-risk-coding">0</span></button><button class="feedback-link" onclick="openFeedback('risk-coding','Risk Coding Assistant')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: EPIC EMR rollout, 43 clinics, IT ops -->
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">06</div>
+                <div class="idea-title">EMR Rollout Readiness Tracker</div>
+                <div class="idea-desc">Multi-site EMR deployment management tool — clinic readiness scoring, go-live sequencing, issue tracking, and stakeholder dashboards. Based on real EPIC rollout experience across 43+ clinics.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'emr-rollout')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-emr-rollout">0</span></button><button class="feedback-link" onclick="openFeedback('emr-rollout','EMR Rollout Tracker')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: IT shared services, 10 depts, 1000+ users, cost savings -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">07</div>
+                <div class="idea-title">IT Shared Services Cost Optimizer</div>
+                <div class="idea-desc">Model and benchmark shared IT service costs across departments — SLA design, chargeback modeling, vendor consolidation analysis, and Opex reduction simulation. Built from 10+ department scale experience.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'it-shared')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-it-shared">0</span></button><button class="feedback-link" onclick="openFeedback('it-shared','IT Shared Services')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: DevOps, CI/CD, QTest, CoPilot, Chef Inspec -->
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">08</div>
+                <div class="idea-title">CI/CD Pipeline Health Scorecard</div>
+                <div class="idea-desc">DORA metrics tracker with AI-generated improvement recommendations — deploy frequency, MTTR, change failure rate, and test automation coverage. Reflects real DevOps toolchain optimization experience.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'cicd-score')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-cicd-score">0</span></button><button class="feedback-link" onclick="openFeedback('cicd-score','CI/CD Scorecard')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: ServiceNow, ITSM transformation, Remedy replacement -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">09</div>
+                <div class="idea-title">ITSM Tool Migration Simulator</div>
+                <div class="idea-desc">Simulate migrating from legacy ITSM platforms (Remedy, homegrown) to ServiceNow — data mapping, workflow translation, cutover risk scoring, and stakeholder communication templates.</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'itsm-sim')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-itsm-sim">0</span></button><button class="feedback-link" onclick="openFeedback('itsm-sim','ITSM Migration Sim')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: Passion - Oura/Apple Health -->
+            <div class="idea-card fade-up stagger-1">
+                <div class="idea-num">10</div>
+                <div class="idea-title">Personal Wearables AI Coach</div>
+                <div class="idea-desc">Extend my Oura + Apple Health dashboard into a conversational AI coach — ask natural language questions about your own data and get personalized weekly trend summaries and recovery insights.</div>
+                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'wearable-ai')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-wearable-ai">0</span></button><button class="feedback-link" onclick="openFeedback('wearable-ai','Wearables AI Coach')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: Passion - Sanskrit/Vedic -->
+            <div class="idea-card fade-up stagger-2">
+                <div class="idea-num">11</div>
+                <div class="idea-title">Vedic Text Semantic Search</div>
+                <div class="idea-desc">Search across Upanishads, Bhagavatam, and Stotra texts by meaning and concept — not just keyword. AI-powered semantic indexing with multilingual support across Sanskrit, Tamil, and English.</div>
+                <div class="idea-impact">🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vedic-search')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vedic-search">0</span></button><button class="feedback-link" onclick="openFeedback('vedic-search','Vedic Search')">💬 Suggest</button></div>
+            </div>
+
+            <!-- From resume: Vendor mgmt, outsourcing, Opex reduction -->
+            <div class="idea-card fade-up stagger-3">
+                <div class="idea-num">12</div>
+                <div class="idea-title">Vendor & Outsourcing ROI Analyzer</div>
+                <div class="idea-desc">Compare build vs. buy vs. outsource scenarios with TCO modeling, vendor risk scoring, SLA benchmarking, and Opex/Capex impact simulation — grounded in $20M+ cost optimization experience.</div>
+                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vendor-roi')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vendor-roi">0</span></button><button class="feedback-link" onclick="openFeedback('vendor-roi','Vendor ROI Analyzer')">💬 Suggest</button></div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+    <div class="container">
+        <div class="contact-grid">
+            <div>
+                <div class="section-label fade-up">Connect</div>
+                <div class="section-title fade-up" style="color: white;">Let's Build Something<br>Together</div>
+                <p class="contact-desc fade-up">
+                    I'm actively exploring VP+ Engineering and Data leadership roles, fractional engagements, and consulting opportunities at companies scaling with AI — in healthcare, fintech, or adjacent industries. If my work resonates with your mission, let's talk.
+                </p>
+                <div class="contact-links fade-up">
+                    <a href="mailto:Vandana_karthik@yahoo.com?subject=Query%20from%20via%20the%20LinkedIn%20website" class="contact-link">
+                        <div class="contact-icon">✉</div>
+                        <div>
+                            <div style="font-weight:600;">Email</div>
+                            <div style="font-size:0.85rem;opacity:0.6;"><span class="__cf_email__" data-cfemail="683e09060c0906093703091a1c000103281109000707460b0705">[email&#160;protected]</span></div>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/vandanakarthik/" target="_blank" class="contact-link">
+                        <div class="contact-icon">in</div>
+                        <div>
+                            <div style="font-weight:600;">LinkedIn</div>
+                            <div style="font-size:0.85rem;opacity:0.6;">linkedin.com/in/vandanakarthik</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="fade-up stagger-2">
+                <div class="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" placeholder="Your name" id="contactName">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="you@company.com" id="contactEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">What are you looking for?</label>
+                        <select class="form-input" id="contactType">
+                            <option value="">Select...</option>
+                            <option value="hire">Full-time VP+ Role</option>
+                            <option value="consult">Consulting Engagement</option>
+                            <option value="poc">POC / App Question</option>
+                            <option value="other">Something Else</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" placeholder="Tell me about your company and what you need..." id="contactMsg"></textarea>
+                    </div>
+                    <button class="form-submit" onclick="handleContact()">Send Message →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p>© 2026 Vandana Karthikeya. All rights reserved. Built with expertise, not just code.</p>
+    </div>
+</footer>
+
+<!-- APP VIEWER -->
+<div class="preview-overlay" id="appModal">
+    <div class="preview-header">
+        <h3 id="appTitle">App</h3>
+        <button class="preview-close" onclick="closeApp()">✕</button>
+    </div>
+    <div class="preview-frame">
+        <iframe id="appFrame" sandbox="allow-scripts allow-same-origin" style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+</div>
+
+<!-- Purchase modal removed - all access via email -->
+
+<script>
+    // Scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Nav scroll effect + active section tracking
+    const sections = ['home','about','experience','pocs','access','consulting','ideas','contact'];
+    const topLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+
+    function updateActiveSection() {
+        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+        let current = 'home';
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && window.scrollY >= el.offsetTop - 120) current = id;
+        });
+        topLinks.forEach(link => {
+            const href = link.getAttribute('href').replace('#','');
+            link.classList.toggle('nav-active', href === current);
+        });
+    }
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+
+    // App viewer
+    // Place your POC HTML files in the SAME folder as this website file
+    const pocFiles = {
+        edi: { title: '837 EDI Claims Validator & Generator', file: 'edi-validator-generator_latest.html' },
+        hcc: { title: 'HCC Risk Score Calculator — CMS V28', file: 'hcc_risk_calculator.html' },
+        fhir: { title: 'HL7 FHIR Data Mapper & Validator', file: 'hl7-fhir-mapper.html' },
+        ivr: { title: 'IVR Call Flow Designer & Simulator', file: 'ivr-call-flow-designer.html' },
+        translator: { title: 'Multi-Language Healthcare Translator', file: 'healthcare-translator.html' },
+        rudram: { title: 'Śrī Rudram Learning App', file: 'rudram-app.html' },
+        bhagavatam: { title: 'Bhagavatam Skandha 1 Learning App', file: 'bhagavatam-skandha1.html' },
+        sundarar: { title: 'Sundaramurthi Nayanar — Friend of God', file: 'sundarar-nayanar.html' },
+        cab: { title: 'Change Advisory Board (CAB) Simulator', file: 'cab-simulator.html' },
+        rca: { title: 'Root Cause Analysis (RCA) Builder', file: 'rca-builder.html' },
+        adherence: { title: 'Medication Adherence Tracker', file: 'medication-adherence.html' },
+        health: { title: 'What Really Drives Your Energy, Heart Health & Recovery', file: 'health_correlations_v2.html' }
+    };
+
+    function openApp(pocId) {
+        const poc = pocFiles[pocId];
+        if (!poc) return;
+
+        // Detect if running locally (file://) vs hosted (http/https)
+        if (window.location.protocol === 'file:') {
+            // Local: open in new tab (iframes blocked on file://)
+            window.open(poc.file, '_blank');
+        } else {
+            // Hosted: open in full-screen overlay
+            document.getElementById('appTitle').textContent = poc.title;
+            document.getElementById('appFrame').src = poc.file;
+            document.getElementById('appModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeApp() {
+        document.getElementById('appModal').classList.remove('active');
+        document.getElementById('appFrame').src = '';
+        document.body.style.overflow = '';
+    }
+
+    function handleContact() {
+        const name = document.getElementById('contactName').value;
+        const email = document.getElementById('contactEmail').value;
+        const type = document.getElementById('contactType').value;
+        const msg = document.getElementById('contactMsg').value;
+        if (!name || !email) { alert('Please fill in your name and email.'); return; }
+        const subject = encodeURIComponent(`Query from ${name} via the LinkedIn website`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${type}\n\n${msg}`);
+        window.location.href = `mailto:Vandana_karthik@yahoo.com?subject=${subject}&body=${body}`;
+    }
+
+    // Close app viewer on overlay click
+    document.getElementById('appModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('appModal')) closeApp();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closeApp(); closeFeedback(); }
+    });
+
+    // ========== UPVOTE SYSTEM ==========
+    function getVotes() { try { return JSON.parse(localStorage.getItem('vk_votes_v2') || '{}'); } catch(e) { return {}; } }
+    function saveVotes(v) { localStorage.setItem('vk_votes_v2', JSON.stringify(v)); }
+    function getCounts() { try { return JSON.parse(localStorage.getItem('vk_counts_v2') || '{}'); } catch(e) { return {}; } }
+    function saveCounts(c) { localStorage.setItem('vk_counts_v2', JSON.stringify(c)); }
+
+    function toggleUpvote(btn, appId) {
+        const votes = getVotes();
+        const counts = getCounts();
+        if (!counts[appId]) counts[appId] = 0;
+        if (votes[appId]) {
+            delete votes[appId];
+            counts[appId] = Math.max(0, counts[appId] - 1);
+            btn.classList.remove('voted');
+        } else {
+            votes[appId] = true;
+            counts[appId]++;
+            btn.classList.add('voted');
+            btn.querySelector('.uv-icon').style.transform = 'translateY(-3px) scale(1.2)';
+            setTimeout(() => btn.querySelector('.uv-icon').style.transform = '', 200);
+        }
+        saveVotes(votes);
+        saveCounts(counts);
+        updateAllCounts();
+    }
+
+    function updateAllCounts() {
+        const votes = getVotes();
+        const counts = getCounts();
+        document.querySelectorAll('.uv-count').forEach(el => {
+            const id = el.id.replace('uv-', '');
+            if (!counts[id]) counts[id] = 0;
+            el.textContent = counts[id];
+        });
+        document.querySelectorAll('.upvote-btn').forEach(btn => {
+            const id = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+            if (id && votes[id]) btn.classList.add('voted');
+        });
+        saveCounts(counts);
+    }
+    updateAllCounts();
+
+    // ========== FEEDBACK SYSTEM WITH SENTIMENT SCAN ==========
+    const fbOverlay = document.createElement('div');
+    fbOverlay.className = 'fb-overlay';
+    fbOverlay.id = 'fbOverlay';
+    fbOverlay.innerHTML = `
+        <div class="fb-modal">
+            <button class="fb-close" onclick="closeFeedback()">&times;</button>
+            <div id="fbForm">
+                <h3>Send Feedback</h3>
+                <div class="fb-app" id="fbAppName"></div>
+                <label for="fbText">Your feedback</label>
+                <textarea id="fbText" placeholder="Share your thoughts, suggestions, or report issues with this tool..."></textarea>
+                <div class="fb-warning" id="fbWarning">
+                    <strong>⚠️ Negative or hurtful language detected</strong>
+                    <span id="fbWarningText"></span>
+                </div>
+                <div class="fb-actions">
+                    <button class="fb-btn fb-btn-cancel" onclick="closeFeedback()">Cancel</button>
+                    <button class="fb-btn fb-btn-send" id="fbSendBtn" onclick="sendFeedback()">Send Feedback →</button>
+                </div>
+            </div>
+            <div class="fb-success" id="fbSuccess">
+                <div class="fb-check">✅</div>
+                <h3>Thank You!</h3>
+                <p>Your feedback has been received. It helps make these tools better for everyone.</p>
+                <button class="fb-btn fb-btn-cancel" onclick="closeFeedback()" style="margin-top:1rem;width:auto;display:inline-block;padding:0.5rem 1.5rem;">Close</button>
+            </div>
+        </div>`;
+    document.body.appendChild(fbOverlay);
+
+    let currentFbApp = '';
+
+    function openFeedback(appId, appName) {
+        currentFbApp = appId;
+        document.getElementById('fbAppName').textContent = appName;
+        document.getElementById('fbText').value = '';
+        document.getElementById('fbWarning').classList.remove('show');
+        document.getElementById('fbText').classList.remove('fb-highlighted');
+        document.getElementById('fbSendBtn').disabled = false;
+        document.getElementById('fbForm').style.display = 'block';
+        document.getElementById('fbSuccess').classList.remove('show');
+        document.getElementById('fbOverlay').classList.add('active');
+    }
+
+    function closeFeedback() {
+        document.getElementById('fbOverlay').classList.remove('active');
+    }
+
+    // Sentiment scanning
+    const negativePatterns = [
+        { pattern: /\b(stupid|dumb|idiot|moron|trash|garbage|useless|worthless|pathetic|terrible|horrible|awful)\b/gi, severity: 'harsh' },
+        { pattern: /\b(hate|sucks?|crap|hell|damn|wtf|stfu|bs|bullshit)\b/gi, severity: 'harsh' },
+        { pattern: /\b(worst|waste of time|never use|don'?t bother|complete(ly)? broken)\b/gi, severity: 'negative' },
+        { pattern: /\b(f+u+c+k+|sh+i+t+|a+s+s+h+o+l+e+|b+i+t+c+h+)\b/gi, severity: 'profanity' },
+        { pattern: /\b(kill|die|threat|attack|destroy)\b/gi, severity: 'threatening' },
+    ];
+
+    function scanSentiment(text) {
+        const issues = [];
+        const lower = text.toLowerCase();
+        for (const { pattern, severity } of negativePatterns) {
+            const matches = text.match(pattern);
+            if (matches) {
+                issues.push({ words: [...new Set(matches.map(m => m.toLowerCase()))], severity });
+            }
+        }
+        return issues;
+    }
+
+    function highlightText(text, issues) {
+        let highlighted = text;
+        const allWords = issues.flatMap(i => i.words);
+        for (const word of allWords) {
+            const regex = new RegExp(`\\b(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi');
+            highlighted = highlighted.replace(regex, '⟨$1⟩');
+        }
+        return highlighted;
+    }
+
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'fbText') {
+            const text = e.target.value;
+            const issues = scanSentiment(text);
+            const warning = document.getElementById('fbWarning');
+            const textarea = document.getElementById('fbText');
+            const sendBtn = document.getElementById('fbSendBtn');
+
+            if (issues.length > 0) {
+                const allWords = issues.flatMap(i => i.words);
+                const hasSevere = issues.some(i => ['profanity', 'threatening'].includes(i.severity));
+                const highlighted = highlightText(text, issues);
+
+                let msg = `The following words were flagged: <strong>${allWords.join(', ')}</strong>. `;
+                if (hasSevere) {
+                    msg += 'Please remove profanity or threatening language before sending.';
+                    sendBtn.disabled = true;
+                } else {
+                    msg += 'Consider rephrasing for constructive feedback. You can still send if intended.';
+                    sendBtn.disabled = false;
+                }
+                document.getElementById('fbWarningText').innerHTML = msg;
+                warning.classList.add('show');
+                textarea.classList.add('fb-highlighted');
+            } else {
+                warning.classList.remove('show');
+                textarea.classList.remove('fb-highlighted');
+                sendBtn.disabled = false;
+            }
+        }
+    });
+
+    function sendFeedback() {
+        const text = document.getElementById('fbText').value.trim();
+        if (!text) { alert('Please enter your feedback.'); return; }
+        const issues = scanSentiment(text);
+        if (issues.some(i => ['profanity', 'threatening'].includes(i.severity))) {
+            alert('Please remove flagged language before sending.'); return;
+        }
+        // Compose mailto
+        const subject = encodeURIComponent(`Tool Feedback: ${document.getElementById('fbAppName').textContent}`);
+        const body = encodeURIComponent(`App: ${document.getElementById('fbAppName').textContent}\n\nFeedback:\n${text}`);
+        window.location.href = `mailto:Vandana_karthik@yahoo.com?subject=${subject}&body=${body}`;
+        // Show success
+        document.getElementById('fbForm').style.display = 'none';
+        document.getElementById('fbSuccess').classList.add('show');
+    }
+
+    // Close feedback on overlay click
+    document.getElementById('fbOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('fbOverlay')) closeFeedback();
+    });
+</script>
+
+<div style="max-width:1100px;margin:3rem auto 0;padding:0 1.5rem 2rem;">
+    <div style="background:#fff8ee;border:2px solid rgba(245,158,11,0.35);border-radius:12px;padding:1.5rem 2rem;font-family:'Outfit',sans-serif;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+            <span style="font-size:1.4rem;">⚠️</span>
+            <div style="color:#b45309;font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;">Important Disclaimer</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">Demo & Training Only</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">All apps use synthetic or publicly available sample data. Not intended for clinical, billing, or operational use without proper validation and compliance review.</p>
+            </div>
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">Not Production-Ready</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">These POCs are prototypes. Taking any tool to enterprise scale requires infrastructure design, reliability engineering, security hardening, and cost architecture.</p>
+            </div>
+            <div style="border-left:3px solid #f59e0b;padding-left:0.9rem;">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#b45309;margin-bottom:0.3rem;">AI Governance</div>
+                <p style="color:#44403c;font-size:0.82rem;line-height:1.65;margin:0;">AI governance is a rapidly evolving field. Use these tools with caution and always apply appropriate human oversight before acting on any outputs.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FLOATING COFFEE WIDGET -->
+    <div id="floatDonate">
+        <div id="floatDonateCard">
+            <div class="fd-icon">☕</div>
+            <div class="fd-body">
+                <h4>Enjoying these tools?</h4>
+                <p>All 12+ apps are <strong>100% free</strong> — no logins, no paywalls, no ads. If they helped you, a coffee keeps them running! 🙏</p>
+                <a href="https://paypal.me/VandanaKarthikeya" target="_blank" class="fd-btn">☕ Buy Me a Coffee</a>
+                <button class="fd-dismiss" onclick="dismissFloat()">Maybe later</button>
+            </div>
+        </div>
+        <button id="floatDonateTab" onclick="reopenFloat()">☕ Support</button>
+    </div>
+
+    <script>
+    (function() {
+        var widget = document.getElementById('floatDonate');
+        var card   = document.getElementById('floatDonateCard');
+        var tab    = document.getElementById('floatDonateTab');
+        var pocs   = document.getElementById('pocs');
+
+        window.dismissFloat = function() {
+            card.classList.add('hidden');
+            tab.classList.add('visible');
+        };
+        window.reopenFloat = function() {
+            card.classList.remove('hidden');
+            tab.classList.remove('visible');
+        };
+
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    widget.classList.add('active');
+                } else {
+                    widget.classList.remove('active');
+                    // Reset card when leaving section
+                    card.classList.remove('hidden');
+                    tab.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0.05 });
+
+        if (pocs) observer.observe(pocs);
+    })();
+    </script>
+</body>
+</html>
