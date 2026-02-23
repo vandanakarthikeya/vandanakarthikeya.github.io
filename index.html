@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -697,9 +698,19 @@
         .idea-title { font-weight: 700; margin-bottom: 0.4rem; }
         .idea-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
         .idea-impact {
-            display: flex; gap: 0.25rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .idea-fire { font-size: 0.85rem; }
+        .idea-impact::after {
+            content: 'Interest level — grows with upvotes';
+            font-size: 0.65rem;
+            color: var(--muted);
+            font-style: italic;
+            letter-spacing: 0.02em;
+        }
 
         /* ========== CONTACT ========== */
         .contact-section {
@@ -1701,7 +1712,7 @@
                 <div class="idea-num">01</div>
                 <div class="idea-title">AI Data Normalization Engine</div>
                 <div class="idea-desc">Reusable AI pipeline to normalize messy structured and unstructured healthcare data across EDI, claims, and enrollment — modeled on the 40% speed-to-market gains achieved at Reveleer.</div>
-                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-data-norm">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'data-norm')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-data-norm">0</span></button><button class="feedback-link" onclick="openFeedback('data-norm','Data Normalization Engine')">💬 Suggest</button></div>
             </div>
 
@@ -1710,7 +1721,7 @@
                 <div class="idea-num">02</div>
                 <div class="idea-title">Security Vulnerability Triage Dashboard</div>
                 <div class="idea-desc">AI-assisted tool to ingest CVE/vulnerability scanner output, auto-prioritize by risk and blast radius, assign remediation owners, and track closure — inspired by resolving 10K+ vulnerabilities in under a year.</div>
-                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-sec-triage">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'sec-triage')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-sec-triage">0</span></button><button class="feedback-link" onclick="openFeedback('sec-triage','Security Triage')">💬 Suggest</button></div>
             </div>
 
@@ -1719,7 +1730,7 @@
                 <div class="idea-num">03</div>
                 <div class="idea-title">Engineering Team Scaling Playbook</div>
                 <div class="idea-desc">Interactive tool for engineering leaders to model team growth — headcount planning, SAFe Agile squad structuring, role gap analysis, and hiring sequencing — from 1 to 100+ engineers.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-team-scale">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'team-scale')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-team-scale">0</span></button><button class="feedback-link" onclick="openFeedback('team-scale','Team Scaling Playbook')">💬 Suggest</button></div>
             </div>
 
@@ -1728,7 +1739,7 @@
                 <div class="idea-num">04</div>
                 <div class="idea-title">M&A Tech Integration Playbook Builder</div>
                 <div class="idea-desc">AI-assisted tool to map post-acquisition systems, identify redundancies, and generate a phased integration roadmap — modeled on real integrations including data center consolidations and EMR migrations.</div>
-                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-ma-playbook">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'ma-playbook')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-ma-playbook">0</span></button><button class="feedback-link" onclick="openFeedback('ma-playbook','M&A Playbook')">💬 Suggest</button></div>
             </div>
 
@@ -1737,7 +1748,7 @@
                 <div class="idea-num">05</div>
                 <div class="idea-title">Risk Adjustment Coding Assistant</div>
                 <div class="idea-desc">NLP-powered ICD-10/HCC coding suggestion from clinical notes with confidence scoring — building on retrospective risk adjustment work that achieved ~98% coding accuracy at Reveleer.</div>
-                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-risk-coding">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'risk-coding')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-risk-coding">0</span></button><button class="feedback-link" onclick="openFeedback('risk-coding','Risk Coding Assistant')">💬 Suggest</button></div>
             </div>
 
@@ -1746,7 +1757,7 @@
                 <div class="idea-num">06</div>
                 <div class="idea-title">EMR Rollout Readiness Tracker</div>
                 <div class="idea-desc">Multi-site EMR deployment management tool — clinic readiness scoring, go-live sequencing, issue tracking, and stakeholder dashboards. Based on real EPIC rollout experience across 43+ clinics.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-emr-rollout">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'emr-rollout')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-emr-rollout">0</span></button><button class="feedback-link" onclick="openFeedback('emr-rollout','EMR Rollout Tracker')">💬 Suggest</button></div>
             </div>
 
@@ -1755,7 +1766,7 @@
                 <div class="idea-num">07</div>
                 <div class="idea-title">IT Shared Services Cost Optimizer</div>
                 <div class="idea-desc">Model and benchmark shared IT service costs across departments — SLA design, chargeback modeling, vendor consolidation analysis, and Opex reduction simulation. Built from 10+ department scale experience.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-it-shared">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'it-shared')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-it-shared">0</span></button><button class="feedback-link" onclick="openFeedback('it-shared','IT Shared Services')">💬 Suggest</button></div>
             </div>
 
@@ -1764,7 +1775,7 @@
                 <div class="idea-num">08</div>
                 <div class="idea-title">CI/CD Pipeline Health Scorecard</div>
                 <div class="idea-desc">DORA metrics tracker with AI-generated improvement recommendations — deploy frequency, MTTR, change failure rate, and test automation coverage. Reflects real DevOps toolchain optimization experience.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-cicd-score">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'cicd-score')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-cicd-score">0</span></button><button class="feedback-link" onclick="openFeedback('cicd-score','CI/CD Scorecard')">💬 Suggest</button></div>
             </div>
 
@@ -1773,7 +1784,7 @@
                 <div class="idea-num">09</div>
                 <div class="idea-title">ITSM Tool Migration Simulator</div>
                 <div class="idea-desc">Simulate migrating from legacy ITSM platforms (Remedy, homegrown) to ServiceNow — data mapping, workflow translation, cutover risk scoring, and stakeholder communication templates.</div>
-                <div class="idea-impact">🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-itsm-sim">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'itsm-sim')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-itsm-sim">0</span></button><button class="feedback-link" onclick="openFeedback('itsm-sim','ITSM Migration Sim')">💬 Suggest</button></div>
             </div>
 
@@ -1782,7 +1793,7 @@
                 <div class="idea-num">10</div>
                 <div class="idea-title">Personal Wearables AI Coach</div>
                 <div class="idea-desc">Extend my Oura + Apple Health dashboard into a conversational AI coach — ask natural language questions about your own data and get personalized weekly trend summaries and recovery insights.</div>
-                <div class="idea-impact">🔥🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-wearable-ai">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'wearable-ai')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-wearable-ai">0</span></button><button class="feedback-link" onclick="openFeedback('wearable-ai','Wearables AI Coach')">💬 Suggest</button></div>
             </div>
 
@@ -1791,7 +1802,7 @@
                 <div class="idea-num">11</div>
                 <div class="idea-title">Vedic Text Semantic Search</div>
                 <div class="idea-desc">Search across Upanishads, Bhagavatam, and Stotra texts by meaning and concept — not just keyword. AI-powered semantic indexing with multilingual support across Sanskrit, Tamil, and English.</div>
-                <div class="idea-impact">🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-vedic-search">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vedic-search')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vedic-search">0</span></button><button class="feedback-link" onclick="openFeedback('vedic-search','Vedic Search')">💬 Suggest</button></div>
             </div>
 
@@ -1800,7 +1811,7 @@
                 <div class="idea-num">12</div>
                 <div class="idea-title">Vendor & Outsourcing ROI Analyzer</div>
                 <div class="idea-desc">Compare build vs. buy vs. outsource scenarios with TCO modeling, vendor risk scoring, SLA benchmarking, and Opex/Capex impact simulation — grounded in $20M+ cost optimization experience.</div>
-                <div class="idea-impact">🔥🔥🔥🔥</div>
+                <div class="idea-impact"><span id="flames-vendor-roi">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vendor-roi')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vendor-roi">0</span></button><button class="feedback-link" onclick="openFeedback('vendor-roi','Vendor ROI Analyzer')">💬 Suggest</button></div>
             </div>
 
@@ -1983,6 +1994,12 @@
     function getCounts() { try { return JSON.parse(localStorage.getItem('vk_counts_v2') || '{}'); } catch(e) { return {}; } }
     function saveCounts(c) { localStorage.setItem('vk_counts_v2', JSON.stringify(c)); }
 
+    function getFlames(count) {
+        // Default 3 flames, +1 per 3 upvotes, max 5
+        const bonus = Math.min(2, Math.floor(count / 3));
+        return '🔥'.repeat(3 + bonus);
+    }
+
     function toggleUpvote(btn, appId) {
         const votes = getVotes();
         const counts = getCounts();
@@ -2010,6 +2027,9 @@
             const id = el.id.replace('uv-', '');
             if (!counts[id]) counts[id] = 0;
             el.textContent = counts[id];
+            // Update flames for roadmap cards
+            const flameEl = document.getElementById('flames-' + id);
+            if (flameEl) flameEl.textContent = getFlames(counts[id]);
         });
         document.querySelectorAll('.upvote-btn').forEach(btn => {
             const id = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
