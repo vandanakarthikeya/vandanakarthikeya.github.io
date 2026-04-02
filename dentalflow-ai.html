@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DentalFlow AI Platform — Vandana Karthikeya AI Lab</title>
+  <meta name="description" content="AI-powered dental practice management platform. Full workflow from patient check-in through insurance verification, clinical documentation, claims submission, and billing." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+  <style>
+    /* ── Nav bar matching vandanakarthikeya.github.io ── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; }
+
+    #lab-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: rgba(10, 10, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 48px;
+    }
+    #lab-nav .nav-left { display: flex; align-items: center; gap: 12px; }
+    #lab-nav .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      color: #94a3b8; text-decoration: none; font-size: 12px; font-weight: 500;
+      padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); transition: all 0.15s;
+    }
+    #lab-nav .back-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.08); }
+    #lab-nav .nav-title { color: #e2e8f0; font-size: 13px; font-weight: 600; }
+    #lab-nav .nav-badge {
+      font-size: 9px; padding: 2px 7px; border-radius: 10px;
+      background: rgba(8,145,178,0.2); color: #38bdf8;
+      border: 1px solid rgba(8,145,178,0.3); font-weight: 700; letter-spacing: 0.5px;
+    }
+    #lab-nav .nav-right { display: flex; align-items: center; gap: 10px; }
+    #lab-nav .nav-tag {
+      font-size: 9px; color: #64748b; font-family: 'DM Mono', monospace;
+      padding: 2px 6px; border: 1px solid rgba(255,255,255,0.07); border-radius: 4px;
+    }
+
+    /* ── Disclaimer overlay ── */
+    #disclaimer {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    #disclaimer.hidden { display: none; }
+    .disc-box {
+      background: #0f172a; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; max-width: 480px; width: 100%; padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .disc-icon { font-size: 32px; margin-bottom: 14px; }
+    .disc-title { color: #f1f5f9; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .disc-sub { color: #38bdf8; font-size: 11px; font-weight: 600; letter-spacing: 1px; margin-bottom: 16px; font-family: 'DM Mono', monospace; }
+    .disc-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .disc-item { display: flex; gap: 10px; }
+    .disc-item-dot { color: #38bdf8; font-size: 16px; flex-shrink: 0; line-height: 1.5; }
+    .disc-item-text { font-size: 12.5px; color: #94a3b8; line-height: 1.6; }
+    .disc-item-text strong { color: #cbd5e1; }
+    .disc-actions { display: flex; gap: 10px; }
+    .disc-proceed {
+      flex: 1; padding: 11px; border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #0369a1, #0891b2);
+      color: #fff; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 3px 12px rgba(8,145,178,0.3); transition: all 0.15s;
+    }
+    .disc-back {
+      padding: 11px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: #94a3b8; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none;
+      display: flex; align-items: center;
+    }
+
+    /* ── Main app mount ── */
+    #app-wrap {
+      display: flex; flex-direction: column;
+      padding-top: 48px; /* offset for fixed nav */
+      height: 100vh;
+    }
+    #root { height: 100%; }
+  </style>
+</head>
+<body>
+
+<!-- ── Site Nav Bar ── -->
+<nav id="lab-nav">
+  <div class="nav-left">
+    <a href="https://vandanakarthikeya.github.io/#pocs" class="back-btn">← AI Lab</a>
+    <span class="nav-title">🦷 DentalFlow AI Platform</span>
+    <span class="nav-badge">POC</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">Supabase</span>
+    <span class="nav-tag">Claude API</span>
+    <span class="nav-tag">Healthcare</span>
+  </div>
+</nav>
+
+<!-- ── Disclaimer overlay (same pattern as main site) ── -->
+<div id="disclaimer">
+  <div class="disc-box">
+    <div class="disc-icon">⚠️</div>
+    <div class="disc-title">Demo &amp; Training Only</div>
+    <div class="disc-sub">IMPORTANT DISCLAIMER</div>
+    <div class="disc-items">
+      <div class="disc-item">
+        <span class="disc-item-dot">›</span>
+        <span class="disc-item-text"><strong>Synthetic data only.</strong> All patient records, claims, and billing are sample data. Not for clinical, billing, or operational use.</span>
+      </div>
+      <div class="disc-item">
+        <span class="disc-item-dot">›</span>
+        <span class="disc-item-text"><strong>Requires your own Supabase project</strong> and Claude API key to run. Setup takes ~5 minutes — instructions are in the app.</span>
+      </div>
+      <div class="disc-item">
+        <span class="disc-item-dot">›</span>
+        <span class="disc-item-text"><strong>Not production-ready.</strong> This POC demonstrates workflow and AI capability. Real deployment needs HIPAA controls, auth, and infrastructure design.</span>
+      </div>
+      <div class="disc-item">
+        <span class="disc-item-dot">›</span>
+        <span class="disc-item-text"><strong>AI outputs require oversight.</strong> All agent-generated notes, claims, and billing summaries must be reviewed before any real-world use.</span>
+      </div>
+    </div>
+    <div class="disc-actions">
+      <a href="https://vandanakarthikeya.github.io/#pocs" class="disc-back">← Back</a>
+      <button class="disc-proceed" onclick="document.getElementById('disclaimer').classList.add('hidden')">
+        I Understand — Open App →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── React App Mount ── -->
+<div id="app-wrap">
+  <div id="root"></div>
+</div>
+
+<!-- CDN: React 18 + Babel (no build step needed) -->
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+
+
+// ═══════════════════════════════════════════════════════════
+// SEED DATA
+// ═══════════════════════════════════════════════════════════
+const SEED_PATIENTS = [
+  { first_name:"Sarah", last_name:"Mitchell", dob:"1988-03-14", phone:"(555) 823-4190", email:"sarah.m@email.com", patient_type:"returning", insurance_name:"Delta Dental PPO", insurance_member_id:"DDL-2847361", insurance_group:"GRP-88471" },
+  { first_name:"James", last_name:"Rodriguez", dob:"1975-07-22", phone:"(555) 412-9033", email:"j.rodriguez@email.com", patient_type:"returning", insurance_name:"Cigna DPPO", insurance_member_id:"CIG-5521847", insurance_group:"GRP-44120" },
+  { first_name:"Emily", last_name:"Chen", dob:"1995-11-08", phone:"(555) 291-7744", email:"emily.c@email.com", patient_type:"new", insurance_name:"Aetna Dental", insurance_member_id:"AET-9918823", insurance_group:"GRP-77392" },
+  { first_name:"Marcus", last_name:"Williams", dob:"1962-04-30", phone:"(555) 639-2211", email:"m.williams@email.com", patient_type:"returning", insurance_name:"Delta Dental PPO", insurance_member_id:"DDL-1193847", insurance_group:"GRP-88471" },
+  { first_name:"Jennifer", last_name:"Park", dob:"1990-09-17", phone:"(555) 774-5502", email:"j.park@email.com", patient_type:"returning", insurance_name:"MetLife Dental", insurance_member_id:"MET-3347821", insurance_group:"GRP-55001" },
+  { first_name:"Robert", last_name:"Thompson", dob:"1958-12-03", phone:"(555) 388-9910", email:"r.thompson@email.com", patient_type:"new", insurance_name:"Humana Dental", insurance_member_id:"HUM-6620481", insurance_group:"GRP-92134" },
+  { first_name:"Aisha", last_name:"Johnson", dob:"2001-05-25", phone:"(555) 557-8823", email:"aisha.j@email.com", patient_type:"returning", insurance_name:"Cigna DPPO", insurance_member_id:"CIG-8847291", insurance_group:"GRP-44120" },
+  { first_name:"Daniel", last_name:"Kim", dob:"1983-08-11", phone:"(555) 201-4432", email:"d.kim@email.com", patient_type:"returning", insurance_name:"Delta Dental PPO", insurance_member_id:"DDL-7741209", insurance_group:"GRP-88471" },
+];
+
+const PROCEDURES_CATALOG = [
+  { cdt_code:"D0120", procedure_name:"Periodic Oral Evaluation", fee:75, category:"preventive" },
+  { cdt_code:"D0150", procedure_name:"Comprehensive Oral Evaluation", fee:125, category:"preventive" },
+  { cdt_code:"D0210", procedure_name:"Full Mouth X-Rays (FMX)", fee:185, category:"preventive" },
+  { cdt_code:"D0274", procedure_name:"4 Bitewing X-Rays", fee:95, category:"preventive" },
+  { cdt_code:"D1110", procedure_name:"Prophylaxis – Adult Cleaning", fee:140, category:"preventive" },
+  { cdt_code:"D1120", procedure_name:"Prophylaxis – Child Cleaning", fee:95, category:"preventive" },
+  { cdt_code:"D2140", procedure_name:"Amalgam Filling – 1 Surface", fee:175, category:"basic" },
+  { cdt_code:"D2150", procedure_name:"Amalgam Filling – 2 Surfaces", fee:220, category:"basic" },
+  { cdt_code:"D2390", procedure_name:"Composite Resin – 1 Surface", fee:210, category:"basic" },
+  { cdt_code:"D4341", procedure_name:"Perio Scaling (per quad)", fee:285, category:"basic" },
+  { cdt_code:"D7140", procedure_name:"Simple Extraction", fee:175, category:"basic" },
+  { cdt_code:"D2750", procedure_name:"Crown – Porcelain/Metal", fee:1250, category:"major" },
+];
+
+const INS_BENEFITS = {
+  "Delta Dental PPO":{ deductible:50, annual_max:1500, preventive:100, basic:80, major:50 },
+  "Cigna DPPO":{ deductible:75, annual_max:2000, preventive:100, basic:80, major:50 },
+  "Aetna Dental":{ deductible:100, annual_max:1000, preventive:100, basic:70, major:50 },
+  "MetLife Dental":{ deductible:50, annual_max:2000, preventive:100, basic:80, major:60 },
+  "Humana Dental":{ deductible:75, annual_max:1000, preventive:80, basic:60, major:40 },
+  "No Insurance":{ deductible:0, annual_max:0, preventive:0, basic:0, major:0 },
+};
+
+// ═══════════════════════════════════════════════════════════
+// SUPABASE REST CLIENT
+// ═══════════════════════════════════════════════════════════
+function createDB(url, key) {
+  const base = url.replace(/\/$/, "") + "/rest/v1";
+  const h = { "apikey":key, "Authorization":`Bearer ${key}`, "Content-Type":"application/json" };
+  return {
+    async get(table, qs="") {
+      const r = await fetch(`${base}/${table}?${qs}`, { headers:h });
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    },
+    async insert(table, rows) {
+      const r = await fetch(`${base}/${table}`, {
+        method:"POST", headers:{ ...h, "Prefer":"return=representation" },
+        body:JSON.stringify(Array.isArray(rows)?rows:[rows]),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    },
+    async update(table, match, data) {
+      const q = Object.entries(match).map(([k,v])=>`${k}=eq.${encodeURIComponent(v)}`).join("&");
+      const r = await fetch(`${base}/${table}?${q}`, {
+        method:"PATCH", headers:{ ...h, "Prefer":"return=representation" },
+        body:JSON.stringify(data),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    },
+    async test() {
+      try { const r = await fetch(`${base}/patients?select=id&limit=1`, { headers:h }); return r.ok; }
+      catch { return false; }
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLAUDE AGENT STREAMING
+// ═══════════════════════════════════════════════════════════
+async function streamAgent(system, user, onChunk) {
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:700, stream:true, system, messages:[{ role:"user", content:user }] }),
+    });
+    if (!r.ok) throw new Error("API error");
+    const reader = r.body.getReader(); const dec = new TextDecoder(); let full="";
+    while(true) {
+      const { done, value } = await reader.read(); if(done) break;
+      for(const line of dec.decode(value).split("\n").filter(l=>l.startsWith("data: "))) {
+        try { const d=JSON.parse(line.slice(6)); if(d.delta?.text){ full+=d.delta.text; onChunk(full); } } catch {}
+      }
+    }
+    return full;
+  } catch {
+    const m="[AI Agent ready — add your Anthropic API key to enable live responses]";
+    onChunk(m); return m;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIGHT DESIGN TOKENS
+// ═══════════════════════════════════════════════════════════
+const T = {
+  bg:       "#f0f4f8",
+  sidebar:  "#ffffff",
+  card:     "#ffffff",
+  cardAlt:  "#f8fafc",
+  border:   "#e2e8f0",
+  borderMd: "#cbd5e1",
+  accent:   "#0891b2",
+  accentLt: "#e0f2fe",
+  accentMd: "#bae6fd",
+  success:  "#16a34a",
+  successLt:"#dcfce7",
+  warn:     "#d97706",
+  warnLt:   "#fef3c7",
+  danger:   "#dc2626",
+  dangerLt: "#fee2e2",
+  purple:   "#7c3aed",
+  purpleLt: "#ede9fe",
+  text:     "#0f172a",
+  textMd:   "#334155",
+  muted:    "#64748b",
+  mutedLt:  "#94a3b8",
+  shadow:   "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05)",
+  shadowMd: "0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05)",
+  font:     "'DM Sans', sans-serif",
+  mono:     "'DM Mono', monospace",
+  head:     "'Syne', sans-serif",
+};
+
+// ═══════════════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════════════
+function Btn({ children, onClick, v="primary", sm, disabled, sx={} }) {
+  const vs = {
+    primary: { background:"linear-gradient(135deg,#0369a1,#0891b2)", color:"#fff", border:"none", boxShadow:"0 2px 8px rgba(8,145,178,0.28)" },
+    success: { background:"linear-gradient(135deg,#15803d,#16a34a)", color:"#fff", border:"none", boxShadow:"0 2px 8px rgba(22,163,74,0.28)" },
+    ghost:   { background:"#f8fafc", color:T.textMd, border:`1px solid ${T.border}` },
+    danger:  { background:T.dangerLt, color:T.danger, border:`1px solid #fca5a5` },
+    outline: { background:"transparent", color:T.accent, border:`1px solid ${T.accent}` },
+  };
+  return (
+    <button onClick={onClick} disabled={disabled} style={{ padding:sm?"5px 12px":"9px 18px", borderRadius:7, fontSize:sm?11:13, fontWeight:600, cursor:disabled?"not-allowed":"pointer", fontFamily:T.font, opacity:disabled?0.45:1, transition:"all 0.15s", letterSpacing:0.1, ...vs[v], ...sx }}>
+      {children}
+    </button>
+  );
+}
+
+function Badge({ s }) {
+  const m = {
+    scheduled: [T.accent,   T.accentLt,  "SCHED"],
+    in_progress:[T.warn,    T.warnLt,    "ACTIVE"],
+    completed:  [T.success, T.successLt, "DONE"],
+    cancelled:  ["#64748b", "#f1f5f9",   "CANC"],
+    no_show:    ["#64748b", "#f1f5f9",   "NO SHOW"],
+    draft:      [T.muted,   "#f1f5f9",   "DRAFT"],
+    submitted:  [T.warn,    T.warnLt,    "SUBMITTED"],
+    accepted:   [T.accent,  T.accentLt,  "ACCEPTED"],
+    processing: [T.purple,  T.purpleLt,  "PROCESSING"],
+    paid:       [T.success, T.successLt, "PAID"],
+    denied:     [T.danger,  T.dangerLt,  "DENIED"],
+    pending:    [T.warn,    T.warnLt,    "PENDING"],
+    overdue:    [T.danger,  T.dangerLt,  "OVERDUE"],
+    partial:    [T.purple,  T.purpleLt,  "PARTIAL"],
+    new:        [T.accent,  T.accentLt,  "NEW"],
+    returning:  [T.success, T.successLt, "RETURN"],
+    open:       [T.warn,    T.warnLt,    "OPEN"],
+    closed:     [T.success, T.successLt, "CLOSED"],
+  };
+  const [c, bg, l] = m[s] || [T.muted, "#f1f5f9", (s||"").toUpperCase()];
+  return (
+    <span style={{ fontSize:9, padding:"3px 8px", borderRadius:20, background:bg, color:c, border:`1px solid ${c}33`, fontFamily:T.mono, fontWeight:700, whiteSpace:"nowrap", letterSpacing:0.5 }}>
+      {l}
+    </span>
+  );
+}
+
+function Card({ children, sx={} }) {
+  return (
+    <div style={{ background:T.card, border:`1px solid ${T.border}`, borderRadius:12, padding:20, boxShadow:T.shadow, ...sx }}>
+      {children}
+    </div>
+  );
+}
+
+function Inp({ label, name, value, onChange, placeholder, type="text", req }) {
+  return (
+    <div style={{ marginBottom:13 }}>
+      {label && <label style={{ fontSize:10, color:T.muted, display:"block", marginBottom:4, fontFamily:T.mono, letterSpacing:0.5, fontWeight:600 }}>{label}{req?" *":""}</label>}
+      <input name={name} value={value} onChange={onChange} placeholder={placeholder} type={type}
+        style={{ width:"100%", padding:"9px 12px", borderRadius:7, border:`1px solid ${T.border}`, background:"#f8fafc", color:T.text, fontSize:13, fontFamily:T.font, boxSizing:"border-box", outline:"none", transition:"border 0.2s" }}
+        onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.border} />
+    </div>
+  );
+}
+
+function Sel({ label, name, value, onChange, opts }) {
+  return (
+    <div style={{ marginBottom:13 }}>
+      {label && <label style={{ fontSize:10, color:T.muted, display:"block", marginBottom:4, fontFamily:T.mono, letterSpacing:0.5, fontWeight:600 }}>{label}</label>}
+      <select name={name} value={value} onChange={onChange}
+        style={{ width:"100%", padding:"9px 12px", borderRadius:7, border:`1px solid ${T.border}`, background:"#f8fafc", color:T.text, fontSize:13, fontFamily:T.font, boxSizing:"border-box" }}>
+        {opts.map(o=><option key={o.v||o} value={o.v||o}>{o.l||o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function AgentBubble({ agent, text, loading }) {
+  return (
+    <div style={{ display:"flex", gap:10, marginTop:13 }}>
+      <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, flexShrink:0, boxShadow:"0 2px 8px rgba(8,145,178,0.3)" }}>🤖</div>
+      <div style={{ flex:1 }}>
+        <div style={{ fontSize:9, color:T.accent, fontFamily:T.mono, marginBottom:4, letterSpacing:1, fontWeight:700 }}>{agent} · DENTALFLOW AI</div>
+        <div style={{ background:T.accentLt, border:`1px solid ${T.accentMd}`, borderRadius:"0 10px 10px 10px", padding:"10px 14px", fontSize:13, lineHeight:1.72, color:T.textMd, whiteSpace:"pre-wrap", minHeight:40 }}>
+          {loading && !text
+            ? <span style={{ display:"flex", gap:4, alignItems:"center" }}>
+                {[0,1,2].map(i=><span key={i} style={{ width:6, height:6, borderRadius:"50%", background:T.accent, display:"inline-block", animation:`dfp 1.2s ${i*0.2}s infinite` }}/>)}
+                <span style={{ fontSize:11, color:T.muted, marginLeft:6 }}>Agent thinking...</span>
+              </span>
+            : text||"Waiting for input..."}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Modal({ open, onClose, title, children, w=510 }) {
+  if(!open) return null;
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.4)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter:"blur(3px)" }}>
+      <div style={{ background:T.card, border:`1px solid ${T.border}`, borderRadius:14, width:"100%", maxWidth:w, maxHeight:"88vh", overflowY:"auto", boxShadow:T.shadowMd }}>
+        <div style={{ padding:"16px 20px", borderBottom:`1px solid ${T.border}`, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, background:T.card, zIndex:1 }}>
+          <span style={{ fontFamily:T.head, fontWeight:700, fontSize:15, color:T.text }}>{title}</span>
+          <button onClick={onClose} style={{ background:"#f1f5f9", border:`1px solid ${T.border}`, color:T.muted, fontSize:18, cursor:"pointer", lineHeight:1, width:28, height:28, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>×</button>
+        </div>
+        <div style={{ padding:"18px 20px" }}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function Empty({ icon, msg }) {
+  return (
+    <div style={{ textAlign:"center", padding:"44px 20px", color:T.muted }}>
+      <div style={{ fontSize:36, marginBottom:10 }}>{icon}</div>
+      <div style={{ fontSize:13 }}>{msg}</div>
+    </div>
+  );
+}
+
+function Spin() {
+  return (
+    <div style={{ display:"flex", justifyContent:"center", alignItems:"center", padding:36 }}>
+      <div style={{ width:28, height:28, border:`3px solid ${T.border}`, borderTopColor:T.accent, borderRadius:"50%", animation:"dfs 0.8s linear infinite" }}/>
+    </div>
+  );
+}
+
+function THead({ cols }) {
+  return (
+    <thead>
+      <tr style={{ borderBottom:`1px solid ${T.border}`, background:"#f8fafc" }}>
+        {cols.map(c=>(
+          <th key={c} style={{ padding:"10px 14px", textAlign:"left", color:T.muted, fontWeight:700, fontSize:10, fontFamily:T.mono, letterSpacing:0.6 }}>{c}</th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+function FilterBar({ filters, active, onChange }) {
+  return (
+    <div style={{ display:"flex", gap:6, marginBottom:14, flexWrap:"wrap" }}>
+      {filters.map(f=>(
+        <button key={f} onClick={()=>onChange(f)} style={{ padding:"5px 12px", borderRadius:20, border:`1.5px solid ${active===f?T.accent:T.border}`, background:active===f?T.accentLt:"#fff", color:active===f?T.accent:T.muted, cursor:"pointer", fontSize:10, fontFamily:T.mono, letterSpacing:0.5, fontWeight:600, transition:"all 0.15s" }}>
+          {f.replace(/_/g," ").toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SectionTitle({ children, action }) {
+  return (
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+      <h1 style={{ fontFamily:T.head, fontWeight:800, fontSize:22, margin:0, color:T.text }}>{children}</h1>
+      {action}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// SETUP SCREEN
+// ═══════════════════════════════════════════════════════════
+function Setup({ onConnect }) {
+  const [url, setUrl] = useState(""); const [key, setKey] = useState("");
+  const [phase, setPhase] = useState("idle");
+  const [err, setErr] = useState(""); const [seedLog, setSeedLog] = useState([]);
+  const log = m => setSeedLog(p=>[...p, m]);
+
+  const connect = async (seed=false) => {
+    if(!url||!key) return; setErr(""); setPhase(seed?"seeding":"testing");
+    const db = createDB(url.trim(), key.trim());
+    const ok = await db.test();
+    if(!ok){ setErr("Connection failed. Check your URL and anon key, and ensure the schema is deployed."); setPhase("error"); return; }
+    if(!seed){ onConnect(url.trim(),key.trim()); return; }
+    try {
+      log("🌱 Inserting patients...");
+      const pts = await db.insert("patients", SEED_PATIENTS);
+      log(`✅ ${pts.length} patients created`);
+      const today = new Date();
+      const apptData = pts.map((p,i) => {
+        const d = new Date(today); d.setDate(d.getDate()+(i<4?i:i-3));
+        const types = ["Comprehensive Exam + Cleaning","Periodic Exam + Cleaning","Emergency Exam","Periodontal Maintenance","Crown Prep","Extraction Consult","Whitening Consult","Night Guard Delivery"];
+        const statuses = ["scheduled","scheduled","completed","scheduled","cancelled","completed","scheduled","completed"];
+        return { patient_id:p.id, appointment_date:d.toISOString().split("T")[0], appointment_time:`${9+i}:00:00`, appointment_type:types[i], status:statuses[i], provider:i%2===0?"Dr. Ravi Patel DDS":"Dr. Sarah Kim DDS", operatory:`Operatory ${(i%3)+1}` };
+      });
+      await db.insert("appointments", apptData);
+      log("✅ Appointments created");
+      for(let i=0;i<3;i++){
+        const enc = await db.insert("encounters",[{ patient_id:pts[i].id, visit_date:new Date(Date.now()-(i+1)*7*864e5).toISOString().split("T")[0], provider:"Dr. Ravi Patel DDS", hygienist:"RDH Kim Thompson", status:"closed", clinical_notes:"Patient presents for routine recall. Perio charting WNL. No acute concerns.", total_billed:[530,310,750][i], insurance_estimated:[342,248,520][i], patient_responsibility:[188,62,230][i] }]);
+        const cl = await db.insert("claims",[{ patient_id:pts[i].id, encounter_id:enc[0].id, claim_number:`CLM-${new Date().getFullYear()}-${100001+i}`, payer_name:pts[i].insurance_name, total_billed:[530,310,750][i], insurance_paid:[342,248,0][i], patient_responsibility:[188,62,230][i], status:["paid","submitted","processing"][i], submitted_at:new Date(Date.now()-i*5*864e5).toISOString(), era_received:i===0 }]);
+        await db.insert("billing_statements",[{ patient_id:pts[i].id, claim_id:cl[0].id, statement_number:`STM-${200001+i}`, amount_billed:[188,62,230][i], amount_paid:[188,0,0][i], balance_due:[0,62,230][i], status:["paid","pending","overdue"][i], dunning_stage:[0,0,1][i], sent_via:"sms", due_date:new Date(Date.now()+(30-i*35)*864e5).toISOString().split("T")[0] }]);
+      }
+      log("✅ Encounters, claims & billing seeded");
+      log("🚀 Launching DentalFlow...");
+      setPhase("done");
+      setTimeout(()=>onConnect(url.trim(),key.trim()),1200);
+    } catch(e){ setErr("Seeding failed: "+e.message); setPhase("error"); }
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 40%,#f0fdf4 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:T.font }}>
+      <div style={{ width:"100%", maxWidth:460 }}>
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:64, height:64, borderRadius:18, background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30, margin:"0 auto 16px", boxShadow:"0 8px 24px rgba(8,145,178,0.3)" }}>🦷</div>
+          <h1 style={{ fontFamily:T.head, fontWeight:800, fontSize:28, color:T.text, margin:0 }}>DentalFlow AI</h1>
+          <p style={{ color:T.muted, marginTop:8, fontSize:14 }}>Full-stack dental practice management platform</p>
+        </div>
+
+        {phase==="seeding" && (
+          <Card>
+            <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:14, letterSpacing:1, fontWeight:700 }}>SEEDING DATABASE</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+              {seedLog.map((l,i)=><div key={i} style={{ fontSize:12, color:i===seedLog.length-1?T.accent:T.success }}>{l}</div>)}
+              <Spin/>
+            </div>
+          </Card>
+        )}
+        {phase==="done" && (
+          <Card sx={{ textAlign:"center", padding:40 }}>
+            <div style={{ fontSize:44, marginBottom:12 }}>🎉</div>
+            <div style={{ color:T.success, fontWeight:700, fontSize:16 }}>All done! Launching...</div>
+          </Card>
+        )}
+        {(phase==="idle"||phase==="testing"||phase==="error") && (
+          <Card>
+            <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:16, letterSpacing:1, fontWeight:700 }}>SUPABASE CONFIGURATION</div>
+            <Inp label="Project URL" value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://xxxx.supabase.co" />
+            <Inp label="Anon / Public Key" value={key} onChange={e=>setKey(e.target.value)} placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+            {err && (
+              <div style={{ fontSize:11, color:T.danger, background:T.dangerLt, border:`1px solid #fca5a5`, borderRadius:7, padding:"9px 11px", marginBottom:12, lineHeight:1.6 }}>
+                {err}
+              </div>
+            )}
+            <div style={{ display:"flex", gap:9 }}>
+              <Btn onClick={()=>connect(false)} disabled={!url||!key||phase==="testing"} sx={{ flex:1 }}>{phase==="testing"?"Connecting...":"Connect"}</Btn>
+              <Btn onClick={()=>connect(true)} v="success" disabled={!url||!key||phase==="seeding"} sx={{ flex:1 }}>🌱 Connect + Seed</Btn>
+            </div>
+            <div style={{ marginTop:18, padding:14, background:T.accentLt, borderRadius:9, border:`1px solid ${T.accentMd}` }}>
+              <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:8, letterSpacing:1, fontWeight:700 }}>QUICK SETUP</div>
+              {["1. Create free project at supabase.com","2. Run supabase-schema.sql in SQL Editor","3. Paste URL + anon key above, click 'Connect + Seed'"].map((s,i)=>(
+                <div key={i} style={{ fontSize:11, color:T.textMd, padding:"3px 0", display:"flex", gap:8 }}>
+                  <span style={{ color:T.accent }}>›</span> {s}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function Sidebar({ active, go, counts={} }) {
+  const nav = [
+    { id:"dashboard", icon:"📊", label:"Dashboard" },
+    { id:"patients",  icon:"👥", label:"Patients",    badge:counts.patients },
+    { id:"appointments",icon:"📅",label:"Appointments",badge:counts.today },
+    { id:"visit",     icon:"🦷", label:"New Visit" },
+    { id:"claims",    icon:"📄", label:"Claims",      badge:counts.claims },
+    { id:"billing",   icon:"💳", label:"Billing / AR", badge:counts.overdue },
+  ];
+  return (
+    <div style={{ width:215, background:T.sidebar, borderRight:`1px solid ${T.border}`, display:"flex", flexDirection:"column", flexShrink:0, boxShadow:"2px 0 8px rgba(0,0,0,0.04)" }}>
+      {/* Logo */}
+      <div style={{ padding:"20px 16px 16px", borderBottom:`1px solid ${T.border}` }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, boxShadow:"0 3px 10px rgba(8,145,178,0.3)" }}>🦷</div>
+          <div>
+            <div style={{ fontFamily:T.head, fontWeight:800, fontSize:14, color:T.text }}>DentalFlow</div>
+            <div style={{ fontSize:8, color:T.accent, fontFamily:T.mono, letterSpacing:1, fontWeight:700 }}>AI PLATFORM</div>
+          </div>
+        </div>
+      </div>
+      {/* Nav */}
+      <nav style={{ flex:1, padding:"12px 8px" }}>
+        {nav.map(n=>(
+          <button key={n.id} onClick={()=>go(n.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:9, padding:"9px 10px", borderRadius:8, border:"none", background:active===n.id?T.accentLt:"transparent", color:active===n.id?T.accent:T.muted, cursor:"pointer", fontFamily:T.font, fontSize:13, fontWeight:active===n.id?600:500, marginBottom:2, transition:"all 0.14s", borderLeft:`2.5px solid ${active===n.id?T.accent:"transparent"}` }}>
+            <span style={{ fontSize:15 }}>{n.icon}</span>
+            <span style={{ flex:1, textAlign:"left" }}>{n.label}</span>
+            {n.badge>0 && (
+              <span style={{ fontSize:9, background:active===n.id?T.accent:T.accentMd, color:active===n.id?"#fff":T.accent, borderRadius:10, padding:"1px 6px", fontFamily:T.mono, fontWeight:700 }}>{n.badge}</span>
+            )}
+          </button>
+        ))}
+      </nav>
+      {/* Footer */}
+      <div style={{ padding:"12px 16px 16px", borderTop:`1px solid ${T.border}` }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12 }}>👨‍⚕️</div>
+          <div>
+            <div style={{ fontSize:11, color:T.textMd, fontWeight:600 }}>Dr. Ravi Patel</div>
+            <div style={{ fontSize:9, color:T.mutedLt, marginTop:1 }}>Smile Bright Dental</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function Dashboard({ db, go, startVisit }) {
+  const [s, setS] = useState(null); const [appts, setAppts] = useState([]); const [recent, setRecent] = useState([]);
+  useEffect(()=>{
+    const today = new Date().toISOString().split("T")[0];
+    Promise.all([
+      db.get("patients","select=id,first_name,last_name,patient_type&order=created_at.desc"),
+      db.get("appointments",`select=*,patients(first_name,last_name)&appointment_date=eq.${today}&order=appointment_time.asc`),
+      db.get("claims","select=status,total_billed,insurance_paid,patient_responsibility"),
+      db.get("billing_statements","select=balance_due,status"),
+    ]).then(([pts,ap,cl,bl])=>{
+      const ar=bl.filter(b=>b.status!=="paid").reduce((s,b)=>s+(b.balance_due||0),0);
+      setS({ pts:pts.length, today:ap.length, claims:cl.length, ar });
+      setAppts(ap.slice(0,6)); setRecent(pts.slice(0,5));
+    }).catch(()=>{});
+  },[]);
+
+  const statCards=[
+    { icon:"👥", label:"Total Patients", val:s?.pts??"—", color:T.accent, bg:T.accentLt, border:"#bae6fd" },
+    { icon:"📅", label:"Appts Today",    val:s?.today??"—", color:T.purple, bg:T.purpleLt, border:"#c4b5fd" },
+    { icon:"📄", label:"Total Claims",   val:s?.claims??"—", color:T.warn, bg:T.warnLt, border:"#fde68a" },
+    { icon:"💰", label:"Outstanding AR", val:s?.ar!=null?`$${s.ar.toFixed(0)}`:"—", color:T.danger, bg:T.dangerLt, border:"#fca5a5" },
+  ];
+
+  return (
+    <div>
+      <div style={{ marginBottom:24 }}>
+        <h1 style={{ fontFamily:T.head, fontWeight:800, fontSize:22, margin:"0 0 4px", color:T.text }}>Good morning, Dr. Patel 👋</h1>
+        <div style={{ color:T.muted, fontSize:13 }}>{new Date().toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</div>
+      </div>
+      {/* Stat cards */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:22 }}>
+        {statCards.map(c=>(
+          <div key={c.label} style={{ background:c.bg, border:`1.5px solid ${c.border}`, borderRadius:12, padding:"16px 18px", boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize:20, marginBottom:8 }}>{c.icon}</div>
+            <div style={{ fontSize:24, fontWeight:800, color:c.color, fontFamily:T.head }}>{c.val}</div>
+            <div style={{ fontSize:11, color:c.color, marginTop:2, fontWeight:500 }}>{c.label}</div>
+          </div>
+        ))}
+      </div>
+      {/* Content grid */}
+      <div style={{ display:"grid", gridTemplateColumns:"1.2fr 1fr", gap:16 }}>
+        <Card>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+            <span style={{ fontWeight:700, fontSize:14, color:T.text }}>📅 Today's Schedule</span>
+            <Btn sm v="ghost" onClick={()=>go("appointments")}>View All</Btn>
+          </div>
+          {!s?<Spin/>:appts.length===0?<Empty icon="📅" msg="No appointments today"/>:appts.map(a=>(
+            <div key={a.id} style={{ display:"flex", alignItems:"center", gap:11, padding:"10px 0", borderBottom:`1px solid ${T.border}` }}>
+              <div style={{ width:40, height:40, borderRadius:10, background:T.accentLt, border:`1px solid ${T.accentMd}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontFamily:T.mono, color:T.accent, flexShrink:0, fontWeight:700 }}>
+                {a.appointment_time?.slice(0,5)}
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:13, fontWeight:600, color:T.text }}>{a.patients?.first_name} {a.patients?.last_name}</div>
+                <div style={{ fontSize:11, color:T.muted, marginTop:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a.appointment_type}</div>
+              </div>
+              <Badge s={a.status}/>
+            </div>
+          ))}
+        </Card>
+        <Card>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+            <span style={{ fontWeight:700, fontSize:14, color:T.text }}>👥 Recent Patients</span>
+            <Btn sm v="ghost" onClick={()=>go("patients")}>View All</Btn>
+          </div>
+          {!s?<Spin/>:recent.length===0?<Empty icon="👥" msg="No patients yet"/>:recent.map(p=>(
+            <div key={p.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 0", borderBottom:`1px solid ${T.border}` }}>
+              <div style={{ width:34, height:34, borderRadius:"50%", background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:700, flexShrink:0, color:"#fff" }}>{p.first_name?.[0]}{p.last_name?.[0]}</div>
+              <div style={{ flex:1 }}><div style={{ fontSize:13, fontWeight:600, color:T.text }}>{p.first_name} {p.last_name}</div></div>
+              <Badge s={p.patient_type||"returning"}/>
+            </div>
+          ))}
+          <div style={{ marginTop:14 }}>
+            <Btn sx={{ width:"100%" }} onClick={()=>go("visit")}>+ Start New Visit</Btn>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// PATIENTS
+// ═══════════════════════════════════════════════════════════
+function Patients({ db, startVisit }) {
+  const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState(""); const [showAdd, setShowAdd] = useState(false);
+  const [sel, setSel] = useState(null);
+  const load = ()=>{ setLoading(true); db.get("patients","select=*&order=last_name.asc,first_name.asc").then(d=>{setRows(d);setLoading(false);}).catch(()=>setLoading(false)); };
+  useEffect(load,[]);
+  const filtered = rows.filter(p=>`${p.first_name} ${p.last_name} ${p.phone||""} ${p.insurance_name||""}`.toLowerCase().includes(q.toLowerCase()));
+  if(sel) return <PatientDetail p={sel} db={db} onBack={()=>setSel(null)} startVisit={p=>{setSel(null);startVisit(p);}} />;
+  return (
+    <div>
+      <SectionTitle action={<Btn onClick={()=>setShowAdd(true)}>+ Add Patient</Btn>}>Patients</SectionTitle>
+      <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by name, phone or insurance…"
+        style={{ width:"100%", padding:"10px 14px", borderRadius:9, border:`1.5px solid ${T.border}`, background:"#fff", color:T.text, fontSize:13, fontFamily:T.font, marginBottom:14, boxSizing:"border-box", outline:"none", boxShadow:"0 1px 3px rgba(0,0,0,0.04)" }}
+        onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.border} />
+      <Card sx={{ padding:0 }}>
+        {loading?<Spin/>:filtered.length===0?<Empty icon="👥" msg="No patients found"/>:(
+          <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+            <THead cols={["Patient","DOB","Phone","Insurance","Member ID","Type","Actions"]}/>
+            <tbody>{filtered.map(p=>(
+              <tr key={p.id} style={{ borderBottom:`1px solid ${T.border}`, transition:"background 0.12s" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                <td style={{ padding:"12px 14px" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#0369a1,#0891b2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:700, flexShrink:0, color:"#fff" }}>{p.first_name?.[0]}{p.last_name?.[0]}</div>
+                    <span style={{ fontWeight:600, color:T.text }}>{p.first_name} {p.last_name}</span>
+                  </div>
+                </td>
+                <td style={{ padding:"12px 14px", color:T.muted }}>{p.dob||"—"}</td>
+                <td style={{ padding:"12px 14px", color:T.textMd }}>{p.phone||"—"}</td>
+                <td style={{ padding:"12px 14px", color:T.muted, fontSize:12 }}>{p.insurance_name||"—"}</td>
+                <td style={{ padding:"12px 14px", fontFamily:T.mono, fontSize:10, color:T.accent }}>{p.insurance_member_id||"—"}</td>
+                <td style={{ padding:"12px 14px" }}><Badge s={p.patient_type||"returning"}/></td>
+                <td style={{ padding:"12px 14px" }}>
+                  <div style={{ display:"flex", gap:6 }}>
+                    <Btn sm v="ghost" onClick={()=>setSel(p)}>View</Btn>
+                    <Btn sm onClick={()=>startVisit(p)}>Visit</Btn>
+                  </div>
+                </td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </Card>
+      <Modal open={showAdd} onClose={()=>setShowAdd(false)} title="Add New Patient">
+        <AddPatientForm db={db} onDone={()=>{setShowAdd(false);load();}} onCancel={()=>setShowAdd(false)} />
+      </Modal>
+    </div>
+  );
+}
+
+function AddPatientForm({ db, onDone, onCancel }) {
+  const [f, setF] = useState({ first_name:"", last_name:"", dob:"", phone:"", email:"", patient_type:"new", insurance_name:"Delta Dental PPO", insurance_member_id:"", insurance_group:"" });
+  const [saving, setSaving] = useState(false);
+  const h = e=>setF(p=>({...p,[e.target.name]:e.target.value}));
+  const save = async()=>{ setSaving(true); try{ await db.insert("patients",[f]); onDone(); }catch(e){ alert(e.message); } setSaving(false); };
+  return (
+    <div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 14px" }}>
+        <Inp label="First Name" name="first_name" value={f.first_name} onChange={h} req />
+        <Inp label="Last Name" name="last_name" value={f.last_name} onChange={h} req />
+        <Inp label="Date of Birth" name="dob" value={f.dob} onChange={h} placeholder="1990-01-15" />
+        <Inp label="Phone" name="phone" value={f.phone} onChange={h} placeholder="(555) 000-0000" />
+        <Inp label="Email" name="email" value={f.email} onChange={h} type="email" />
+        <Sel label="Patient Type" name="patient_type" value={f.patient_type} onChange={h} opts={["new","returning"]} />
+        <Sel label="Insurance" name="insurance_name" value={f.insurance_name} onChange={h} opts={Object.keys(INS_BENEFITS)} />
+        <Inp label="Member ID" name="insurance_member_id" value={f.insurance_member_id} onChange={h} />
+        <Inp label="Group Number" name="insurance_group" value={f.insurance_group} onChange={h} />
+      </div>
+      <div style={{ display:"flex", gap:9, justifyContent:"flex-end", marginTop:6 }}>
+        <Btn v="ghost" onClick={onCancel}>Cancel</Btn>
+        <Btn onClick={save} disabled={!f.first_name||!f.last_name||saving}>{saving?"Saving…":"Add Patient"}</Btn>
+      </div>
+    </div>
+  );
+}
+
+function PatientDetail({ p, db, onBack, startVisit }) {
+  const [enc, setEnc] = useState([]); const [cl, setCl] = useState([]);
+  useEffect(()=>{
+    db.get("encounters",`select=*&patient_id=eq.${p.id}&order=visit_date.desc`).then(setEnc).catch(()=>{});
+    db.get("claims",`select=*&patient_id=eq.${p.id}&order=created_at.desc`).then(setCl).catch(()=>{});
+  },[p.id]);
+  const totalBilled = enc.reduce((s,e)=>s+(e.total_billed||0),0);
+  return (
+    <div>
+      <div style={{ display:"flex", gap:12, alignItems:"flex-start", marginBottom:22 }}>
+        <Btn v="ghost" sm onClick={onBack}>← Back</Btn>
+        <div style={{ flex:1 }}>
+          <h1 style={{ fontFamily:T.head, fontWeight:800, fontSize:22, margin:0, color:T.text }}>{p.first_name} {p.last_name}</h1>
+          <div style={{ color:T.muted, fontSize:12, marginTop:4 }}>{p.patient_number} · {p.email||"No email"}</div>
+        </div>
+        <Btn onClick={()=>startVisit(p)}>🦷 New Visit</Btn>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:18 }}>
+        <Card sx={{ padding:16 }}>
+          <div style={{ fontSize:9, color:T.muted, fontFamily:T.mono, marginBottom:8, fontWeight:700, letterSpacing:0.5 }}>CONTACT</div>
+          {[["Phone",p.phone||"—"],["Email",p.email||"—"],["DOB",p.dob||"—"]].map(([k,v])=>(
+            <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", borderBottom:`1px solid ${T.border}`, fontSize:12 }}>
+              <span style={{ color:T.muted }}>{k}</span><span style={{ fontWeight:500, color:T.text }}>{v}</span>
+            </div>
+          ))}
+        </Card>
+        <Card sx={{ padding:16 }}>
+          <div style={{ fontSize:9, color:T.muted, fontFamily:T.mono, marginBottom:8, fontWeight:700, letterSpacing:0.5 }}>INSURANCE</div>
+          {[["Plan",p.insurance_name||"—"],["Member",p.insurance_member_id||"—"],["Group",p.insurance_group||"—"]].map(([k,v])=>(
+            <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", borderBottom:`1px solid ${T.border}`, fontSize:12 }}>
+              <span style={{ color:T.muted }}>{k}</span><span style={{ fontWeight:500, color:T.text, fontSize:11 }}>{v}</span>
+            </div>
+          ))}
+        </Card>
+        <div style={{ background:`linear-gradient(135deg,#e0f2fe,#dbeafe)`, border:`1.5px solid #bae6fd`, borderRadius:12, padding:16, boxShadow:T.shadow }}>
+          <div style={{ fontSize:9, color:T.accent, fontFamily:T.mono, marginBottom:8, fontWeight:700, letterSpacing:0.5 }}>LIFETIME VALUE</div>
+          <div style={{ fontSize:24, fontWeight:800, color:T.accent }}>${totalBilled.toFixed(0)}</div>
+          <div style={{ fontSize:11, color:T.muted, marginTop:3 }}>{enc.length} visit{enc.length!==1?"s":""}</div>
+          <div style={{ marginTop:10 }}><Badge s={p.patient_type||"returning"}/></div>
+        </div>
+      </div>
+      <Card>
+        <div style={{ fontWeight:700, fontSize:14, marginBottom:14, color:T.text }}>Visit History ({enc.length})</div>
+        {enc.length===0?<Empty icon="🦷" msg="No visits yet"/>:enc.map(e=>(
+          <div key={e.id} style={{ display:"flex", gap:12, alignItems:"center", padding:"10px 0", borderBottom:`1px solid ${T.border}` }}>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:13, fontWeight:500, color:T.text }}>{e.visit_date} · {e.provider}</div>
+              <div style={{ fontSize:11, color:T.muted, marginTop:2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:340 }}>{e.clinical_notes?.slice(0,80)}...</div>
+            </div>
+            <div style={{ fontSize:14, color:T.accent, fontWeight:700 }}>${e.total_billed}</div>
+            <Badge s={e.status}/>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// APPOINTMENTS
+// ═══════════════════════════════════════════════════════════
+function Appointments({ db, startVisit }) {
+  const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+  useEffect(()=>{ db.get("appointments","select=*,patients(id,first_name,last_name,insurance_name)&order=appointment_date.asc,appointment_time.asc").then(d=>{setRows(d);setLoading(false);}).catch(()=>setLoading(false)); },[]);
+  const filtered = filter==="all"?rows:rows.filter(r=>r.status===filter);
+  return (
+    <div>
+      <SectionTitle>Appointments</SectionTitle>
+      <FilterBar filters={["all","scheduled","in_progress","completed","cancelled"]} active={filter} onChange={setFilter}/>
+      <Card sx={{ padding:0 }}>
+        {loading?<Spin/>:filtered.length===0?<Empty icon="📅" msg="No appointments"/>:(
+          <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+            <THead cols={["Date","Time","Patient","Type","Provider","Room","Status","Action"]}/>
+            <tbody>{filtered.map(a=>(
+              <tr key={a.id} style={{ borderBottom:`1px solid ${T.border}`, transition:"background 0.12s" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                <td style={{ padding:"11px 14px", fontFamily:T.mono, fontSize:11, color:T.textMd }}>{a.appointment_date}</td>
+                <td style={{ padding:"11px 14px", fontFamily:T.mono, fontSize:11 }}><span style={{ background:T.accentLt, color:T.accent, padding:"2px 7px", borderRadius:5, fontWeight:700 }}>{a.appointment_time?.slice(0,5)}</span></td>
+                <td style={{ padding:"11px 14px", fontWeight:600, color:T.text }}>{a.patients?.first_name} {a.patients?.last_name}</td>
+                <td style={{ padding:"11px 14px", color:T.muted, fontSize:12 }}>{a.appointment_type}</td>
+                <td style={{ padding:"11px 14px", color:T.muted, fontSize:12 }}>{a.provider}</td>
+                <td style={{ padding:"11px 14px", color:T.muted, fontSize:12 }}>{a.operatory}</td>
+                <td style={{ padding:"11px 14px" }}><Badge s={a.status}/></td>
+                <td style={{ padding:"11px 14px" }}>{(a.status==="scheduled"||a.status==="in_progress")&&a.patients&&<Btn sm onClick={()=>startVisit(a.patients)}>Start Visit</Btn>}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEW VISIT — 6-STEP WORKFLOW
+// ═══════════════════════════════════════════════════════════
+const VISIT_STEPS = ["Select Patient","Verify Coverage","Clinical","Documentation","Submit Claim","Billing"];
+
+function NewVisit({ db, initPatient, onDone }) {
+  const [step, setStep] = useState(initPatient?1:0);
+  const [patient, setPatient] = useState(initPatient||null);
+  const [patients, setPatients] = useState([]);
+  const [procs, setProcs] = useState(PROCEDURES_CATALOG.slice(0,3).map(p=>({...p,sel:true,done:false})));
+  const [encounter, setEncounter] = useState(null);
+  const [claim, setClaim] = useState(null);
+  const [at, setAt] = useState({});
+  const [al, setAl] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  useEffect(()=>{ if(!initPatient) db.get("patients","select=*&order=last_name").then(setPatients).catch(()=>{}); },[]);
+
+  const agent = async(k,sys,usr)=>{ setAl(p=>({...p,[k]:true})); setAt(p=>({...p,[k]:""})); await streamAgent(sys,usr,t=>setAt(p=>({...p,[k]:t}))); setAl(p=>({...p,[k]:false})); };
+
+  const pickPatient = async p => {
+    setPatient(p); setStep(1);
+    const b = INS_BENEFITS[p.insurance_name]||INS_BENEFITS["No Insurance"];
+    const pl = PROCEDURES_CATALOG.slice(0,3).map(pr=>({...pr,sel:true,done:false}));
+    setProcs(pl);
+    const total = pl.reduce((s,x)=>s+x.fee,0);
+    agent("ins","You are DentalFlow Insurance Verification Agent. Be concise and precise.",
+      `Patient: ${p.first_name} ${p.last_name} | Insurance: ${p.insurance_name} (${p.insurance_member_id||"N/A"})
+Benefits: Annual Max $${b.annual_max}, Preventive ${b.preventive}%, Basic ${b.basic}%, Major ${b.major}%, Deductible $${b.deductible}
+Planned: ${pl.map(x=>`${x.cdt_code} ${x.procedure_name} $${x.fee}`).join(", ")} | Total: $${total}
+Estimate insurance vs patient cost per procedure. Note any limits. Max 110 words.`);
+  };
+
+  const toggleProc = i => setProcs(p=>p.map((x,j)=>j===i?{...x,sel:!x.sel}:x));
+  const doneProc = i => setProcs(p=>p.map((x,j)=>j===i?{...x,done:true}:x));
+  const addProc = code=>{ const pr=PROCEDURES_CATALOG.find(x=>x.cdt_code===code); if(pr&&!procs.find(x=>x.cdt_code===code)) setProcs(p=>[...p,{...pr,sel:true,done:false}]); };
+
+  const genNotes = async()=>{
+    const done=procs.filter(x=>x.sel&&x.done).map(x=>`${x.cdt_code} ${x.procedure_name}`).join(", ")||"Exam, Cleaning, X-Rays";
+    await agent("clin","You are a dental clinical documentation AI. Generate concise SOAP notes.",
+      `Patient: ${patient.first_name} ${patient.last_name} | Date: ${new Date().toLocaleDateString()} | Provider: Dr. Ravi Patel DDS
+Procedures: ${done}
+Generate SOAP clinical note with plausible clinical findings. Under 120 words. No headers.`);
+    setStep(3);
+  };
+
+  const saveAll = async()=>{
+    setSaving(true);
+    try {
+      const sel=procs.filter(x=>x.sel); const total=sel.reduce((s,x)=>s+x.fee,0);
+      const b=INS_BENEFITS[patient.insurance_name]||INS_BENEFITS["No Insurance"];
+      const insEst=Math.round(sel.reduce((s,x)=>s+x.fee*(b[x.category]||0)/100,0));
+      const ptResp=total-insEst;
+      const enc=await db.insert("encounters",[{ patient_id:patient.id, visit_date:new Date().toISOString().split("T")[0], provider:"Dr. Ravi Patel DDS", hygienist:"RDH Kim Thompson", status:"closed", clinical_notes:at.clin||"Visit completed.", total_billed:total, insurance_estimated:insEst, patient_responsibility:ptResp }]);
+      await db.insert("encounter_procedures",sel.map(x=>({ encounter_id:enc[0].id, cdt_code:x.cdt_code, procedure_name:x.procedure_name, fee:x.fee, completed:true, completed_at:new Date().toISOString() })));
+      const clNum=`CLM-${new Date().getFullYear()}-${Math.floor(Math.random()*900000+100000)}`;
+      const cl=await db.insert("claims",[{ claim_number:clNum, patient_id:patient.id, encounter_id:enc[0].id, payer_name:patient.insurance_name, total_billed:total, insurance_paid:insEst, patient_responsibility:ptResp, status:"submitted", submitted_at:new Date().toISOString() }]);
+      setEncounter(enc[0]); setClaim(cl[0]); setStep(4);
+      agent("clm","You are DentalFlow Claims Agent. Confirm claim submission concisely.",
+        `Claim ${clNum} | Patient: ${patient.first_name} ${patient.last_name} | Payer: ${patient.insurance_name} | Billed: $${total} | Est Insurance: $${insEst} | Patient: $${ptResp}
+Confirm EDI 837P submission and 3-5 day timeline. 70 words max.`);
+    } catch(e){ alert("Save error: "+e.message); }
+    setSaving(false);
+  };
+
+  const finalize = async()=>{
+    if(!claim) return;
+    await db.insert("billing_statements",[{ patient_id:patient.id, claim_id:claim.id, statement_number:`STM-${Math.floor(Math.random()*900000+100000)}`, amount_billed:claim.patient_responsibility, balance_due:claim.patient_responsibility, status:"pending", sent_via:"sms", due_date:new Date(Date.now()+30*864e5).toISOString().split("T")[0] }]);
+    setStep(5);
+    agent("bill","You are DentalFlow Billing Agent. Write a warm, patient-friendly billing summary.",
+      `Patient: ${patient.first_name} ${patient.last_name} | Total: $${claim.total_billed} | Insurance Pays: $${claim.insurance_paid} | Balance: $${claim.patient_responsibility}
+Options: (1) Pay now 2% discount, (2) CareCredit 0% APR 12mo, (3) 3-month in-office plan. 80 words max.`);
+  };
+
+  const selProcs = procs.filter(x=>x.sel);
+  const total = selProcs.reduce((s,x)=>s+x.fee,0);
+
+  return (
+    <div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+        <h1 style={{ fontFamily:T.head, fontWeight:800, fontSize:22, margin:0, color:T.text }}>🦷 New Visit</h1>
+        {patient && <div style={{ fontSize:13, color:T.muted }}>Patient: <strong style={{ color:T.text }}>{patient.first_name} {patient.last_name}</strong></div>}
+      </div>
+
+      {/* Step bar */}
+      <div style={{ display:"flex", gap:3, marginBottom:22, overflowX:"auto", paddingBottom:2 }}>
+        {VISIT_STEPS.map((l,i)=>(
+          <div key={i} style={{ flex:1, minWidth:80, padding:"8px 6px", borderRadius:8, textAlign:"center", background:i===step?T.accentLt:i<step?T.successLt:"#f8fafc", border:`1.5px solid ${i===step?T.accent:i<step?"#86efac":T.border}`, fontSize:10, color:i===step?T.accent:i<step?T.success:T.muted, fontFamily:T.mono, fontWeight:i===step?700:500, transition:"all 0.25s" }}>
+            {i<step?"✓ ":""}{l}
+          </div>
+        ))}
+      </div>
+
+      {/* Step 0 */}
+      {step===0 && (
+        <Card>
+          <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:14, letterSpacing:1, fontWeight:700 }}>SELECT PATIENT</div>
+          {patients.length===0?<Spin/>:(
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {patients.map(p=>(
+                <div key={p.id} onClick={()=>pickPatient(p)} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:10, border:`1.5px solid ${T.border}`, cursor:"pointer", transition:"all 0.18s", background:"#fafafa" }}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=T.accent;e.currentTarget.style.background=T.accentLt;}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=T.border;e.currentTarget.style.background="#fafafa";}}>
+                  <div style={{ width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#0369a1,#0891b2)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,flexShrink:0,color:"#fff" }}>{p.first_name?.[0]}{p.last_name?.[0]}</div>
+                  <div style={{ flex:1 }}><div style={{ fontWeight:600, fontSize:14, color:T.text }}>{p.first_name} {p.last_name}</div><div style={{ fontSize:11, color:T.muted, marginTop:2 }}>{p.insurance_name} · {p.phone}</div></div>
+                  <Badge s={p.patient_type||"returning"}/>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Step 1 */}
+      {step===1 && patient && (
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <Card>
+            <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:12, letterSpacing:1, fontWeight:700 }}>🛡️ INSURANCE VERIFICATION</div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:6 }}>
+              {[["Plan",patient.insurance_name],["Member ID",patient.insurance_member_id||"—"],["Annual Max",`$${INS_BENEFITS[patient.insurance_name]?.annual_max||"N/A"}`]].map(([k,v])=>(
+                <div key={k} style={{ padding:"10px 12px", borderRadius:8, background:T.accentLt, border:`1px solid ${T.accentMd}` }}>
+                  <div style={{ fontSize:9, color:T.accent, fontFamily:T.mono, fontWeight:700 }}>{k}</div>
+                  <div style={{ fontSize:13, fontWeight:600, marginTop:4, color:T.text }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <AgentBubble agent="INSURANCE AGENT" text={at.ins} loading={al.ins}/>
+          </Card>
+          <Card>
+            <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:12, letterSpacing:1, fontWeight:700 }}>📋 PROCEDURE SELECTION</div>
+            {procs.map((pr,i)=>(
+              <div key={pr.cdt_code} style={{ display:"flex", alignItems:"center", gap:11, padding:"9px 0", borderBottom:`1px solid ${T.border}` }}>
+                <input type="checkbox" checked={pr.sel} onChange={()=>toggleProc(i)} style={{ accentColor:T.accent, width:15, height:15 }}/>
+                <span style={{ fontFamily:T.mono, fontSize:10, color:T.accent, width:55, fontWeight:700 }}>{pr.cdt_code}</span>
+                <span style={{ flex:1, fontSize:13, color:T.text }}>{pr.procedure_name}</span>
+                <span style={{ fontSize:12, color:T.muted, width:55, textAlign:"right" }}>${pr.fee}</span>
+              </div>
+            ))}
+            <div style={{ marginTop:11 }}>
+              <select onChange={e=>{addProc(e.target.value);e.target.value="";}} style={{ padding:"8px 12px", borderRadius:7, border:`1px solid ${T.border}`, background:"#f8fafc", color:T.muted, fontSize:12, fontFamily:T.font, width:"100%", boxSizing:"border-box" }}>
+                <option value="">+ Add additional procedure…</option>
+                {PROCEDURES_CATALOG.filter(p=>!procs.find(x=>x.cdt_code===p.cdt_code)).map(p=><option key={p.cdt_code} value={p.cdt_code}>{p.cdt_code} – {p.procedure_name} (${p.fee})</option>)}
+              </select>
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:13, paddingTop:11, borderTop:`1px solid ${T.border}` }}>
+              <span style={{ fontWeight:700, fontSize:15, color:T.text }}>Total: <span style={{ color:T.accent }}>${total}</span></span>
+              <Btn onClick={()=>setStep(2)} disabled={al.ins||selProcs.length===0}>Continue to Clinical →</Btn>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Step 2 */}
+      {step===2 && (
+        <Card>
+          <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:13, letterSpacing:1, fontWeight:700 }}>🦷 MARK PROCEDURES COMPLETE</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:18 }}>
+            {selProcs.map((pr,i)=>(
+              <div key={pr.cdt_code} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:10, background:pr.done?T.successLt:"#fafafa", border:`1.5px solid ${pr.done?"#86efac":T.border}`, transition:"all 0.22s" }}>
+                <div style={{ width:27, height:27, borderRadius:"50%", background:pr.done?T.successLt:"#f1f5f9", border:`1.5px solid ${pr.done?"#86efac":T.borderMd}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:pr.done?T.success:T.muted, flexShrink:0, fontWeight:700 }}>{pr.done?"✓":(i+1)}</div>
+                <span style={{ fontFamily:T.mono, fontSize:10, color:T.accent, width:55, fontWeight:700 }}>{pr.cdt_code}</span>
+                <span style={{ flex:1, fontSize:13, color:pr.done?T.success:T.text, fontWeight:pr.done?600:400 }}>{pr.procedure_name}</span>
+                <span style={{ fontSize:12, color:T.muted }}>${pr.fee}</span>
+                {!pr.done && <Btn sm v="outline" onClick={()=>doneProc(procs.findIndex(x=>x.cdt_code===pr.cdt_code))}>✓ Done</Btn>}
+              </div>
+            ))}
+          </div>
+          <Btn v="success" onClick={genNotes} disabled={al.clin}>{al.clin?"Generating…":"🤖 Generate Clinical Notes →"}</Btn>
+        </Card>
+      )}
+
+      {/* Step 3 */}
+      {step===3 && (
+        <Card>
+          <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:12, letterSpacing:1, fontWeight:700 }}>📝 CLINICAL DOCUMENTATION</div>
+          <AgentBubble agent="CLINICAL DOCUMENTATION AGENT" text={at.clin} loading={al.clin}/>
+          {!al.clin && <div style={{ marginTop:14 }}><Btn onClick={saveAll} disabled={saving}>{saving?"Saving to Supabase…":"💾 Save Encounter & Generate Claim"}</Btn></div>}
+        </Card>
+      )}
+
+      {/* Step 4 */}
+      {step===4 && claim && (
+        <Card>
+          <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:12, letterSpacing:1, fontWeight:700 }}>📄 CLAIM SUBMITTED</div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:14 }}>
+            {[["Claim #",claim.claim_number,T.accentLt,T.accentMd,T.accent],["Payer",claim.payer_name,"#f8fafc",T.border,T.text],["Total Billed",`$${claim.total_billed}`,"#f8fafc",T.border,T.text],["Est Insurance",`$${claim.insurance_paid}`,T.successLt,"#86efac",T.success],["Patient Resp.",`$${claim.patient_responsibility}`,T.warnLt,"#fde68a",T.warn],["EDI Status","837P Accepted",T.successLt,"#86efac",T.success]].map(([k,v,bg,bd,c])=>(
+              <div key={k} style={{ padding:"10px 12px", borderRadius:8, background:bg, border:`1px solid ${bd}` }}>
+                <div style={{ fontSize:9, color:T.muted, fontFamily:T.mono, fontWeight:700 }}>{k}</div>
+                <div style={{ fontSize:12.5, fontWeight:700, marginTop:4, color:c }}>{v}</div>
+              </div>
+            ))}
+          </div>
+          <AgentBubble agent="CLAIMS AGENT" text={at.clm} loading={al.clm}/>
+          {!al.clm && <div style={{ marginTop:13 }}><Btn onClick={finalize}>Generate Patient Statement →</Btn></div>}
+        </Card>
+      )}
+
+      {/* Step 5 */}
+      {step===5 && claim && (
+        <Card>
+          <div style={{ fontSize:10, color:T.accent, fontFamily:T.mono, marginBottom:12, letterSpacing:1, fontWeight:700 }}>💳 PATIENT BILLING</div>
+          <div style={{ background:"linear-gradient(135deg,#e0f2fe,#dbeafe)", border:`1.5px solid #bae6fd`, borderRadius:12, padding:20, marginBottom:14 }}>
+            <div style={{ fontSize:10, color:T.muted, marginBottom:12, fontFamily:T.mono, fontWeight:700 }}>STATEMENT · {patient.first_name?.toUpperCase()} {patient.last_name?.toUpperCase()} · {new Date().toLocaleDateString()}</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14 }}>
+              <div><div style={{ fontSize:10, color:T.muted, fontWeight:600 }}>Total Charges</div><div style={{ fontSize:22, fontWeight:800, color:T.text }}>${claim.total_billed}</div></div>
+              <div><div style={{ fontSize:10, color:T.muted, fontWeight:600 }}>Insurance Pays</div><div style={{ fontSize:22, fontWeight:800, color:T.success }}>−${claim.insurance_paid}</div></div>
+              <div><div style={{ fontSize:10, color:T.muted, fontWeight:600 }}>Your Balance</div><div style={{ fontSize:22, fontWeight:800, color:T.warn }}>${claim.patient_responsibility}</div></div>
+            </div>
+          </div>
+          <AgentBubble agent="BILLING AGENT" text={at.bill} loading={al.bill}/>
+          {!al.bill && (
+            <div style={{ marginTop:16, padding:20, borderRadius:12, background:T.successLt, border:`1.5px solid #86efac`, textAlign:"center" }}>
+              <div style={{ fontSize:34, marginBottom:10 }}>✅</div>
+              <div style={{ fontWeight:700, color:T.success, fontSize:15 }}>Visit Complete — All Records Saved</div>
+              <div style={{ fontSize:12, color:T.muted, marginTop:5 }}>Encounter · Procedures · Claim · Statement saved to Supabase</div>
+              <div style={{ marginTop:14 }}><Btn v="success" onClick={onDone}>← Return to Dashboard</Btn></div>
+            </div>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLAIMS
+// ═══════════════════════════════════════════════════════════
+function Claims({ db }) {
+  const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all"); const [modal, setModal] = useState(null);
+  const load = ()=>{ setLoading(true); db.get("claims","select=*,patients(first_name,last_name)&order=created_at.desc").then(d=>{setRows(d);setLoading(false);}).catch(()=>setLoading(false)); };
+  useEffect(load,[]);
+  const resubmit = async cl => {
+    setModal({ cl, text:"", loading:true });
+    await streamAgent("You are DentalFlow Claims Agent. Provide resubmission guidance.",
+      `Claim: ${cl.claim_number} | Payer: ${cl.payer_name} | Billed: $${cl.total_billed} | Status: ${cl.status} | Reason: ${cl.denial_reason||"None"}\nProvide resubmission strategy. 80 words max.`,
+      t=>setModal(p=>({...p,text:t,loading:false})));
+    await db.update("claims",{id:cl.id},{status:"submitted",submitted_at:new Date().toISOString()});
+    load();
+  };
+  const filtered = filter==="all"?rows:rows.filter(r=>r.status===filter);
+  const st = { total:rows.length, submitted:rows.filter(r=>r.status==="submitted").length, paid:rows.filter(r=>r.status==="paid").length, denied:rows.filter(r=>r.status==="denied").length };
+  return (
+    <div>
+      <SectionTitle>Claims Management</SectionTitle>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:20 }}>
+        {[[`${st.total}`,"Total Claims",T.accent,T.accentLt,"#bae6fd"],[`${st.submitted}`,"Submitted",T.warn,T.warnLt,"#fde68a"],[`${st.paid}`,"Paid",T.success,T.successLt,"#86efac"],[`${st.denied}`,"Denied",T.danger,T.dangerLt,"#fca5a5"]].map(([v,l,c,bg,bd])=>(
+          <div key={l} style={{ background:bg, border:`1.5px solid ${bd}`, borderRadius:12, padding:"16px 18px", boxShadow:T.shadow }}>
+            <div style={{ fontSize:26, fontWeight:800, color:c, fontFamily:T.head }}>{v}</div>
+            <div style={{ fontSize:11, color:c, marginTop:3, fontWeight:600 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <FilterBar filters={["all","draft","submitted","processing","paid","denied"]} active={filter} onChange={setFilter}/>
+      <Card sx={{ padding:0 }}>
+        {loading?<Spin/>:filtered.length===0?<Empty icon="📄" msg="No claims"/>:(
+          <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+            <THead cols={["Claim #","Patient","Payer","Billed","Ins Paid","Pt Resp","Status","Action"]}/>
+            <tbody>{filtered.map(c=>(
+              <tr key={c.id} style={{ borderBottom:`1px solid ${T.border}`, transition:"background 0.12s" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                <td style={{ padding:"11px 14px", fontFamily:T.mono, fontSize:10, color:T.accent, fontWeight:700 }}>{c.claim_number}</td>
+                <td style={{ padding:"11px 14px", fontWeight:600, color:T.text }}>{c.patients?.first_name} {c.patients?.last_name}</td>
+                <td style={{ padding:"11px 14px", color:T.muted, fontSize:12 }}>{c.payer_name}</td>
+                <td style={{ padding:"11px 14px", color:T.textMd }}>${c.total_billed}</td>
+                <td style={{ padding:"11px 14px", color:T.success, fontWeight:600 }}>${c.insurance_paid||0}</td>
+                <td style={{ padding:"11px 14px", color:T.warn, fontWeight:600 }}>${c.patient_responsibility||0}</td>
+                <td style={{ padding:"11px 14px" }}><Badge s={c.status}/></td>
+                <td style={{ padding:"11px 14px" }}>
+                  {c.status==="denied"&&<Btn sm onClick={()=>resubmit(c)}>🔄 Resubmit</Btn>}
+                  {c.status==="submitted"&&<Btn sm v="ghost">Track</Btn>}
+                </td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </Card>
+      <Modal open={!!modal} onClose={()=>setModal(null)} title="AI Resubmission Analysis">
+        {modal&&<AgentBubble agent="CLAIMS AGENT" text={modal.text} loading={modal.loading}/>}
+      </Modal>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// BILLING / AR
+// ═══════════════════════════════════════════════════════════
+function Billing({ db }) {
+  const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all"); const [modal, setModal] = useState(null);
+  const load = ()=>{ setLoading(true); db.get("billing_statements","select=*,patients(first_name,last_name,phone,email)&order=created_at.desc").then(d=>{setRows(d);setLoading(false);}).catch(()=>setLoading(false)); };
+  useEffect(load,[]);
+
+  const remind = async st => {
+    setModal({ st, text:"", loading:true });
+    const stages=["Initial statement","30-day reminder","60-day notice","90-day final notice — be firm"];
+    await streamAgent("You are DentalFlow Billing Agent. Write concise patient SMS reminders.",
+      `Patient: ${st.patients?.first_name} ${st.patients?.last_name} | Balance: $${st.balance_due} | Due: ${st.due_date} | Stage: ${stages[st.dunning_stage||0]}\nWrite the SMS to send. Max 60 words.`,
+      t=>setModal(p=>({...p,text:t,loading:false})));
+    await db.update("billing_statements",{id:st.id},{dunning_stage:(st.dunning_stage||0)+1});
+    load();
+  };
+
+  const markPaid = async st=>{
+    await db.update("billing_statements",{id:st.id},{status:"paid",amount_paid:st.balance_due,balance_due:0,payment_date:new Date().toISOString().split("T")[0],payment_method:"credit_card"});
+    load();
+  };
+
+  const filtered = filter==="all"?rows:rows.filter(r=>r.status===filter);
+  const ar = rows.filter(r=>r.status!=="paid").reduce((s,r)=>s+(r.balance_due||0),0);
+  const collected = rows.filter(r=>r.status==="paid").reduce((s,r)=>s+(r.amount_paid||0),0);
+  const overdue = rows.filter(r=>r.status==="overdue").length;
+
+  return (
+    <div>
+      <SectionTitle>Billing & AR</SectionTitle>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:20 }}>
+        {[[`$${ar.toFixed(0)}`,"Outstanding AR",T.danger,T.dangerLt,"#fca5a5"],[`${overdue}`,"Overdue Accounts",T.warn,T.warnLt,"#fde68a"],[`$${collected.toFixed(0)}`,"Total Collected",T.success,T.successLt,"#86efac"]].map(([v,l,c,bg,bd])=>(
+          <div key={l} style={{ background:bg, border:`1.5px solid ${bd}`, borderRadius:12, padding:"18px 20px", boxShadow:T.shadow }}>
+            <div style={{ fontSize:26, fontWeight:800, color:c, fontFamily:T.head }}>{v}</div>
+            <div style={{ fontSize:11, color:c, marginTop:3, fontWeight:600 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <FilterBar filters={["all","pending","partial","overdue","paid"]} active={filter} onChange={setFilter}/>
+      <Card sx={{ padding:0 }}>
+        {loading?<Spin/>:filtered.length===0?<Empty icon="💳" msg="No billing records"/>:(
+          <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+            <THead cols={["Statement","Patient","Billed","Paid","Balance","Due Date","Stage","Status","Actions"]}/>
+            <tbody>{filtered.map(s=>(
+              <tr key={s.id} style={{ borderBottom:`1px solid ${T.border}`, transition:"background 0.12s" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                <td style={{ padding:"11px 14px", fontFamily:T.mono, fontSize:10, color:T.accent, fontWeight:700 }}>{s.statement_number}</td>
+                <td style={{ padding:"11px 14px", fontWeight:600, color:T.text }}>{s.patients?.first_name} {s.patients?.last_name}</td>
+                <td style={{ padding:"11px 14px", color:T.textMd }}>${s.amount_billed}</td>
+                <td style={{ padding:"11px 14px", color:T.success, fontWeight:600 }}>${s.amount_paid||0}</td>
+                <td style={{ padding:"11px 14px", color:s.balance_due>0?T.warn:T.success, fontWeight:700 }}>${s.balance_due||0}</td>
+                <td style={{ padding:"11px 14px", fontSize:12, color:T.muted }}>{s.due_date||"—"}</td>
+                <td style={{ padding:"11px 14px", fontSize:10, color:T.muted, fontFamily:T.mono }}>Stage {s.dunning_stage||0}</td>
+                <td style={{ padding:"11px 14px" }}><Badge s={s.status}/></td>
+                <td style={{ padding:"11px 14px" }}>
+                  {s.status!=="paid" && (
+                    <div style={{ display:"flex", gap:6 }}>
+                      <Btn sm v="ghost" onClick={()=>remind(s)}>💬 Remind</Btn>
+                      <Btn sm v="success" onClick={()=>markPaid(s)}>✓ Paid</Btn>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </Card>
+      <Modal open={!!modal} onClose={()=>setModal(null)} title="AI Payment Reminder (SMS Draft)">
+        {modal&&<div>
+          <AgentBubble agent="BILLING AGENT" text={modal.text} loading={modal.loading}/>
+          {!modal.loading && <div style={{ marginTop:12, padding:10, borderRadius:8, background:T.successLt, border:`1px solid #86efac`, fontSize:12, color:T.success, fontWeight:600 }}>✅ SMS queued · Dunning stage updated</div>}
+        </div>}
+      </Modal>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════════
+function App() {
+  const [config, setConfig] = useState(()=>{ try{ return JSON.parse(localStorage.getItem("df_cfg")||"null"); }catch{ return null; } });
+  const [db, setDb] = useState(()=>{ try{ const c=JSON.parse(localStorage.getItem("df_cfg")||"null"); return c?createDB(c.url,c.key):null; }catch{ return null; } });
+  const [view, setView] = useState("dashboard");
+  const [visitPt, setVisitPt] = useState(null);
+  const [counts, setCounts] = useState({});
+
+  const connect = (url,key)=>{ const c={url,key}; localStorage.setItem("df_cfg",JSON.stringify(c)); setConfig(c); setDb(createDB(url,key)); };
+
+  useEffect(()=>{
+    if(!db) return;
+    const today=new Date().toISOString().split("T")[0];
+    Promise.all([
+      db.get("patients","select=id"),
+      db.get("appointments",`select=id&appointment_date=eq.${today}&status=eq.scheduled`),
+      db.get("claims","select=id&status=in.(submitted,processing)"),
+      db.get("billing_statements","select=id&status=eq.overdue"),
+    ]).then(([p,a,c,o])=>setCounts({ patients:p.length, today:a.length, claims:c.length, overdue:o.length })).catch(()=>{});
+  },[db,view]);
+
+  const go = v=>{ setView(v); if(v!=="visit") setVisitPt(null); };
+  const startVisit = p=>{ setVisitPt(p); setView("visit"); };
+
+  const CSS = `
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f0f4f8; height: 100vh; overflow: hidden; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @keyframes dfs { to { transform: rotate(360deg); } }
+    @keyframes dfp { 0%,100% { opacity:.2; transform:scale(0.7); } 50% { opacity:1; transform:scale(1); } }
+    select option { background: #ffffff; color: #0f172a; }
+    input::placeholder { color: #94a3b8; }
+    button:hover { filter: brightness(0.96); }
+  `;
+
+  if(!config||!db) return <><style>{CSS}</style><Setup onConnect={connect}/></>;
+
+  return (
+    <>
+      <style>{CSS}</style>
+      <div style={{ display:"flex", height:"100vh", fontFamily:T.font, background:T.bg, color:T.text, overflow:"hidden" }}>
+        <Sidebar active={view} go={go} counts={counts}/>
+        <div style={{ flex:1, overflowY:"auto", padding:"26px 30px" }}>
+          {view==="dashboard"    && <Dashboard db={db} go={go} startVisit={startVisit}/>}
+          {view==="patients"     && <Patients db={db} startVisit={startVisit}/>}
+          {view==="appointments" && <Appointments db={db} startVisit={startVisit}/>}
+          {view==="visit"        && <NewVisit db={db} initPatient={visitPt} onDone={()=>go("dashboard")}/>}
+          {view==="claims"       && <Claims db={db}/>}
+          {view==="billing"      && <Billing db={db}/>}
+          <div style={{ textAlign:"right", marginTop:24, paddingTop:14, borderTop:`1px solid ${T.border}` }}>
+            <button onClick={()=>{ localStorage.removeItem("df_cfg"); setConfig(null); setDb(null); }} style={{ background:"none", border:"none", color:T.mutedLt, fontSize:10, cursor:"pointer", fontFamily:T.mono }}>
+              ⚙ Disconnect Database
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Mount the app
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
