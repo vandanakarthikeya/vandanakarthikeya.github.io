@@ -238,6 +238,9 @@
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
+    // ── Chatbot config — set your Cloudflare Worker URL here ─────────────────
+    const WORKER_URL = "https://autumn-poetry-9d74.vvandana11.workers.dev";
+
     // ── Helpers ──────────────────────────────────────────────────────────────
     const scoreColor = (s) => s >= 85 ? '#10b981' : s >= 70 ? '#f59e0b' : '#ef4444';
     const scoreColorRgb = (s) => s >= 85 ? 'rgba(16,185,129,0.2)' : s >= 70 ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)';
@@ -1092,16 +1095,11 @@
 
     // ── Chatbot ───────────────────────────────────────────────────────────────
     const Chatbot = () => {
-      const [open, setOpen]         = useState(false);
-      const [msgs, setMsgs]         = useState([]);
-      const [input, setInput]       = useState('');
-      const [loading, setLoading]   = useState(false);
-      const [apiKey, setApiKey]     = useState(() => localStorage.getItem('anthropic_key') || '');
-      const [proxyUrl, setProxyUrl] = useState(() => localStorage.getItem('anthropic_proxy') || '');
-      const [keyInput, setKeyInput] = useState('');
-      const [proxyInput, setProxyInput] = useState('');
+      const [open, setOpen]       = useState(false);
+      const [msgs, setMsgs]       = useState([]);
+      const [input, setInput]     = useState('');
+      const [loading, setLoading] = useState(false);
       const bottomRef = useRef();
-      const setupDone = apiKey && proxyUrl;
 
       useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:'smooth' }); }, [msgs, loading]);
 
@@ -1136,13 +1134,9 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
         setInput('');
         setLoading(true);
         try {
-          const res = await fetch(proxyUrl, {
+          const res = await fetch(WORKER_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': apiKey,
-              'anthropic-version': '2023-06-01',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: 'claude-haiku-4-5-20251001',
               max_tokens: 512,
@@ -1158,16 +1152,6 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
           setMsgs(m => [...m, { role:'assistant', content: `⚠ Error: ${e.message}` }]);
         }
         setLoading(false);
-      };
-
-      const saveSetup = () => {
-        if (!keyInput.trim() || !proxyInput.trim()) return;
-        localStorage.setItem('anthropic_key', keyInput.trim());
-        localStorage.setItem('anthropic_proxy', proxyInput.trim());
-        setApiKey(keyInput.trim());
-        setProxyUrl(proxyInput.trim());
-        setKeyInput('');
-        setProxyInput('');
       };
 
       const SUGGESTIONS = [
@@ -1204,116 +1188,69 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
                 <span style={{fontSize:'1rem'}}>🧬</span>
                 <div>
                   <div style={{fontFamily:'Outfit,sans-serif',fontWeight:600,fontSize:'0.9rem',color:'var(--ink)'}}>Health AI Assistant</div>
-                  <div style={{fontSize:'0.68rem',color:'var(--ink3)'}}>Powered by Claude · data stays in your browser</div>
+                  <div style={{fontSize:'0.68rem',color:'var(--ink3)'}}>Powered by Claude · Ask anything about this data</div>
                 </div>
               </div>
 
-              {/* API key prompt */}
-              {!setupDone ? (
-                <div style={{ flex:1, overflowY:'auto', padding:'1.25rem', display:'flex', flexDirection:'column', gap:'0.65rem' }}>
-                  <div style={{fontSize:'0.78rem',color:'var(--ink)',fontWeight:600}}>One-time setup (2 steps)</div>
-
-                  <div style={{fontSize:'0.72rem',color:'var(--ink3)',lineHeight:1.5,background:'rgba(255,255,255,0.04)',padding:'0.6rem 0.75rem',borderRadius:6,border:'1px solid var(--border)'}}>
-                    <strong style={{color:'var(--ink)'}}>Step 1 — Deploy a free proxy (3 min):</strong><br/>
-                    1. Open <a href="https://workers.cloudflare.com" target="_blank" style={{color:'var(--accent)'}}>workers.cloudflare.com</a> → sign up free<br/>
-                    2. Click <strong>Create a Worker</strong><br/>
-                    3. Replace all code with the contents of <code style={{background:'rgba(255,255,255,0.08)',padding:'0 3px',borderRadius:3}}>cloudflare-worker.js</code> in your repo<br/>
-                    4. Click <strong>Save and Deploy</strong> → copy the <code style={{background:'rgba(255,255,255,0.08)',padding:'0 3px',borderRadius:3}}>.workers.dev</code> URL
-                  </div>
-
-                  <div style={{fontSize:'0.72rem',color:'var(--ink3)'}}>Cloudflare Worker URL</div>
-                  <input
-                    type="text" placeholder="https://health-proxy.yourname.workers.dev"
-                    value={proxyInput} onChange={e=>setProxyInput(e.target.value)}
-                    style={{ width:'100%', padding:'0.55rem 0.7rem', background:'rgba(255,255,255,0.05)',
-                      border:'1px solid var(--border)', borderRadius:6, color:'var(--ink)',
-                      fontFamily:'JetBrains Mono,monospace', fontSize:'0.72rem', outline:'none', boxSizing:'border-box' }}
-                  />
-
-                  <div style={{fontSize:'0.72rem',color:'var(--ink3)'}}>Anthropic API Key — <a href="https://console.anthropic.com/keys" target="_blank" style={{color:'var(--accent)'}}>get one free →</a></div>
-                  <input
-                    type="password" placeholder="sk-ant-..."
-                    value={keyInput} onChange={e=>setKeyInput(e.target.value)}
-                    onKeyDown={e=>e.key==='Enter'&&saveSetup()}
-                    style={{ width:'100%', padding:'0.55rem 0.7rem', background:'rgba(255,255,255,0.05)',
-                      border:'1px solid var(--border)', borderRadius:6, color:'var(--ink)',
-                      fontFamily:'JetBrains Mono,monospace', fontSize:'0.72rem', outline:'none', boxSizing:'border-box' }}
-                  />
-
-                  <button onClick={saveSetup} disabled={!keyInput.trim()||!proxyInput.trim()}
-                    style={{ padding:'0.55rem', background: keyInput.trim()&&proxyInput.trim() ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                      border:'none', borderRadius:6, color: keyInput.trim()&&proxyInput.trim() ? '#fff' : 'var(--ink3)',
-                      cursor: keyInput.trim()&&proxyInput.trim() ? 'pointer' : 'default',
-                      fontFamily:'Outfit,sans-serif', fontSize:'0.82rem', fontWeight:500 }}>
-                    Save & Start Chatting →
-                  </button>
-                  <div style={{fontSize:'0.65rem',color:'var(--ink3)',textAlign:'center',lineHeight:1.4}}>Both stored in your browser only. The proxy forwards requests to Anthropic — your health data never leaves your device.</div>
-                </div>
-              ) : (
-                <>
-                  {/* Messages */}
-                  <div style={{ flex:1, overflowY:'auto', padding:'0.75rem', display:'flex', flexDirection:'column', gap:'0.6rem' }}>
-                    {msgs.length === 0 && (
-                      <div style={{ padding:'0.5rem 0' }}>
-                        <div style={{fontSize:'0.78rem',color:'var(--ink3)',marginBottom:'0.6rem'}}>Ask about your health data:</div>
-                        {SUGGESTIONS.map(s => (
-                          <button key={s} onClick={() => { setInput(s); }}
-                            style={{ display:'block', width:'100%', textAlign:'left', marginBottom:'0.4rem',
-                              padding:'0.45rem 0.7rem', background:'rgba(255,255,255,0.04)',
-                              border:'1px solid var(--border)', borderRadius:6, color:'var(--ink3)',
-                              cursor:'pointer', fontSize:'0.75rem', fontFamily:'Outfit,sans-serif' }}>
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {msgs.map((m, i) => (
-                      <div key={i} style={{
-                        alignSelf: m.role==='user' ? 'flex-end' : 'flex-start',
-                        maxWidth:'88%', padding:'0.55rem 0.8rem',
-                        background: m.role==='user' ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                        borderRadius: m.role==='user' ? '10px 10px 2px 10px' : '10px 10px 10px 2px',
-                        fontSize:'0.78rem', lineHeight:1.55, color:'var(--ink)',
-                        fontFamily:'Outfit,sans-serif', whiteSpace:'pre-wrap',
-                      }}>{m.content}</div>
+              {/* Messages */}
+              <div style={{ flex:1, overflowY:'auto', padding:'0.75rem', display:'flex', flexDirection:'column', gap:'0.6rem' }}>
+                {msgs.length === 0 && (
+                  <div style={{ padding:'0.5rem 0' }}>
+                    <div style={{fontSize:'0.78rem',color:'var(--ink3)',marginBottom:'0.6rem'}}>Ask about this health data:</div>
+                    {SUGGESTIONS.map(s => (
+                      <button key={s} onClick={() => setInput(s)}
+                        style={{ display:'block', width:'100%', textAlign:'left', marginBottom:'0.4rem',
+                          padding:'0.45rem 0.7rem', background:'rgba(255,255,255,0.04)',
+                          border:'1px solid var(--border)', borderRadius:6, color:'var(--ink3)',
+                          cursor:'pointer', fontSize:'0.75rem', fontFamily:'Outfit,sans-serif' }}>
+                        {s}
+                      </button>
                     ))}
-                    {loading && (
-                      <div style={{ alignSelf:'flex-start', padding:'0.5rem 0.8rem',
-                        background:'rgba(255,255,255,0.06)', borderRadius:'10px 10px 10px 2px',
-                        fontSize:'0.78rem', color:'var(--ink3)' }}>
-                        ●●● thinking
-                      </div>
-                    )}
-                    <div ref={bottomRef} />
                   </div>
+                )}
+                {msgs.map((m, i) => (
+                  <div key={i} style={{
+                    alignSelf: m.role==='user' ? 'flex-end' : 'flex-start',
+                    maxWidth:'88%', padding:'0.55rem 0.8rem',
+                    background: m.role==='user' ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    borderRadius: m.role==='user' ? '10px 10px 2px 10px' : '10px 10px 10px 2px',
+                    fontSize:'0.78rem', lineHeight:1.55, color:'var(--ink)',
+                    fontFamily:'Outfit,sans-serif', whiteSpace:'pre-wrap',
+                  }}>{m.content}</div>
+                ))}
+                {loading && (
+                  <div style={{ alignSelf:'flex-start', padding:'0.5rem 0.8rem',
+                    background:'rgba(255,255,255,0.06)', borderRadius:'10px 10px 10px 2px',
+                    fontSize:'0.78rem', color:'var(--ink3)' }}>
+                    ●●● thinking
+                  </div>
+                )}
+                <div ref={bottomRef} />
+              </div>
 
-                  {/* Input */}
-                  <div style={{ padding:'0.6rem 0.75rem', borderTop:'1px solid var(--border)',
-                    display:'flex', gap:'0.5rem', alignItems:'flex-end' }}>
-                    <textarea
-                      value={input} onChange={e=>setInput(e.target.value)} placeholder="Ask about your data…"
-                      onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
-                      rows={1} style={{ flex:1, resize:'none', padding:'0.5rem 0.65rem',
-                        background:'rgba(255,255,255,0.05)', border:'1px solid var(--border)',
-                        borderRadius:6, color:'var(--ink)', fontFamily:'Outfit,sans-serif',
-                        fontSize:'0.78rem', outline:'none', lineHeight:1.4, maxHeight:80,
-                        overflowY:'auto' }}
-                    />
-                    <button onClick={send} disabled={loading || !input.trim()}
-                      style={{ padding:'0.5rem 0.75rem', background: loading||!input.trim() ? 'rgba(255,255,255,0.05)' : 'var(--accent)',
-                        border:'none', borderRadius:6, color: loading||!input.trim() ? 'var(--ink3)' : '#fff',
-                        cursor: loading||!input.trim() ? 'default' : 'pointer', fontSize:'0.9rem',
-                        transition:'all 0.15s', flexShrink:0 }}>
-                      ↑
-                    </button>
-                  </div>
-
-                  {/* Clear/key row */}
-                  <div style={{ padding:'0.3rem 0.75rem 0.5rem', display:'flex', gap:'0.75rem', justifyContent:'flex-end' }}>
-                    {msgs.length > 0 && <button onClick={()=>setMsgs([])} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Clear chat</button>}
-                    <button onClick={()=>{localStorage.removeItem('anthropic_key');localStorage.removeItem('anthropic_proxy');setApiKey('');setProxyUrl('');setMsgs([]);}} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Change setup</button>
-                  </div>
-                </>
+              {/* Input */}
+              <div style={{ padding:'0.6rem 0.75rem', borderTop:'1px solid var(--border)',
+                display:'flex', gap:'0.5rem', alignItems:'flex-end' }}>
+                <textarea
+                  value={input} onChange={e=>setInput(e.target.value)} placeholder="Ask about the data…"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
+                  rows={1} style={{ flex:1, resize:'none', padding:'0.5rem 0.65rem',
+                    background:'rgba(255,255,255,0.05)', border:'1px solid var(--border)',
+                    borderRadius:6, color:'var(--ink)', fontFamily:'Outfit,sans-serif',
+                    fontSize:'0.78rem', outline:'none', lineHeight:1.4, maxHeight:80, overflowY:'auto' }}
+                />
+                <button onClick={send} disabled={loading || !input.trim()}
+                  style={{ padding:'0.5rem 0.75rem', background: loading||!input.trim() ? 'rgba(255,255,255,0.05)' : 'var(--accent)',
+                    border:'none', borderRadius:6, color: loading||!input.trim() ? 'var(--ink3)' : '#fff',
+                    cursor: loading||!input.trim() ? 'default' : 'pointer', fontSize:'0.9rem',
+                    transition:'all 0.15s', flexShrink:0 }}>
+                  ↑
+                </button>
+              </div>
+              {msgs.length > 0 && (
+                <div style={{ padding:'0.3rem 0.75rem 0.5rem', display:'flex', justifyContent:'flex-end' }}>
+                  <button onClick={()=>setMsgs([])} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Clear chat</button>
+                </div>
               )}
             </div>
           )}
