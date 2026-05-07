@@ -1,0 +1,306 @@
+name: Refresh Health Data
+
+on:
+  schedule:
+    # Runs at 7:00 AM UTC daily (midnight PT / 3am ET)
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    # Also allows manual trigger from GitHub Actions UI
+
+permissions:
+  contents: write   # needed to commit health_data.js back to repo
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Copy pipeline scripts
+        run: |
+          # pipeline/ is not in this repo (it lives in the local health data folder)
+          # The scripts are inlined below as part of the workflow
+          echo "Pipeline scripts embedded in workflow"
+
+      - name: Fetch Oura data and regenerate health_data.js
+        env:
+          OURA_TOKEN: ${{ secrets.OURA_TOKEN }}
+        run: |
+          python3 - << 'PYEOF'
+          import os, json, sys, time, datetime, requests
+          from collections import defaultdict
+          from pathlib import Path
+
+          BASE = "https://api.ouraring.com/v2/usercollection"
+          TOKEN = os.environ["OURA_TOKEN"]
+          LOOKBACK = 180
+          OUTPUT = Path("health_data.js")
+          APPLE_JSON = Path("apple_health_data.json")
+
+          def _get(endpoint, params=None, retries=3):
+              url = f"{BASE}/{endpoint}"
+              headers = {"Authorization": f"Bearer {TOKEN}"}
+              for attempt in range(retries):
+                  try:
+                      r = requests.get(url, headers=headers, params=params, timeout=30)
+                      if r.status_code == 429:
+                          time.sleep(int(r.headers.get("Retry-After", 60)))
+                          continue
+                      r.raise_for_status()
+                      return r.json()
+                  except requests.RequestException:
+                      if attempt == retries - 1: raise
+                      time.sleep(2 ** attempt)
+              return {}
+
+          def _paginate(endpoint, start_date, end_date):
+              params = {"start_date": start_date, "end_date": end_date}
+              items = []
+              while True:
+                  data = _get(endpoint, params)
+                  items.extend(data.get("data", []))
+                  next_token = data.get("next_token")
+                  if not next_token: break
+                  params = {"next_token": next_token}
+              return items
+
+          def flt(v):
+              try: return float(v)
+              except: return None
+          def nt(v):
+              try: return int(float(v))
+              except: return None
+          def day(ts): return (ts or "")[:10]
+          def avg(vals):
+              clean = [v for v in vals if v is not None]
+              return round(sum(clean)/len(clean), 1) if clean else None
+
+          end_date = datetime.date.today().isoformat()
+          start_date = (datetime.date.today() - datetime.timedelta(days=LOOKBACK)).isoformat()
+          print(f"Fetching {start_date} → {end_date}")
+
+          # Load existing data to preserve history + Apple Health
+          existing = {}
+          if OUTPUT.exists():
+              try:
+                  content = OUTPUT.read_text()
+                  json_str = content.split("const HEALTH_DATA = ", 1)[1].rstrip(";\n")
+                  existing = json.loads(json_str)
+                  print(f"Loaded existing: {len(existing.get('timeline',[]))} days")
+              except Exception as e:
+                  print(f"Could not parse existing: {e}")
+
+          # Fetch all Oura endpoints
+          endpoints = {
+              "readiness":      "daily_readiness",
+              "sleep":          "daily_sleep",
+              "activity":       "daily_activity",
+              "stress":         "daily_stress",
+              "resilience":     "daily_resilience",
+              "spo2":           "daily_spo2",
+              "cardiovascular": "daily_cardiovascular_age",
+          }
+          raw = {}
+          for key, ep in endpoints.items():
+              print(f"  fetching {ep}...")
+              raw[key] = _paginate(ep, start_date, end_date)
+
+          print("  fetching sleep sessions...")
+          raw["sleep_sessions"] = _paginate("sleep", start_date, end_date)
+          print("  fetching workouts...")
+          raw["workouts"] = _paginate("workout", start_date, end_date)
+          print("  fetching rest mode...")
+          raw["rest_mode"] = _paginate("rest_mode_period", start_date, end_date)
+          print("  fetching heart rate stream...")
+          raw["heartrate"] = _paginate("heartrate", start_date, end_date)
+
+          # Parse into dicts keyed by day
+          oura = {}
+
+          oura["readiness"] = {}
+          for r in raw["readiness"]:
+              d = r.get("day","")
+              oura["readiness"][d] = {"score": nt(r.get("score")), "temp_deviation": flt(r.get("temperature_deviation")), "contributors": r.get("contributors") or {}}
+
+          oura["sleep"] = {}
+          for r in raw["sleep"]:
+              d = r.get("day","")
+              oura["sleep"][d] = {"score": nt(r.get("score")), "contributors": r.get("contributors") or {}}
+
+          oura["activity"] = {}
+          for r in raw["activity"]:
+              d = r.get("day","")
+              oura["activity"][d] = {"steps": nt(r.get("steps")), "active_calories": nt(r.get("active_calories")), "total_calories": nt(r.get("total_calories")), "score": nt(r.get("score")), "high_activity_time": nt(r.get("high_activity_time")), "medium_activity_time": nt(r.get("medium_activity_time")), "low_activity_time": nt(r.get("low_activity_time")), "sedentary_time": nt(r.get("sedentary_time")), "resting_time": nt(r.get("resting_time")), "non_wear_time": nt(r.get("non_wear_time")), "inactivity_alerts": nt(r.get("inactivity_alerts")), "contributors": r.get("contributors") or {}}
+
+          oura["stress"] = {}
+          for r in raw["stress"]:
+              d = r.get("day","")
+              oura["stress"][d] = {"stress_high": nt(r.get("stress_high")), "recovery_high": nt(r.get("recovery_high")), "summary": r.get("day_summary","")}
+
+          oura["resilience"] = {}
+          for r in raw["resilience"]:
+              d = r.get("day","")
+              oura["resilience"][d] = {"level": r.get("level",""), "contributors": r.get("contributors") or {}}
+
+          oura["spo2"] = {}
+          for r in raw["spo2"]:
+              d = r.get("day","")
+              pct = r.get("spo2_percentage") or {}
+              oura["spo2"][d] = {"spo2_avg": flt(pct.get("average")), "breathing_disturbance_index": flt(r.get("breathing_disturbance_index"))}
+
+          oura["cardiovascular"] = {}
+          for r in raw["cardiovascular"]:
+              d = r.get("day","")
+              oura["cardiovascular"][d] = {"vascular_age": nt(r.get("vascular_age"))}
+
+          oura["sleep_model"] = {}
+          for r in raw["sleep_sessions"]:
+              d = r.get("day",""); stype = r.get("type","")
+              if d in oura["sleep_model"] and oura["sleep_model"][d].get("type") == "long_sleep" and stype != "long_sleep": continue
+              hr_data = r.get("heart_rate") or {}; hrv_data = r.get("hrv") or {}
+              phases5 = r.get("sleep_phase_5_min","")
+              hr_items = [x for x in hr_data.get("items",[]) if x is not None]
+              hrv_items = [x for x in hrv_data.get("items",[]) if x is not None]
+              deep=phases5.count("1"); light=phases5.count("2"); rem=phases5.count("3"); awake=phases5.count("4")
+              total=deep+light+rem+awake; pct=lambda n: round(n/total*100,1) if total else 0
+              oura["sleep_model"][d] = {"type":stype,"bedtime_start":(r.get("bedtime_start") or "")[:16],"bedtime_end":(r.get("bedtime_end") or "")[:16],"total_sleep":nt(r.get("total_sleep_duration")),"time_in_bed":nt(r.get("time_in_bed")),"deep_sleep":nt(r.get("deep_sleep_duration")),"light_sleep":nt(r.get("light_sleep_duration")),"rem_sleep":nt(r.get("rem_sleep_duration")),"awake_time":nt(r.get("awake_time")),"latency":nt(r.get("latency")),"efficiency":nt(r.get("efficiency")),"avg_hr":flt(r.get("average_heart_rate")),"lowest_hr":nt(r.get("lowest_heart_rate")),"avg_hrv":nt(r.get("average_hrv")),"avg_breath":flt(r.get("average_breath")),"restless_periods":nt(r.get("restless_periods")),"hr_series":hr_items[:60],"hrv_series":hrv_items[:60],"phases":{"deep_pct":pct(deep),"light_pct":pct(light),"rem_pct":pct(rem),"awake_pct":pct(awake)}}
+
+          daily_hr = defaultdict(list)
+          for r in raw["heartrate"]:
+              d = day(r.get("timestamp","")); bpm = nt(r.get("bpm"))
+              if d and bpm: daily_hr[d].append(bpm)
+          oura["heartrate"] = {d: {"avg_bpm": round(sum(v)/len(v),1),"min_bpm":min(v),"max_bpm":max(v)} for d,v in daily_hr.items()}
+
+          workouts = []
+          for r in raw["workouts"]:
+              d = r.get("day",""); st = r.get("start_datetime",""); et = r.get("end_datetime","")
+              dur = None
+              try:
+                  from datetime import datetime as dt
+                  s=dt.fromisoformat(st.replace("Z","+00:00")); e=dt.fromisoformat(et.replace("Z","+00:00")); dur=int((e-s).total_seconds()/60)
+              except: pass
+              workouts.append({"day":d,"activity":r.get("activity","").replace("_"," ").title(),"calories":nt(r.get("calories")),"distance_m":flt(r.get("distance")),"intensity":r.get("intensity",""),"duration_min":dur,"start":st[:16]})
+          workouts = sorted(workouts, key=lambda x: x["day"])
+
+          rest_mode = []
+          for r in raw["rest_mode"]:
+              d = r.get("start_day",""); episodes = r.get("episodes") or []
+              tags = []
+              for ep in (episodes if isinstance(episodes,list) else []):
+                  tags.extend(ep.get("tags",[]))
+              rest_mode.append({"day":d,"tags":[t.replace("tag_generic_","").replace("_"," ") for t in tags],"start":(r.get("start_time") or "")[:16]})
+
+          # Merge API data with existing older history
+          existing_timeline = {e["day"]: e for e in existing.get("timeline",[])}
+          all_days = set(existing_timeline.keys())
+          for key in oura.values():
+              if isinstance(key, dict): all_days.update(key.keys())
+
+          # Apple Health: prefer Shortcut JSON, fall back to existing
+          apple = {}
+          apple_updated = None
+          if APPLE_JSON.exists():
+              try:
+                  aj = json.loads(APPLE_JSON.read_text())
+                  apple = aj.get("daily", {})
+                  apple_updated = aj.get("updated_at")
+                  print(f"Apple Health JSON: {len(apple)} days (updated {apple_updated})")
+              except: pass
+          if not apple:
+              for e in existing.get("timeline",[]):
+                  if "apple" in e: apple[e["day"]] = e["apple"]
+              apple_updated = existing.get("stats",{}).get("apple_updated_at")
+              print(f"Apple Health: preserved {len(apple)} days from existing data")
+
+          # Preserve temperature from existing (not in API)
+          oura["temperature"] = {}
+          for e in existing.get("timeline",[]):
+              if "oura_temperature" in e: oura["temperature"][e["day"]] = e["oura_temperature"]
+
+          # Preserve daytime stress from existing (high-frequency, not re-fetched)
+          daytime_stress = existing.get("daytime_stress", [])
+
+          # Build timeline
+          timeline = []
+          for d in sorted(all_days):
+              if d < "2025-09-01": continue
+              entry = {"day": d}
+              for key, src in oura.items():
+                  if isinstance(src, dict) and d in src:
+                      entry[f"oura_{key}"] = src[d]
+              if d in apple: entry["apple"] = apple[d]
+              timeline.append(entry)
+
+          oura_days = [e for e in timeline if "oura_readiness" in e]
+          oura_updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+          def latest(path_parts):
+              for e in reversed(timeline):
+                  node = e
+                  for k in path_parts:
+                      node = node.get(k) if isinstance(node, dict) else None
+                  if node is not None: return node
+              return None
+
+          stats = {
+              "days_tracked": len(oura_days),
+              "apple_days_tracked": len([e for e in timeline if "apple" in e]),
+              "date_range_start": oura_days[0]["day"] if oura_days else "",
+              "date_range_end": oura_days[-1]["day"] if oura_days else "",
+              "avg_readiness_score": avg([e.get("oura_readiness",{}).get("score") for e in timeline]),
+              "avg_sleep_score": avg([e.get("oura_sleep",{}).get("score") for e in timeline]),
+              "avg_activity_score": avg([e.get("oura_activity",{}).get("score") for e in timeline]),
+              "avg_hrv": avg([e.get("oura_sleep_model",{}).get("avg_hrv") for e in timeline]),
+              "avg_resting_hr": avg([e.get("oura_sleep_model",{}).get("avg_hr") for e in timeline]),
+              "avg_steps_oura": avg([e.get("oura_activity",{}).get("steps") for e in timeline]),
+              "avg_spo2": avg([e.get("oura_spo2",{}).get("spo2_avg") for e in timeline]),
+              "latest_readiness_score": latest(["oura_readiness","score"]),
+              "latest_sleep_score": latest(["oura_sleep","score"]),
+              "latest_activity_score": latest(["oura_activity","score"]),
+              "latest_hrv": latest(["oura_sleep_model","avg_hrv"]),
+              "latest_resting_hr": latest(["oura_sleep_model","avg_hr"]),
+              "latest_vascular_age": latest(["oura_cardiovascular","vascular_age"]),
+              "oura_updated_at": oura_updated,
+              "apple_updated_at": apple_updated,
+              "generated_at": oura_updated,
+          }
+
+          payload = {"stats": stats, "timeline": timeline, "workouts": workouts, "daytime_stress": daytime_stress, "rest_mode": rest_mode}
+
+          with open(OUTPUT, "w") as f:
+              f.write(f"// Oura: {oura_updated} · Apple Health: {apple_updated or 'manual sync'}\n")
+              f.write("// Auto-generated by GitHub Actions — do not edit manually\n")
+              f.write("const HEALTH_DATA = ")
+              json.dump(payload, f, separators=(",",":"))
+              f.write(";\n")
+
+          size_kb = OUTPUT.stat().st_size / 1024
+          print(f"\n✅ health_data.js written ({size_kb:.0f} KB) — {len(timeline)} days, {len(oura_days)} Oura days")
+          PYEOF
+
+      - name: Commit health_data.js if changed
+        run: |
+          git config user.name  "health-bot"
+          git config user.email "health-bot@users.noreply.github.com"
+          git add health_data.js
+          # Only commit if the file actually changed
+          if git diff --staged --quiet; then
+            echo "No changes to health_data.js — skipping commit"
+          else
+            git commit -m "chore: refresh Oura health data $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+            echo "✅ Committed and pushed health_data.js"
+          fi
