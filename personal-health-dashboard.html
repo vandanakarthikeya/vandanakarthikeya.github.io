@@ -1092,13 +1092,16 @@
 
     // ── Chatbot ───────────────────────────────────────────────────────────────
     const Chatbot = () => {
-      const [open, setOpen]       = useState(false);
-      const [msgs, setMsgs]       = useState([]);
-      const [input, setInput]     = useState('');
-      const [loading, setLoading] = useState(false);
-      const [apiKey, setApiKey]   = useState(() => localStorage.getItem('anthropic_key') || '');
+      const [open, setOpen]         = useState(false);
+      const [msgs, setMsgs]         = useState([]);
+      const [input, setInput]       = useState('');
+      const [loading, setLoading]   = useState(false);
+      const [apiKey, setApiKey]     = useState(() => localStorage.getItem('anthropic_key') || '');
+      const [proxyUrl, setProxyUrl] = useState(() => localStorage.getItem('anthropic_proxy') || '');
       const [keyInput, setKeyInput] = useState('');
+      const [proxyInput, setProxyInput] = useState('');
       const bottomRef = useRef();
+      const setupDone = apiKey && proxyUrl;
 
       useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:'smooth' }); }, [msgs, loading]);
 
@@ -1133,16 +1136,15 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
         setInput('');
         setLoading(true);
         try {
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
+          const res = await fetch(proxyUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'x-api-key': apiKey,
               'anthropic-version': '2023-06-01',
-              'anthropic-dangerous-client-side-keys': 'true',
             },
             body: JSON.stringify({
-              model: 'claude-haiku-4-5',
+              model: 'claude-3-5-haiku-20241022',
               max_tokens: 512,
               system: buildSystemPrompt(),
               messages: newMsgs,
@@ -1158,11 +1160,14 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
         setLoading(false);
       };
 
-      const saveKey = () => {
-        if (!keyInput.trim()) return;
+      const saveSetup = () => {
+        if (!keyInput.trim() || !proxyInput.trim()) return;
         localStorage.setItem('anthropic_key', keyInput.trim());
+        localStorage.setItem('anthropic_proxy', proxyInput.trim());
         setApiKey(keyInput.trim());
+        setProxyUrl(proxyInput.trim());
         setKeyInput('');
+        setProxyInput('');
       };
 
       const SUGGESTIONS = [
@@ -1204,31 +1209,45 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
               </div>
 
               {/* API key prompt */}
-              {!apiKey ? (
-                <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'center',
-                  alignItems:'center', padding:'1.5rem', gap:'0.75rem' }}>
-                  <div style={{fontSize:'0.8rem',color:'var(--ink3)',textAlign:'center',lineHeight:1.5}}>
-                    Enter your Anthropic API key to ask questions about your health data.<br/>
-                    <span style={{fontSize:'0.7rem',opacity:0.6}}>Stored in browser localStorage only. Never sent anywhere except Anthropic.</span>
+              {!setupDone ? (
+                <div style={{ flex:1, overflowY:'auto', padding:'1.25rem', display:'flex', flexDirection:'column', gap:'0.65rem' }}>
+                  <div style={{fontSize:'0.78rem',color:'var(--ink)',fontWeight:600}}>One-time setup (2 steps)</div>
+
+                  <div style={{fontSize:'0.72rem',color:'var(--ink3)',lineHeight:1.5,background:'rgba(255,255,255,0.04)',padding:'0.6rem 0.75rem',borderRadius:6,border:'1px solid var(--border)'}}>
+                    <strong style={{color:'var(--ink)'}}>Step 1 — Deploy a free proxy (3 min):</strong><br/>
+                    1. Open <a href="https://workers.cloudflare.com" target="_blank" style={{color:'var(--accent)'}}>workers.cloudflare.com</a> → sign up free<br/>
+                    2. Click <strong>Create a Worker</strong><br/>
+                    3. Replace all code with the contents of <code style={{background:'rgba(255,255,255,0.08)',padding:'0 3px',borderRadius:3}}>cloudflare-worker.js</code> in your repo<br/>
+                    4. Click <strong>Save and Deploy</strong> → copy the <code style={{background:'rgba(255,255,255,0.08)',padding:'0 3px',borderRadius:3}}>.workers.dev</code> URL
                   </div>
+
+                  <div style={{fontSize:'0.72rem',color:'var(--ink3)'}}>Cloudflare Worker URL</div>
                   <input
-                    type="password" placeholder="sk-ant-..." value={keyInput}
-                    onChange={e=>setKeyInput(e.target.value)}
-                    onKeyDown={e=>e.key==='Enter'&&saveKey()}
-                    style={{ width:'100%', padding:'0.6rem 0.75rem', background:'rgba(255,255,255,0.05)',
+                    type="text" placeholder="https://health-proxy.yourname.workers.dev"
+                    value={proxyInput} onChange={e=>setProxyInput(e.target.value)}
+                    style={{ width:'100%', padding:'0.55rem 0.7rem', background:'rgba(255,255,255,0.05)',
                       border:'1px solid var(--border)', borderRadius:6, color:'var(--ink)',
-                      fontFamily:'JetBrains Mono,monospace', fontSize:'0.75rem', outline:'none' }}
+                      fontFamily:'JetBrains Mono,monospace', fontSize:'0.72rem', outline:'none', boxSizing:'border-box' }}
                   />
-                  <button onClick={saveKey}
-                    style={{ padding:'0.5rem 1.25rem', background:'var(--accent)', border:'none',
-                      borderRadius:6, color:'#fff', cursor:'pointer', fontFamily:'Outfit,sans-serif',
-                      fontSize:'0.8rem', fontWeight:500 }}>
-                    Save Key →
+
+                  <div style={{fontSize:'0.72rem',color:'var(--ink3)'}}>Anthropic API Key — <a href="https://console.anthropic.com/keys" target="_blank" style={{color:'var(--accent)'}}>get one free →</a></div>
+                  <input
+                    type="password" placeholder="sk-ant-..."
+                    value={keyInput} onChange={e=>setKeyInput(e.target.value)}
+                    onKeyDown={e=>e.key==='Enter'&&saveSetup()}
+                    style={{ width:'100%', padding:'0.55rem 0.7rem', background:'rgba(255,255,255,0.05)',
+                      border:'1px solid var(--border)', borderRadius:6, color:'var(--ink)',
+                      fontFamily:'JetBrains Mono,monospace', fontSize:'0.72rem', outline:'none', boxSizing:'border-box' }}
+                  />
+
+                  <button onClick={saveSetup} disabled={!keyInput.trim()||!proxyInput.trim()}
+                    style={{ padding:'0.55rem', background: keyInput.trim()&&proxyInput.trim() ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                      border:'none', borderRadius:6, color: keyInput.trim()&&proxyInput.trim() ? '#fff' : 'var(--ink3)',
+                      cursor: keyInput.trim()&&proxyInput.trim() ? 'pointer' : 'default',
+                      fontFamily:'Outfit,sans-serif', fontSize:'0.82rem', fontWeight:500 }}>
+                    Save & Start Chatting →
                   </button>
-                  <a href="https://console.anthropic.com/keys" target="_blank"
-                    style={{fontSize:'0.7rem',color:'var(--accent)',textDecoration:'none'}}>
-                    Get a free key at console.anthropic.com →
-                  </a>
+                  <div style={{fontSize:'0.65rem',color:'var(--ink3)',textAlign:'center',lineHeight:1.4}}>Both stored in your browser only. The proxy forwards requests to Anthropic — your health data never leaves your device.</div>
                 </div>
               ) : (
                 <>
@@ -1292,7 +1311,7 @@ Respond concisely with actionable insights. Be direct and data-driven. Use the a
                   {/* Clear/key row */}
                   <div style={{ padding:'0.3rem 0.75rem 0.5rem', display:'flex', gap:'0.75rem', justifyContent:'flex-end' }}>
                     {msgs.length > 0 && <button onClick={()=>setMsgs([])} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Clear chat</button>}
-                    <button onClick={()=>{localStorage.removeItem('anthropic_key');setApiKey('');setMsgs([]);}} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Change API key</button>
+                    <button onClick={()=>{localStorage.removeItem('anthropic_key');localStorage.removeItem('anthropic_proxy');setApiKey('');setProxyUrl('');setMsgs([]);}} style={{fontSize:'0.65rem',color:'var(--ink3)',background:'none',border:'none',cursor:'pointer',padding:0}}>Change setup</button>
                   </div>
                 </>
               )}
