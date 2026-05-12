@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Health Dashboard — Tech Stack & Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; color: #f0ede8; font-family: 'Outfit', sans-serif; padding: 2rem; min-height: 100vh; }
+    h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .subtitle { color: rgba(240,237,232,0.45); font-size: 0.85rem; margin-bottom: 2.5rem; }
+    .accent { color: #c45d3e; }
+    .teal { color: #34d399; }
+
+    /* ── Tech Stack Grid ── */
+    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #c45d3e; margin-bottom: 1rem; }
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 2.5rem; }
+    .stack-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.9rem 1rem; }
+    .stack-card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,232,0.4); margin-bottom: 0.3rem; }
+    .stack-card-value { font-size: 0.88rem; font-weight: 500; color: #f0ede8; }
+    .stack-card-note { font-size: 0.7rem; color: rgba(240,237,232,0.4); margin-top: 0.2rem; }
+
+    /* ── Architecture Diagram ── */
+    .arch-wrap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+    .arch-col { display: flex; flex-direction: column; gap: 0.75rem; }
+    .arch-col-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.4); margin-bottom: 0.25rem; text-align: center; }
+    .arch-node { border-radius: 10px; padding: 0.85rem 1rem; border: 1px solid; position: relative; }
+    .arch-node.source  { background: rgba(26,107,90,0.12);  border-color: rgba(26,107,90,0.4);  }
+    .arch-node.process { background: rgba(196,93,62,0.10);  border-color: rgba(196,93,62,0.35); }
+    .arch-node.output  { background: rgba(96,165,250,0.10); border-color: rgba(96,165,250,0.3); }
+    .arch-node.ai      { background: rgba(167,139,250,0.10); border-color: rgba(167,139,250,0.35); }
+    .arch-node-icon { font-size: 1.2rem; margin-bottom: 0.3rem; }
+    .arch-node-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .arch-node-desc { font-size: 0.68rem; color: rgba(240,237,232,0.5); line-height: 1.4; }
+    .arch-node-tag  { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.4rem; border-radius: 4px; margin-top: 0.4rem; }
+    .tag-free    { background: rgba(52,211,153,0.15); color: #34d399; }
+    .tag-auto    { background: rgba(196,93,62,0.15);  color: #c45d3e; }
+    .tag-manual  { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .tag-secure  { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+    /* ── Flow Diagram ── */
+    .flow { display: flex; align-items: stretch; gap: 0; margin-bottom: 2.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+    .flow-step { display: flex; flex-direction: column; align-items: center; min-width: 130px; }
+    .flow-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.7rem 0.8rem; text-align: center; width: 100%; }
+    .flow-box-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .flow-box-name { font-size: 0.75rem; font-weight: 600; }
+    .flow-box-sub  { font-size: 0.62rem; color: rgba(240,237,232,0.4); margin-top: 0.2rem; }
+    .flow-arrow { display: flex; align-items: center; padding: 0 0.3rem; color: rgba(255,255,255,0.2); font-size: 1.2rem; flex-shrink: 0; align-self: center; margin-bottom: 0; }
+    .flow-label { font-size: 0.58rem; color: rgba(240,237,232,0.35); text-align: center; margin-top: 0.3rem; max-width: 110px; }
+
+    /* ── n8n Flow ── */
+    .n8n-flow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; margin-bottom: 2rem; }
+    .n8n-node { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .n8n-box  { width: 90px; border-radius: 8px; padding: 0.6rem 0.5rem; text-align: center; border: 1.5px solid; }
+    .n8n-box-icon { font-size: 1.1rem; }
+    .n8n-box-name { font-size: 0.6rem; font-weight: 600; margin-top: 0.2rem; line-height: 1.2; }
+    .n8n-arrow { font-size: 1rem; color: rgba(255,255,255,0.2); flex-shrink: 0; align-self: center; margin-bottom: 1.2rem; }
+    .n8n-trigger  { background: rgba(245,158,11,0.1);  border-color: rgba(245,158,11,0.4);  color: #f59e0b; }
+    .n8n-http     { background: rgba(96,165,250,0.1);  border-color: rgba(96,165,250,0.35); color: #60a5fa; }
+    .n8n-code     { background: rgba(196,93,62,0.1);   border-color: rgba(196,93,62,0.35);  color: #c45d3e; }
+    .n8n-github   { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #f0ede8; }
+    .n8n-ai       { background: rgba(167,139,250,0.1);  border-color: rgba(167,139,250,0.35); color: #a78bfa; }
+    .n8n-notify   { background: rgba(52,211,153,0.1);  border-color: rgba(52,211,153,0.35); color: #34d399; }
+
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 2rem 0; }
+    .cost-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+    .cost-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 0.8rem; }
+    .cost-name { font-size: 0.72rem; font-weight: 600; color: rgba(240,237,232,0.7); margin-bottom: 0.2rem; }
+    .cost-val  { font-size: 1.1rem; font-weight: 700; color: #34d399; }
+    .cost-note { font-size: 0.62rem; color: rgba(240,237,232,0.35); margin-top: 0.15rem; }
+  </style>
+</head>
+<body>
+
+  <h1>Personal Health Analytics — <span class="accent">Tech Stack & Architecture</span></h1>
+  <p class="subtitle">Oura Ring + Apple Health · GitHub Pages · Claude AI · Cloudflare Workers</p>
+
+  <!-- TECH STACK -->
+  <div class="section-title">Tech Stack</div>
+  <div class="stack-grid">
+    <div class="stack-card"><div class="stack-card-label">Frontend</div><div class="stack-card-value">React 18 + Plotly.js</div><div class="stack-card-note">Via CDN · No build step</div></div>
+    <div class="stack-card"><div class="stack-card-label">Hosting</div><div class="stack-card-value">GitHub Pages</div><div class="stack-card-note">Static · Free · Auto-deploy</div></div>
+    <div class="stack-card"><div class="stack-card-label">Data Pipeline</div><div class="stack-card-value">Python 3.11</div><div class="stack-card-note">Local + GitHub Actions</div></div>
+    <div class="stack-card"><div class="stack-card-label">Automation</div><div class="stack-card-value">GitHub Actions</div><div class="stack-card-note">Nightly cron · Free tier</div></div>
+    <div class="stack-card"><div class="stack-card-label">Wearable API</div><div class="stack-card-value">Oura Ring API v2</div><div class="stack-card-note">REST · Bearer token · Free</div></div>
+    <div class="stack-card"><div class="stack-card-label">Mobile Sync</div><div class="stack-card-value">Scriptable (iOS)</div><div class="stack-card-note">HealthKit → GitHub · Free app</div></div>
+    <div class="stack-card"><div class="stack-card-label">AI Chatbot</div><div class="stack-card-value">Claude Haiku 4.5</div><div class="stack-card-note">~$0.0002/query</div></div>
+    <div class="stack-card"><div class="stack-card-label">API Proxy</div><div class="stack-card-value">Cloudflare Workers</div><div class="stack-card-note">CORS proxy · 100k req/day free</div></div>
+    <div class="stack-card"><div class="stack-card-label">Data Format</div><div class="stack-card-value">health_data.js</div><div class="stack-card-note">~600KB · Committed to repo</div></div>
+    <div class="stack-card"><div class="stack-card-label">Charts</div><div class="stack-card-value">Plotly.js 2.27</div><div class="stack-card-note">Interactive · Dark theme</div></div>
+    <div class="stack-card"><div class="stack-card-label">Fonts</div><div class="stack-card-value">Outfit + JetBrains Mono</div><div class="stack-card-note">Google Fonts · Free</div></div>
+    <div class="stack-card"><div class="stack-card-label">Total Cost</div><div class="stack-card-value" style="color:#34d399">~$0/month</div><div class="stack-card-note">Except Claude API usage</div></div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ARCHITECTURE -->
+  <div class="section-title">Architecture — Data Flow</div>
+  <div class="arch-wrap">
+    <div class="arch-col">
+      <div class="arch-col-title">Data Sources</div>
+      <div class="arch-node source">
+        <div class="arch-node-icon">💍</div>
+        <div class="arch-node-name">Oura Ring API v2</div>
+        <div class="arch-node-desc">Readiness · Sleep · Activity · HRV · SpO2 · Stress · Cardiovascular Age · Workouts</div>
+        <span class="arch-node-tag tag-auto">Auto nightly</span>
+      </div>
+      <div class="arch-node source">
+        <div class="arch-node-icon">📱</div>
+        <div class="arch-node-name">Apple Health (Scriptable)</div>
+        <div class="arch-node-desc">Steps · HR · Calories · Weight · Exercise · Mindfulness · Blood Glucose</div>
+        <span class="arch-node-tag tag-manual">Weekly tap</span>
+      </div>
+      <div class="arch-node source">
+        <div class="arch-node-icon">📄</div>
+        <div class="arch-node-name">Apple Health XML</div>
+        <div class="arch-node-desc">277MB export · HRV · SpO2 · Respiratory Rate · Walking Speed</div>
+        <span class="arch-node-tag tag-manual">Manual export</span>
+      </div>
+    </div>
+
+    <div class="arch-col">
+      <div class="arch-col-title">Processing Layer</div>
+      <div class="arch-node process">
+        <div class="arch-node-icon">⚙️</div>
+        <div class="arch-node-name">GitHub Actions</div>
+        <div class="arch-node-desc">Nightly Python pipeline · Fetches Oura API · Merges Apple Health · Commits health_data.js</div>
+        <span class="arch-node-tag tag-auto">7am UTC daily</span>
+      </div>
+      <div class="arch-node process">
+        <div class="arch-node-icon">🐍</div>
+        <div class="arch-node-name">Python Pipeline (local)</div>
+        <div class="arch-node-desc">run.py · SAX XML parser for Apple Health · Aggregates 495K+ records · Outputs ~600KB JSON</div>
+        <span class="arch-node-tag tag-manual">On-demand</span>
+      </div>
+      <div class="arch-node ai">
+        <div class="arch-node-icon">☁️</div>
+        <div class="arch-node-name">Cloudflare Worker</div>
+        <div class="arch-node-desc">CORS proxy · Forwards requests to Anthropic · API key stored as encrypted env variable</div>
+        <span class="arch-node-tag tag-secure">Secure · Free</span>
+      </div>
+    </div>
+
+    <div class="arch-col">
+      <div class="arch-col-title">Output Layer</div>
+      <div class="arch-node output">
+        <div class="arch-node-icon">📊</div>
+        <div class="arch-node-name">health_data.js</div>
+        <div class="arch-node-desc">Aggregated daily timeline · 245 days · Stats · Workouts · Committed to GitHub repo</div>
+        <span class="arch-node-tag tag-free">Static file</span>
+      </div>
+      <div class="arch-node output">
+        <div class="arch-node-icon">🌐</div>
+        <div class="arch-node-name">GitHub Pages Dashboard</div>
+        <div class="arch-node-desc">React 18 · 6 tabs · Plotly charts · Source badges · Date range filter · No server needed</div>
+        <span class="arch-node-tag tag-free">Free hosting</span>
+      </div>
+      <div class="arch-node ai">
+        <div class="arch-node-icon">🧬</div>
+        <div class="arch-node-name">Claude Haiku Chatbot</div>
+        <div class="arch-node-desc">Health data as system prompt · Plain-English Q&A · No visitor setup required</div>
+        <span class="arch-node-tag tag-secure">~$0.0002/query</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- DATA FLOW -->
+  <div class="section-title">End-to-End Data Flow</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">💍📱</div><div class="flow-box-name">Wearables</div><div class="flow-box-sub">Oura + Apple Watch</div></div>
+      <div class="flow-label">Raw biometric signals</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">🔌</div><div class="flow-box-name">API / Export</div><div class="flow-box-sub">Oura v2 · HealthKit</div></div>
+      <div class="flow-label">REST API + XML/JSON</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">⚙️</div><div class="flow-box-name">Python Pipeline</div><div class="flow-box-sub">GitHub Actions</div></div>
+      <div class="flow-label">Aggregate · Merge · Normalise</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">📦</div><div class="flow-box-name">health_data.js</div><div class="flow-box-sub">~600KB static file</div></div>
+      <div class="flow-label">Committed to GitHub</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">🌐</div><div class="flow-box-name">GitHub Pages</div><div class="flow-box-sub">React + Plotly</div></div>
+      <div class="flow-label">Static dashboard render</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">🧬</div><div class="flow-box-name">Claude AI</div><div class="flow-box-sub">via CF Worker</div></div>
+      <div class="flow-label">Natural language insights</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box"><div class="flow-box-icon">👤</div><div class="flow-box-name">You / Visitor</div><div class="flow-box-sub">Any browser</div></div>
+      <div class="flow-label">Insights + Q&A</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- N8N WORKFLOW -->
+  <div class="section-title">n8n Workflow — Automated Health Data Sync</div>
+  <div class="n8n-flow">
+    <div class="n8n-node">
+      <div class="n8n-box n8n-trigger"><div class="n8n-box-icon">⏰</div><div class="n8n-box-name">Schedule Trigger</div></div>
+      <div class="flow-label">Daily 7am UTC</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-code"><div class="n8n-box-icon">📅</div><div class="n8n-box-name">Set Date Range</div></div>
+      <div class="flow-label">Last 180 days</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-http"><div class="n8n-box-icon">💍</div><div class="n8n-box-name">Oura Readiness</div></div>
+      <div class="flow-label">HTTP GET</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-http"><div class="n8n-box-icon">🌙</div><div class="n8n-box-name">Oura Sleep</div></div>
+      <div class="flow-label">HTTP GET</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-http"><div class="n8n-box-icon">🏃</div><div class="n8n-box-name">Oura Activity</div></div>
+      <div class="flow-label">HTTP GET</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-github"><div class="n8n-box-icon">📦</div><div class="n8n-box-name">Get health_data.js</div></div>
+      <div class="flow-label">GitHub API GET</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-code"><div class="n8n-box-icon">🔀</div><div class="n8n-box-name">Merge & Transform</div></div>
+      <div class="flow-label">Code node (JS)</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-github"><div class="n8n-box-icon">💾</div><div class="n8n-box-name">Commit to GitHub</div></div>
+      <div class="flow-label">GitHub API PUT</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-ai"><div class="n8n-box-icon">🧬</div><div class="n8n-box-name">Claude Summary</div></div>
+      <div class="flow-label">Daily AI insight</div>
+    </div>
+    <div class="n8n-arrow">→</div>
+    <div class="n8n-node">
+      <div class="n8n-box n8n-notify"><div class="n8n-box-icon">📧</div><div class="n8n-box-name">Email / Slack</div></div>
+      <div class="flow-label">Daily digest</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- COST BREAKDOWN -->
+  <div class="section-title">Cost Breakdown (Monthly)</div>
+  <div class="cost-grid">
+    <div class="cost-card"><div class="cost-name">GitHub Pages</div><div class="cost-val">$0</div><div class="cost-note">Free tier · 1GB storage</div></div>
+    <div class="cost-card"><div class="cost-name">GitHub Actions</div><div class="cost-val">$0</div><div class="cost-note">2,000 min/month free</div></div>
+    <div class="cost-card"><div class="cost-name">Oura Ring API</div><div class="cost-val">$0</div><div class="cost-note">Free with ring ownership</div></div>
+    <div class="cost-card"><div class="cost-name">Cloudflare Workers</div><div class="cost-val">$0</div><div class="cost-note">100k req/day free</div></div>
+    <div class="cost-card"><div class="cost-name">Scriptable (iOS)</div><div class="cost-val">$0</div><div class="cost-note">Free App Store app</div></div>
+    <div class="cost-card"><div class="cost-name">Claude Haiku API</div><div class="cost-val">~$0.02</div><div class="cost-note">~100 chatbot queries/mo</div></div>
+    <div class="cost-card" style="border-color:rgba(52,211,153,0.3)"><div class="cost-name" style="color:#34d399">Total</div><div class="cost-val">~$0.02</div><div class="cost-note">vs $10–15/mo for Gyroscope</div></div>
+  </div>
+
+</body>
+</html>

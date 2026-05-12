@@ -1,0 +1,212 @@
+{
+  "name": "Health Dashboard — Daily Oura Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 7 * * *" }] }
+      },
+      "name": "⏰ Daily 7am UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 300],
+      "id": "node-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst start = new Date(today);\nstart.setDate(start.getDate() - 180);\n\nreturn [{\n  json: {\n    start_date: start.toISOString().slice(0, 10),\n    end_date: today.toISOString().slice(0, 10),\n    generated_at: today.toISOString().slice(0, 16).replace('T', ' ')\n  }\n}];"
+      },
+      "name": "📅 Set Date Range",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "id": "node-dates"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ouraring.com/v2/usercollection/daily_readiness?start_date={{ $json.start_date }}&end_date={{ $json.end_date }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "💍 Oura Readiness",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 160],
+      "id": "node-readiness",
+      "credentials": { "httpHeaderAuth": { "id": "oura-token", "name": "Oura Bearer Token" } }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ouraring.com/v2/usercollection/daily_sleep?start_date={{ $('📅 Set Date Range').item.json.start_date }}&end_date={{ $('📅 Set Date Range').item.json.end_date }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "🌙 Oura Sleep",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "id": "node-sleep",
+      "credentials": { "httpHeaderAuth": { "id": "oura-token", "name": "Oura Bearer Token" } }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ouraring.com/v2/usercollection/daily_activity?start_date={{ $('📅 Set Date Range').item.json.start_date }}&end_date={{ $('📅 Set Date Range').item.json.end_date }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "🏃 Oura Activity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 440],
+      "id": "node-activity",
+      "credentials": { "httpHeaderAuth": { "id": "oura-token", "name": "Oura Bearer Token" } }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ouraring.com/v2/usercollection/daily_stress?start_date={{ $('📅 Set Date Range').item.json.start_date }}&end_date={{ $('📅 Set Date Range').item.json.end_date }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "🧠 Oura Stress",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 580],
+      "id": "node-stress",
+      "credentials": { "httpHeaderAuth": { "id": "oura-token", "name": "Oura Bearer Token" } }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ouraring.com/v2/usercollection/sleep?start_date={{ $('📅 Set Date Range').item.json.start_date }}&end_date={{ $('📅 Set Date Range').item.json.end_date }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "💤 Sleep Sessions (HRV)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 720],
+      "id": "node-sleep-sessions",
+      "credentials": { "httpHeaderAuth": { "id": "oura-token", "name": "Oura Bearer Token" } }
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/vandanakarthikeya/vandanakarthikeya.github.io/contents/health_data.js",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "name": "📦 Get Existing health_data.js",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 440],
+      "id": "node-get-file",
+      "credentials": { "httpHeaderAuth": { "id": "github-token", "name": "GitHub PAT" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge all Oura data sources into unified daily timeline\nconst readiness = $('💍 Oura Readiness').item.json.data || [];\nconst sleep     = $('🌙 Oura Sleep').item.json.data || [];\nconst activity  = $('🏃 Oura Activity').item.json.data || [];\nconst stress    = $('🧠 Oura Stress').item.json.data || [];\nconst sessions  = $('💤 Sleep Sessions (HRV)').item.json.data || [];\nconst fileData  = $('📦 Get Existing health_data.js').item.json;\nconst generatedAt = $('📅 Set Date Range').item.json.generated_at;\n\n// Decode existing file to preserve Apple Health data\nlet existing = { stats: {}, timeline: [], workouts: [] };\ntry {\n  const content = Buffer.from(fileData.content, 'base64').toString('utf-8');\n  const jsonStr = content.split('const HEALTH_DATA = ')[1].replace(/;\\s*$/, '');\n  existing = JSON.parse(jsonStr);\n} catch(e) { console.log('Starting fresh:', e.message); }\n\n// Index existing Apple Health data by day\nconst appleByDay = {};\nfor (const e of existing.timeline || []) {\n  if (e.apple) appleByDay[e.day] = e.apple;\n}\n\n// Build lookup maps\nconst readMap = {}; for (const r of readiness) readMap[r.day] = { score: r.score, contributors: r.contributors };\nconst sleepMap = {}; for (const s of sleep)     sleepMap[s.day] = { score: s.score, contributors: s.contributors };\nconst actMap = {};  for (const a of activity)   actMap[a.day]  = { steps: a.steps, active_calories: a.active_calories, score: a.score };\nconst stressMap = {}; for (const s of stress)   stressMap[s.day] = { stress_high: s.stress_high, recovery_high: s.recovery_high };\n\n// HRV from sleep sessions (long_sleep preferred)\nconst hrvMap = {};\nfor (const s of sessions) {\n  if (!hrvMap[s.day] || (s.type === 'long_sleep' && hrvMap[s.day].type !== 'long_sleep')) {\n    hrvMap[s.day] = { avg_hrv: s.average_hrv, avg_hr: s.average_heart_rate, type: s.type };\n  }\n}\n\n// Collect all days\nconst allDays = new Set([\n  ...Object.keys(readMap), ...Object.keys(sleepMap),\n  ...Object.keys(actMap),  ...Object.keys(appleByDay)\n]);\n\n// Build timeline\nconst timeline = [];\nfor (const day of [...allDays].sort()) {\n  const entry = { day };\n  if (readMap[day])   entry.oura_readiness = readMap[day];\n  if (sleepMap[day])  entry.oura_sleep     = sleepMap[day];\n  if (actMap[day])    entry.oura_activity  = actMap[day];\n  if (stressMap[day]) entry.oura_stress    = stressMap[day];\n  if (hrvMap[day])    entry.oura_sleep_model = hrvMap[day];\n  if (appleByDay[day]) entry.apple         = appleByDay[day];\n  timeline.push(entry);\n}\n\n// Compute summary stats\nconst ouradays = timeline.filter(e => e.oura_readiness);\nconst avg = arr => arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length*10)/10 : null;\n\nconst stats = {\n  days_tracked: ouradays.length,\n  apple_days_tracked: timeline.filter(e => e.apple).length,\n  date_range_start: ouradays[0]?.day || '',\n  date_range_end:   ouradays[ouradays.length-1]?.day || '',\n  avg_readiness_score: avg(ouradays.map(e=>e.oura_readiness?.score).filter(Boolean)),\n  avg_sleep_score:     avg(ouradays.map(e=>e.oura_sleep?.score).filter(Boolean)),\n  avg_hrv:             avg(ouradays.map(e=>e.oura_sleep_model?.avg_hrv).filter(Boolean)),\n  avg_resting_hr:      avg(ouradays.map(e=>e.oura_sleep_model?.avg_hr).filter(Boolean)),\n  oura_updated_at: generatedAt,\n  apple_updated_at: existing.stats?.apple_updated_at || null,\n  generated_at: generatedAt\n};\n\nconst payload = { stats, timeline, workouts: existing.workouts || [] };\nconst jsContent = `// Auto-generated by n8n workflow — ${generatedAt}\\nconst HEALTH_DATA = ${JSON.stringify(payload)};\\n`;\nconst encoded = Buffer.from(jsContent).toString('base64');\n\nreturn [{ json: { content: encoded, sha: fileData.sha, stats, payload } }];"
+      },
+      "name": "🔀 Merge & Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 440],
+      "id": "node-merge"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.github.com/repos/vandanakarthikeya/vandanakarthikeya.github.io/contents/health_data.js",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "message", "value": "=chore: refresh Oura health data {{ $('📅 Set Date Range').item.json.end_date }} [skip ci]" },
+            { "name": "content", "value": "={{ $json.content }}" },
+            { "name": "sha",     "value": "={{ $json.sha }}" },
+            { "name": "branch",  "value": "main" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "💾 Commit to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 440],
+      "id": "node-commit",
+      "credentials": { "httpHeaderAuth": { "id": "github-token", "name": "GitHub PAT" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_CLOUDFLARE_WORKER.workers.dev",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model",      "value": "claude-haiku-4-5-20251001" },
+            { "name": "max_tokens", "value": "300" },
+            { "name": "system",     "value": "You are a health data analyst. Provide a concise 3-sentence daily health insight summary." },
+            { "name": "messages",   "value": "=[{\"role\":\"user\",\"content\":\"Summarise today's health metrics: Readiness={{ $('🔀 Merge & Transform Data').item.json.stats.avg_readiness_score }}, Sleep={{ $('🔀 Merge & Transform Data').item.json.stats.avg_sleep_score }}, HRV={{ $('🔀 Merge & Transform Data').item.json.stats.avg_hrv }}ms. What should I focus on today?\"}]" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "🧬 Claude Daily Insight",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 440],
+      "id": "node-claude"
+    },
+    {
+      "parameters": {
+        "jsCode": "const stats = $('🔀 Merge & Transform Data').item.json.stats;\nconst aiResponse = $input.item.json;\nconst insight = aiResponse.content?.[0]?.text || 'No insight generated';\nconst date = stats.date_range_end;\n\nreturn [{\n  json: {\n    subject: `🧬 Health Dashboard — Daily Update ${date}`,\n    body: `Daily Health Summary — ${date}\\n\\n` +\n          `📊 Readiness: ${stats.avg_readiness_score}\\n` +\n          `🌙 Sleep: ${stats.avg_sleep_score}\\n` +\n          `⚡ HRV: ${stats.avg_hrv}ms\\n` +\n          `❤️  Resting HR: ${stats.avg_resting_hr}bpm\\n\\n` +\n          `🧬 AI Insight:\\n${insight}\\n\\n` +\n          `🔗 Dashboard: https://vandanakarthikeya.github.io/personal-health-dashboard.html`\n  }\n}];"
+      },
+      "name": "📝 Build Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 440],
+      "id": "node-notify-build"
+    },
+    {
+      "parameters": {
+        "fromEmail": "health-bot@yourdomain.com",
+        "toEmail": "Vandana_karthik@yahoo.com",
+        "subject": "={{ $json.subject }}",
+        "text": "={{ $json.body }}"
+      },
+      "name": "📧 Email Daily Digest",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1760, 440],
+      "id": "node-email"
+    }
+  ],
+  "connections": {
+    "⏰ Daily 7am UTC":        { "main": [[{ "node": "📅 Set Date Range",              "type": "main", "index": 0 }]] },
+    "📅 Set Date Range":       { "main": [[{ "node": "💍 Oura Readiness",              "type": "main", "index": 0 },
+                                           { "node": "🌙 Oura Sleep",                  "type": "main", "index": 0 },
+                                           { "node": "🏃 Oura Activity",               "type": "main", "index": 0 },
+                                           { "node": "🧠 Oura Stress",                 "type": "main", "index": 0 },
+                                           { "node": "💤 Sleep Sessions (HRV)",        "type": "main", "index": 0 }]] },
+    "💍 Oura Readiness":       { "main": [[{ "node": "📦 Get Existing health_data.js", "type": "main", "index": 0 }]] },
+    "🌙 Oura Sleep":           { "main": [[{ "node": "📦 Get Existing health_data.js", "type": "main", "index": 0 }]] },
+    "🏃 Oura Activity":        { "main": [[{ "node": "📦 Get Existing health_data.js", "type": "main", "index": 0 }]] },
+    "🧠 Oura Stress":          { "main": [[{ "node": "📦 Get Existing health_data.js", "type": "main", "index": 0 }]] },
+    "💤 Sleep Sessions (HRV)": { "main": [[{ "node": "📦 Get Existing health_data.js", "type": "main", "index": 0 }]] },
+    "📦 Get Existing health_data.js": { "main": [[{ "node": "🔀 Merge & Transform Data", "type": "main", "index": 0 }]] },
+    "🔀 Merge & Transform Data":      { "main": [[{ "node": "💾 Commit to GitHub",        "type": "main", "index": 0 }]] },
+    "💾 Commit to GitHub":            { "main": [[{ "node": "🧬 Claude Daily Insight",    "type": "main", "index": 0 }]] },
+    "🧬 Claude Daily Insight":        { "main": [[{ "node": "📝 Build Notification",       "type": "main", "index": 0 }]] },
+    "📝 Build Notification":          { "main": [[{ "node": "📧 Email Daily Digest",       "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["health", "oura", "automation"],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Daily sync of Oura Ring data to GitHub Pages health dashboard. Fetches readiness, sleep, activity, stress and HRV → merges with existing Apple Health data → commits health_data.js → generates AI daily insight via Claude → emails daily digest.\n\nCredentials needed:\n1. 'Oura Bearer Token' — httpHeaderAuth, Header Name: Authorization, Value: Bearer YOUR_OURA_TOKEN\n2. 'GitHub PAT' — httpHeaderAuth, Header Name: Authorization, Value: token YOUR_GITHUB_TOKEN\n3. Email SMTP credentials for the Send Email node\n\nReplace YOUR_CLOUDFLARE_WORKER in the Claude node URL."
+  }
+}
