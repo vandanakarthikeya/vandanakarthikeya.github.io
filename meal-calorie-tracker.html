@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meal Calorie Tracker - Digital Twin</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='84'>M</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09090d;
+      --panel: rgba(255,255,255,0.055);
+      --panel2: rgba(255,255,255,0.085);
+      --border: rgba(255,255,255,0.11);
+      --border2: rgba(255,255,255,0.18);
+      --ink: #f4f0ea;
+      --ink2: rgba(244,240,234,0.72);
+      --ink3: rgba(244,240,234,0.46);
+      --accent: #e8734f;
+      --mint: #39d7a4;
+      --blue: #76b7ff;
+      --gold: #f2c96d;
+      --red: #f87171;
+      --radius: 18px;
+    }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(232,115,79,0.18), transparent 28%),
+        radial-gradient(circle at 86% 8%, rgba(57,215,164,0.14), transparent 24%),
+        var(--bg);
+      color: var(--ink);
+      font-family: "Outfit", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    .mono { font-family: "JetBrains Mono", monospace; }
+    .topbar {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand-title { font-family: "DM Serif Display", serif; font-size: 1.55rem; line-height: 1; }
+    .brand-sub { color: var(--ink3); font-size: 0.78rem; margin-top: 0.25rem; }
+    .nav { margin-left: auto; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+    .button {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--ink2);
+      border-radius: 999px;
+      padding: 0.5rem 0.78rem;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .button:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.09); }
+    .button.primary { color: #ffc1ad; border-color: rgba(232,115,79,0.45); background: rgba(232,115,79,0.14); }
+    .button.good { color: #a9f5d4; border-color: rgba(57,215,164,0.4); background: rgba(57,215,164,0.12); }
+    .button.danger { color: #fecaca; border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.1); }
+    .shell { max-width: 1220px; margin: 0 auto; padding: 1rem 1.25rem 1.5rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.62fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(1rem, 2vw, 1.35rem);
+      min-width: 0;
+    }
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.68rem;
+      letter-spacing: 0.11em;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    h1, h2 {
+      font-family: "DM Serif Display", serif;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    h1 { font-size: clamp(2.35rem, 7vw, 4.4rem); line-height: 0.94; margin: 0.35rem 0 0.7rem; }
+    h2 { font-size: clamp(1.6rem, 3.6vw, 2.35rem); line-height: 1; margin: 0.3rem 0 0.8rem; }
+    .caption { color: var(--ink2); line-height: 1.5; font-size: 0.93rem; max-width: 680px; }
+    .upload-zone {
+      margin-top: 1rem;
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: 16px;
+      padding: 1rem;
+      background: rgba(255,255,255,0.035);
+      display: grid;
+      gap: 0.8rem;
+    }
+    .preview-wrap {
+      min-height: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .preview-wrap img { width: 100%; height: 100%; max-height: 420px; object-fit: contain; display: none; }
+    .preview-placeholder { color: var(--ink3); text-align: center; line-height: 1.4; padding: 2rem; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.72rem;
+    }
+    .field { display: grid; gap: 0.28rem; }
+    label {
+      color: var(--ink3);
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.11);
+      background: rgba(255,255,255,0.055);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 0.72rem 0.8rem;
+      outline: none;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    input:focus, textarea:focus { border-color: rgba(57,215,164,0.45); box-shadow: 0 0 0 3px rgba(57,215,164,0.09); }
+    .span-2 { grid-column: span 2; }
+    .span-4 { grid-column: span 4; }
+    .actions { display: flex; gap: 0.55rem; flex-wrap: wrap; align-items: center; margin-top: 0.85rem; }
+    .status { color: var(--ink3); font-size: 0.82rem; line-height: 1.4; }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+    .metric {
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 0.88rem;
+      background: rgba(255,255,255,0.045);
+      min-height: 100px;
+    }
+    .metric span {
+      display: block;
+      color: var(--ink3);
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .metric strong {
+      font-family: "JetBrains Mono", monospace;
+      font-size: clamp(1.35rem, 4vw, 2rem);
+      font-weight: 500;
+    }
+    .section-grid { margin-top: 1rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 0.62fr); gap: 1rem; }
+    .meal-list { display: grid; gap: 0.65rem; }
+    .meal-row {
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.04);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .meal-title { font-weight: 800; color: var(--ink); }
+    .meal-meta { color: var(--ink3); font-size: 0.78rem; margin-top: 0.22rem; line-height: 1.35; }
+    .meal-numbers { color: var(--ink2); font-family: "JetBrains Mono", monospace; font-size: 0.82rem; }
+    .note {
+      color: var(--ink3);
+      font-size: 0.76rem;
+      line-height: 1.5;
+      margin-top: 0.7rem;
+    }
+    @media (max-width: 920px) {
+      .hero, .section-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .span-4 { grid-column: span 2; }
+    }
+    @media (max-width: 620px) {
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .nav { margin-left: 0; }
+      .shell { padding: 0.85rem; }
+      .form-grid, .metric-grid { grid-template-columns: 1fr; }
+      .span-2, .span-4 { grid-column: span 1; }
+      .meal-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand-title">Meal Tracker</div>
+      <div class="brand-sub">Photo estimates, editable nutrition, local storage</div>
+    </div>
+    <nav class="nav">
+      <a class="button" href="healthy-digital-twin.html">Digital Twin</a>
+      <a class="button" href="personal-health-dashboard.html">Health Analytics</a>
+      <a class="button primary" href="https://vandanakarthikeya.github.io/#pocs">Back to POCs</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <article class="card">
+        <div class="eyebrow">Track from a meal photo</div>
+        <h1>What did I eat?</h1>
+        <p class="caption">Upload a meal photo, get a Claude-powered calorie estimate, then edit and save it. Estimates are directional, so confirm portions before logging.</p>
+
+        <div class="upload-zone">
+          <input id="photo-input" type="file" accept="image/*" />
+          <div class="preview-wrap">
+            <img id="photo-preview" alt="Meal preview" />
+            <div id="preview-placeholder" class="preview-placeholder">Choose a meal photo to estimate calories and macros.</div>
+          </div>
+          <div class="actions">
+            <button id="estimate-btn" class="button primary" type="button">Estimate from photo</button>
+            <button id="clear-photo-btn" class="button" type="button">Clear photo</button>
+            <span id="estimate-status" class="status">No estimate yet.</span>
+          </div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <div class="eyebrow">Today</div>
+        <h2>Meal totals</h2>
+        <div class="metric-grid">
+          <div class="metric"><span>Calories</span><strong id="today-calories">0</strong></div>
+          <div class="metric"><span>Protein</span><strong id="today-protein">0g</strong></div>
+          <div class="metric"><span>Carbs</span><strong id="today-carbs">0g</strong></div>
+          <div class="metric"><span>Fat</span><strong id="today-fat">0g</strong></div>
+        </div>
+        <div class="actions">
+          <button id="export-btn" class="button" type="button">Export JSON</button>
+          <button id="clear-day-btn" class="button danger" type="button">Clear today</button>
+        </div>
+        <p class="note">Saved in this browser under <span class="mono">dt_meals_v1</span>. The Digital Twin reads the same local meal log.</p>
+      </aside>
+    </section>
+
+    <section class="section-grid">
+      <article class="card">
+        <div class="eyebrow">Review before saving</div>
+        <h2>Meal entry</h2>
+        <form id="meal-form">
+          <div class="form-grid">
+            <div class="field span-2">
+              <label for="meal-name">Meal name</label>
+              <input id="meal-name" type="text" placeholder="e.g. Paneer bowl with rice" />
+            </div>
+            <div class="field">
+              <label for="meal-date">Date</label>
+              <input id="meal-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="meal-time">Time</label>
+              <input id="meal-time" type="time" />
+            </div>
+            <div class="field">
+              <label for="calories">Calories</label>
+              <input id="calories" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="calories-low">Low estimate</label>
+              <input id="calories-low" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="calories-high">High estimate</label>
+              <input id="calories-high" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="confidence">Confidence</label>
+              <input id="confidence" type="text" placeholder="medium" />
+            </div>
+            <div class="field">
+              <label for="protein">Protein g</label>
+              <input id="protein" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="carbs">Carbs g</label>
+              <input id="carbs" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="fat">Fat g</label>
+              <input id="fat" type="number" min="0" step="1" />
+            </div>
+            <div class="field">
+              <label for="fiber">Fiber g</label>
+              <input id="fiber" type="number" min="0" step="1" />
+            </div>
+            <div class="field span-4">
+              <label for="items">Detected items / assumptions</label>
+              <textarea id="items" placeholder="Food items, portions, and what to verify"></textarea>
+            </div>
+            <div class="field span-4">
+              <label for="notes">Notes</label>
+              <textarea id="notes" placeholder="Add hunger, context, or corrections"></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="button good" type="submit">Save meal</button>
+            <button id="reset-form-btn" class="button" type="button">Reset form</button>
+            <span class="status">Confirm/edit before saving. Photo calories are estimates.</span>
+          </div>
+        </form>
+      </article>
+
+      <aside class="card">
+        <div class="eyebrow">Saved locally</div>
+        <h2>Today’s meals</h2>
+        <div id="meal-list" class="meal-list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const WORKER_URL = "https://autumn-poetry-9d74.vvandana11.workers.dev";
+    const STORE_KEY = "dt_meals_v1";
+    let currentImage = null;
+
+    const $ = (id) => document.getElementById(id);
+    const todayKey = () => new Date().toISOString().slice(0, 10);
+    const nowTime = () => new Date().toTimeString().slice(0, 5);
+    const uid = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const num = (id) => Number($(id).value || 0);
+    const fmtNumber = (v) => Math.round(v || 0).toLocaleString();
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+
+    function readMeals() {
+      try { return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
+      catch { return []; }
+    }
+
+    function writeMeals(meals) {
+      localStorage.setItem(STORE_KEY, JSON.stringify(meals));
+      render();
+    }
+
+    function mealsForToday() {
+      const key = todayKey();
+      return readMeals().filter((meal) => meal.date === key);
+    }
+
+    function totals(meals) {
+      const sum = (key) => meals.reduce((total, meal) => total + (Number(meal[key]) || 0), 0);
+      return {
+        calories: sum("calories"),
+        protein: sum("protein"),
+        carbs: sum("carbs"),
+        fat: sum("fat")
+      };
+    }
+
+    function resetForm() {
+      $("meal-form").reset();
+      $("meal-date").value = todayKey();
+      $("meal-time").value = nowTime();
+      $("confidence").value = "manual";
+    }
+
+    function fillForm(estimate) {
+      $("meal-name").value = estimate.name || "Estimated meal";
+      $("calories").value = Math.round(estimate.calories || 0);
+      $("calories-low").value = Math.round(estimate.caloriesLow || estimate.calories_low || 0);
+      $("calories-high").value = Math.round(estimate.caloriesHigh || estimate.calories_high || 0);
+      $("protein").value = Math.round(estimate.protein || 0);
+      $("carbs").value = Math.round(estimate.carbs || 0);
+      $("fat").value = Math.round(estimate.fat || 0);
+      $("fiber").value = Math.round(estimate.fiber || 0);
+      $("confidence").value = estimate.confidence || "medium";
+      const itemLines = Array.isArray(estimate.items)
+        ? estimate.items.map((item) => typeof item === "string" ? item : `${item.name || "item"}: ${item.portion || ""} ${item.calories ? `(${item.calories} kcal)` : ""}`.trim())
+        : [];
+      $("items").value = itemLines.join("\n");
+      $("notes").value = estimate.notes || estimate.verify || "Check portions before saving.";
+    }
+
+    function mealFromForm() {
+      return {
+        id: uid(),
+        date: $("meal-date").value || todayKey(),
+        time: $("meal-time").value || nowTime(),
+        source: currentImage ? "photo" : "manual",
+        name: $("meal-name").value.trim() || "Meal",
+        calories: num("calories"),
+        caloriesLow: num("calories-low"),
+        caloriesHigh: num("calories-high"),
+        protein: num("protein"),
+        carbs: num("carbs"),
+        fat: num("fat"),
+        fiber: num("fiber"),
+        confidence: $("confidence").value.trim() || "manual",
+        items: $("items").value.split("\n").map((line) => line.trim()).filter(Boolean),
+        notes: $("notes").value.trim(),
+        imagePreview: currentImage?.preview || null,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function parseEstimateText(text) {
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No JSON estimate returned");
+      return JSON.parse(match[0]);
+    }
+
+    async function resizeImage(file) {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const img = await new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = dataUrl;
+      });
+      const max = 1024;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL("image/jpeg", 0.82);
+      return {
+        preview: compressed,
+        base64: compressed.split(",")[1],
+        mediaType: "image/jpeg"
+      };
+    }
+
+    async function estimateMeal() {
+      if (!currentImage) {
+        $("estimate-status").textContent = "Choose a meal photo first.";
+        return;
+      }
+      $("estimate-status").textContent = "Asking Claude to estimate meal nutrition...";
+      const prompt = `Estimate nutrition from this meal photo. Return only JSON with keys:
+name, calories, caloriesLow, caloriesHigh, protein, carbs, fat, fiber, confidence, items, notes, verify.
+Use realistic portion assumptions. If uncertain, give ranges and list what the user should verify.`;
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 700,
+            system: "You are a careful nutrition estimation assistant. You estimate calories and macros from meal images for wellness tracking. Be conservative, use ranges, and never claim medical precision.",
+            messages: [{
+              role: "user",
+              content: [
+                { type: "text", text: prompt },
+                { type: "image", source: { type: "base64", media_type: currentImage.mediaType, data: currentImage.base64 } }
+              ]
+            }]
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error?.message || `API error ${res.status}`);
+        const text = json.content?.[0]?.text || "";
+        fillForm(parseEstimateText(text));
+        $("estimate-status").textContent = "Estimate ready. Review and edit before saving.";
+      } catch (error) {
+        $("estimate-status").textContent = `Estimate failed. Use manual entry. ${error.message}`;
+      }
+    }
+
+    function render() {
+      const todayMeals = mealsForToday();
+      const t = totals(todayMeals);
+      $("today-calories").textContent = fmtNumber(t.calories);
+      $("today-protein").textContent = `${fmtNumber(t.protein)}g`;
+      $("today-carbs").textContent = `${fmtNumber(t.carbs)}g`;
+      $("today-fat").textContent = `${fmtNumber(t.fat)}g`;
+      $("meal-list").innerHTML = todayMeals.length ? todayMeals.slice().reverse().map((meal) => `
+        <div class="meal-row">
+          <div>
+            <div class="meal-title">${escapeHtml(meal.name)}</div>
+            <div class="meal-meta">${escapeHtml(meal.time || "")} · ${escapeHtml(meal.source || "manual")} · confidence ${escapeHtml(meal.confidence || "manual")}</div>
+            <div class="meal-meta">${escapeHtml((meal.items || []).slice(0, 2).join(" · ") || meal.notes || "No item details")}</div>
+          </div>
+          <div>
+            <div class="meal-numbers">${fmtNumber(meal.calories)} kcal · ${fmtNumber(meal.protein)}g protein</div>
+            <div class="actions" style="justify-content:flex-end;margin-top:0.5rem">
+              <button class="button danger" type="button" data-delete="${meal.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join("") : `<div class="status">No meals saved today yet.</div>`;
+      document.querySelectorAll("[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => {
+          writeMeals(readMeals().filter((meal) => meal.id !== button.dataset.delete));
+        });
+      });
+    }
+
+    $("photo-input").addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      $("estimate-status").textContent = "Preparing image...";
+      currentImage = await resizeImage(file);
+      $("photo-preview").src = currentImage.preview;
+      $("photo-preview").style.display = "block";
+      $("preview-placeholder").style.display = "none";
+      $("estimate-status").textContent = "Photo ready. Estimate when you are ready.";
+    });
+
+    $("estimate-btn").addEventListener("click", estimateMeal);
+    $("clear-photo-btn").addEventListener("click", () => {
+      currentImage = null;
+      $("photo-input").value = "";
+      $("photo-preview").removeAttribute("src");
+      $("photo-preview").style.display = "none";
+      $("preview-placeholder").style.display = "block";
+      $("estimate-status").textContent = "Photo cleared.";
+    });
+    $("reset-form-btn").addEventListener("click", resetForm);
+    $("meal-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const meal = mealFromForm();
+      writeMeals([...readMeals(), meal]);
+      resetForm();
+      $("estimate-status").textContent = "Meal saved. Digital Twin can read it now.";
+    });
+    $("export-btn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(readMeals(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `meal-log-${todayKey()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+    $("clear-day-btn").addEventListener("click", () => {
+      if (!confirm("Clear today's saved meals?")) return;
+      writeMeals(readMeals().filter((meal) => meal.date !== todayKey()));
+    });
+
+    resetForm();
+    render();
+  </script>
+</body>
+</html>
