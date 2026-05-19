@@ -991,12 +991,16 @@ YOUR JOB:
 - Give practical, concise answers. Use numbers when useful. Be encouraging but honest.
 - Reference today's logged meals when relevant to give personalised advice
 
-LOGGING MEALS — VERY IMPORTANT:
-If the user says they had something, are logging something, or asks you to add/log a food item, you MUST do TWO things:
-1. End your reply with a [LOG_MEAL:] marker on its own line containing valid compact JSON (no newlines inside JSON) with these exact keys: name, calories, caloriesLow, caloriesHigh, protein, carbs, fat, fiber, confidence, items (array of strings), notes
-2. In your reply text, do NOT say "I've added it" or "Done!" — instead say something like "Logged ✅" so the user knows it's real
-Example of a valid marker (must be at the very end, on its own line):
-[LOG_MEAL:{"name":"Strawberry Iced Tea","calories":120,"caloriesLow":100,"caloriesHigh":140,"protein":0,"carbs":30,"fat":0,"fiber":0,"confidence":"medium","items":["Strawberry iced tea ~350ml"],"notes":"Estimate based on standard Starbucks size"}]
+LOGGING MEALS — CRITICAL RULES:
+Only emit a LOG_MEAL marker when the user EXPLICITLY asks to log/add/save a new food item they haven't logged yet today.
+Do NOT re-log items already in today's meal list.
+Do NOT log just because the user mentions or asks about a food.
+
+When logging IS needed:
+1. Write your conversational reply first (under 130 words)
+2. On the very last line, with nothing after it, write the marker:
+LOG_MEAL>>{"name":"...","calories":0,"caloriesLow":0,"caloriesHigh":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"confidence":"medium","items":["item description"],"notes":"source of estimate"}<<LOG_MEAL
+Rules for the marker: single line, valid JSON, no line breaks inside JSON, no markdown, no trailing text after <<LOG_MEAL.
 
 STRICT LIMITS:
 - If a question is completely unrelated to food, nutrition, meals, health, or the digital twin (e.g. sports scores, coding help, weather, finance), reply with exactly: "I can't answer that — I'm your nutrition and meal assistant. Ask me anything about food, calories, or your eating today!"
@@ -1046,16 +1050,52 @@ STRICT LIMITS:
     }
 
     function extractLogMeal(rawReply) {
-      // Returns { displayText, loggedMeal|null }
-      const marker = rawReply.match(/\[LOG_MEAL:(\{[\s\S]*?\})\]/);
-      if (!marker) return { displayText: rawReply, loggedMeal: null };
+      // Returns { displayText, loggedMeal|null, parseError|null }
+      const START = "LOG_MEAL>>";
+      const END   = "<<LOG_MEAL";
+      const si = rawReply.indexOf(START);
+      if (si === -1) return { displayText: rawReply, loggedMeal: null, parseError: null };
+
+      const ei = rawReply.indexOf(END, si);
+      if (ei === -1) {
+        // Malformed — strip everything from marker start to avoid showing raw marker
+        const displayText = rawReply.slice(0, si).trim();
+        return { displayText, loggedMeal: null, parseError: "Missing closing <<LOG_MEAL tag" };
+      }
+
+      const jsonStr = rawReply.slice(si + START.length, ei).trim();
+      const displayText = rawReply.slice(0, si).trim();
+
       try {
-        const mealData = JSON.parse(marker[1]);
-        const displayText = rawReply.replace(marker[0], "").trim();
-        return { displayText, loggedMeal: mealData };
-      } catch {
-        // Bad JSON in marker — strip it and carry on
-        return { displayText: rawReply.replace(marker[0], "").trim(), loggedMeal: null };
+        const mealData = JSON.parse(jsonStr);
+        return { displayText, loggedMeal: mealData, parseError: null };
+      } catch (e) {
+        return { displayText, loggedMeal: null, parseError: `JSON parse failed: ${e.message}` };
+      }
+    }
+
+    // Self-check: runs after every Claude response to catch silent failures
+    function chatSelfCheck({ rawReply, displayText, loggedMeal, parseError }) {
+      const issues = [];
+      if (rawReply.includes("LOG_MEAL>>") && !loggedMeal && parseError) {
+        issues.push(`LOG_MEAL marker found but failed to parse: ${parseError}`);
+      }
+      if (rawReply.includes("LOG_MEAL>>") && rawReply.includes("<<LOG_MEAL") && !loggedMeal && !parseError) {
+        issues.push("LOG_MEAL marker found and parsed but no meal was returned — possible empty JSON");
+      }
+      // Check if the raw marker text leaked into displayText
+      if (displayText.includes("LOG_MEAL") || displayText.includes("[LOG_MEAL")) {
+        issues.push("Raw LOG_MEAL marker leaked into display text — stripping failed");
+      }
+      if (issues.length > 0) {
+        console.warn("[MealTracker self-check]", issues);
+        // Show a subtle in-chat warning (not user-facing panic, just a flag)
+        const msgs = $("chat-messages");
+        const warn = document.createElement("div");
+        warn.className = "chat-msg bot";
+        warn.innerHTML = `<div style="background:rgba(242,201,109,0.1);border:1px solid rgba(242,201,109,0.3);border-radius:10px;padding:0.45rem 0.75rem;font-size:0.72rem;color:#f2c96d;">⚠️ Logging issue detected: ${escapeHtml(issues[0])} — meal was not saved. Please use the Text tab to log manually.</div>`;
+        msgs.appendChild(warn);
+        msgs.scrollTop = msgs.scrollHeight;
       }
     }
 
@@ -1111,18 +1151,33 @@ STRICT LIMITS:
         const rawReply = json.content?.[0]?.text?.trim() || "Sorry, I couldn't get a response.";
 
         // Parse and execute any meal-logging action
-        const { displayText, loggedMeal } = extractLogMeal(rawReply);
+        const { displayText, loggedMeal, parseError } = extractLogMeal(rawReply);
 
-        typingBubble.textContent = displayText;
+        typingBubble.textContent = displayText || "(no reply)";
         typingBubble.classList.remove("typing");
 
-        // Store the clean reply (without marker) in history
+        // Store clean reply (no marker) in history so follow-ups have clean context
         chatState.history.push({ role: "assistant", content: displayText });
 
-        // If Claude logged a meal, persist it and show a confirmation chip
+        // Self-check every response for silent failures
+        chatSelfCheck({ rawReply, displayText, loggedMeal, parseError });
+
+        // Log meal only if:
+        // 1. Claude returned a valid meal object
+        // 2. Not a duplicate (same name not already logged today within last 2 mins)
         if (loggedMeal) {
-          const saved = chatLogMeal(loggedMeal);
-          chatAddLoggedConfirmation(saved);
+          const existing = mealsForToday();
+          const isDuplicate = existing.some(m =>
+            m.name.toLowerCase() === (loggedMeal.name || "").toLowerCase() &&
+            m.source === "chat" &&
+            (Date.now() - new Date(m.createdAt).getTime()) < 120000
+          );
+          if (!isDuplicate) {
+            const saved = chatLogMeal(loggedMeal);
+            chatAddLoggedConfirmation(saved);
+          } else {
+            console.info("[MealTracker] Duplicate chat log suppressed:", loggedMeal.name);
+          }
         }
 
       } catch (err) {
