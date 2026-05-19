@@ -975,10 +975,10 @@ Use realistic portion assumptions. If uncertain, give ranges and list what the u
         mealContext = `Meals logged today (${today}):\n${lines.join("\n")}\nRunning totals: ${Math.round(t.calories)} kcal · ${Math.round(t.protein)}g protein · ${Math.round(t.carbs)}g carbs · ${Math.round(t.fat)}g fat`;
       }
 
-      return `You are a personal nutrition assistant embedded in a meal-tracking Digital Twin app.
+      return `You are a personal nutrition assistant embedded in a meal-tracking Digital Twin app. You can both advise AND actually log meals.
 
 USER PROFILE:
-- Eats exclusively Indian vegetarian food as a baseline (no meat, no eggs)
+- Eats Indian vegetarian food as a baseline (no meat, no eggs)
 - Goal: track daily nutrition accurately as part of a health digital twin
 - Today is ${today}
 
@@ -987,15 +987,21 @@ ${mealContext}
 YOUR JOB:
 - Answer questions about meal choices, calories, macros, portion sizes, and nutritional value
 - Help the user decide whether a food fits their day (e.g. "can I have X?", "is Y a good choice?")
-- If the user mentions non-Indian food (like Subway, pizza, sushi), still answer helpfully — estimate calories and give a verdict based on today's intake and nutritional balance
+- If the user mentions non-Indian food (like Subway, pizza, a coffee drink), still answer helpfully — estimate calories and give a verdict
 - Give practical, concise answers. Use numbers when useful. Be encouraging but honest.
-- You may suggest swaps or adjustments (e.g. "skip the cheese", "go for a smaller portion")
 - Reference today's logged meals when relevant to give personalised advice
 
+LOGGING MEALS — VERY IMPORTANT:
+If the user says they had something, are logging something, or asks you to add/log a food item, you MUST do TWO things:
+1. End your reply with a [LOG_MEAL:] marker on its own line containing valid compact JSON (no newlines inside JSON) with these exact keys: name, calories, caloriesLow, caloriesHigh, protein, carbs, fat, fiber, confidence, items (array of strings), notes
+2. In your reply text, do NOT say "I've added it" or "Done!" — instead say something like "Logged ✅" so the user knows it's real
+Example of a valid marker (must be at the very end, on its own line):
+[LOG_MEAL:{"name":"Strawberry Iced Tea","calories":120,"caloriesLow":100,"caloriesHigh":140,"protein":0,"carbs":30,"fat":0,"fiber":0,"confidence":"medium","items":["Strawberry iced tea ~350ml"],"notes":"Estimate based on standard Starbucks size"}]
+
 STRICT LIMITS:
-- If a question is completely unrelated to food, nutrition, meals, health, or the digital twin (e.g. sports scores, coding help, general knowledge, weather, finance), reply with exactly: "I can't answer that — I'm your nutrition and meal assistant. Ask me anything about food, calories, or your eating today!"
+- If a question is completely unrelated to food, nutrition, meals, health, or the digital twin (e.g. sports scores, coding help, weather, finance), reply with exactly: "I can't answer that — I'm your nutrition and meal assistant. Ask me anything about food, calories, or your eating today!"
 - Do not make medical diagnoses or prescribe treatments
-- Keep answers under 120 words unless a detailed breakdown is genuinely needed`;
+- Keep answers under 130 words (excluding the LOG_MEAL marker)`;
     }
 
     function chatAddMessage(role, text, typing = false) {
@@ -1013,6 +1019,67 @@ STRICT LIMITS:
 
     function hideSuggestions() {
       $("chat-suggestions").style.display = "none";
+    }
+
+    function chatLogMeal(mealData) {
+      // Log a meal directly from chat to localStorage
+      const meal = {
+        id: uid(),
+        date: todayKey(),
+        time: nowTime(),
+        source: "chat",
+        name: mealData.name || "Chat-logged meal",
+        calories: Number(mealData.calories) || 0,
+        caloriesLow: Number(mealData.caloriesLow) || 0,
+        caloriesHigh: Number(mealData.caloriesHigh) || 0,
+        protein: Number(mealData.protein) || 0,
+        carbs: Number(mealData.carbs) || 0,
+        fat: Number(mealData.fat) || 0,
+        fiber: Number(mealData.fiber) || 0,
+        confidence: mealData.confidence || "medium",
+        items: Array.isArray(mealData.items) ? mealData.items : [],
+        notes: mealData.notes || "",
+        createdAt: new Date().toISOString()
+      };
+      writeMeals([...readMeals(), meal]);
+      return meal;
+    }
+
+    function extractLogMeal(rawReply) {
+      // Returns { displayText, loggedMeal|null }
+      const marker = rawReply.match(/\[LOG_MEAL:(\{[\s\S]*?\})\]/);
+      if (!marker) return { displayText: rawReply, loggedMeal: null };
+      try {
+        const mealData = JSON.parse(marker[1]);
+        const displayText = rawReply.replace(marker[0], "").trim();
+        return { displayText, loggedMeal: mealData };
+      } catch {
+        // Bad JSON in marker — strip it and carry on
+        return { displayText: rawReply.replace(marker[0], "").trim(), loggedMeal: null };
+      }
+    }
+
+    function chatAddLoggedConfirmation(meal) {
+      const msgs = $("chat-messages");
+      const div = document.createElement("div");
+      div.className = "chat-msg bot";
+      div.innerHTML = `
+        <div style="
+          background: rgba(57,215,164,0.12);
+          border: 1px solid rgba(57,215,164,0.35);
+          border-radius: 12px;
+          padding: 0.55rem 0.85rem;
+          font-size: 0.78rem;
+          color: #a9f5d4;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        ">
+          <span style="font-size:1rem">✅</span>
+          <span><strong>${escapeHtml(meal.name)}</strong> logged — ${Math.round(meal.calories)} kcal · ${Math.round(meal.protein)}g protein · ${Math.round(meal.carbs)}g carbs · ${Math.round(meal.fat)}g fat</span>
+        </div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
     }
 
     async function chatSend(text) {
@@ -1034,17 +1101,30 @@ STRICT LIMITS:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: "claude-haiku-4-5-20251001",
-            max_tokens: 400,
+            max_tokens: 500,
             system: buildChatSystemPrompt(),
             messages: chatState.history
           })
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error?.message || `Error ${res.status}`);
-        const reply = json.content?.[0]?.text?.trim() || "Sorry, I couldn't get a response.";
-        typingBubble.textContent = reply;
+        const rawReply = json.content?.[0]?.text?.trim() || "Sorry, I couldn't get a response.";
+
+        // Parse and execute any meal-logging action
+        const { displayText, loggedMeal } = extractLogMeal(rawReply);
+
+        typingBubble.textContent = displayText;
         typingBubble.classList.remove("typing");
-        chatState.history.push({ role: "assistant", content: reply });
+
+        // Store the clean reply (without marker) in history
+        chatState.history.push({ role: "assistant", content: displayText });
+
+        // If Claude logged a meal, persist it and show a confirmation chip
+        if (loggedMeal) {
+          const saved = chatLogMeal(loggedMeal);
+          chatAddLoggedConfirmation(saved);
+        }
+
       } catch (err) {
         typingBubble.textContent = `Something went wrong: ${err.message}`;
         typingBubble.classList.remove("typing");
