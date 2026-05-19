@@ -92,8 +92,36 @@
     h1 { font-size: clamp(2.35rem, 7vw, 4.4rem); line-height: 0.94; margin: 0.35rem 0 0.7rem; }
     h2 { font-size: clamp(1.6rem, 3.6vw, 2.35rem); line-height: 1; margin: 0.3rem 0 0.8rem; }
     .caption { color: var(--ink2); line-height: 1.5; font-size: 0.93rem; max-width: 680px; }
-    .upload-zone {
+    .mode-tabs {
+      display: flex;
+      gap: 0.5rem;
       margin-top: 1rem;
+    }
+    .mode-tab {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--ink3);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+    .mode-tab.active {
+      background: rgba(232,115,79,0.15);
+      border-color: rgba(232,115,79,0.5);
+      color: #ffc1ad;
+    }
+    .mode-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.2);
+      color: var(--ink2);
+    }
+    .upload-zone {
+      margin-top: 0.6rem;
       border: 1px dashed rgba(255,255,255,0.22);
       border-radius: 16px;
       padding: 1rem;
@@ -101,6 +129,45 @@
       display: grid;
       gap: 0.8rem;
     }
+    .text-zone {
+      margin-top: 0.6rem;
+      display: none;
+      gap: 0.8rem;
+      flex-direction: column;
+    }
+    .text-zone.visible { display: flex; }
+    .text-input-area {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 1rem;
+      outline: none;
+      min-height: 120px;
+      resize: vertical;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .text-input-area:focus { border-color: rgba(232,115,79,0.5); box-shadow: 0 0 0 3px rgba(232,115,79,0.1); }
+    .text-input-area::placeholder { color: var(--ink3); }
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--ink3);
+      border-radius: 999px;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip:hover { background: rgba(255,255,255,0.09); color: var(--ink2); border-color: rgba(255,255,255,0.22); }
     .preview-wrap {
       min-height: 240px;
       border-radius: 14px;
@@ -206,7 +273,7 @@
   <header class="topbar">
     <div>
       <div class="brand-title">Meal Tracker</div>
-      <div class="brand-sub">Photo estimates, editable nutrition, local storage</div>
+      <div class="brand-sub">Photo or text estimates · Indian vegetarian · editable nutrition · local storage</div>
     </div>
     <nav class="nav">
       <a class="button" href="healthy-digital-twin.html">Digital Twin</a>
@@ -220,9 +287,15 @@
       <article class="card">
         <div class="eyebrow">Track from a meal photo</div>
         <h1>What did I eat?</h1>
-        <p class="caption">Upload a meal photo, get a Claude-powered calorie estimate, then edit and save it. Estimates are directional, so confirm portions before logging.</p>
+        <p class="caption">Upload a meal photo <em>or</em> type what you ate — Claude estimates calories and macros for Indian vegetarian food. Review before saving.</p>
 
-        <div class="upload-zone">
+        <div class="mode-tabs">
+          <button class="mode-tab active" id="tab-photo" type="button">📷 Photo</button>
+          <button class="mode-tab" id="tab-text" type="button">✍️ Text description</button>
+        </div>
+
+        <!-- Photo mode -->
+        <div class="upload-zone" id="photo-mode">
           <input id="photo-input" type="file" accept="image/*" />
           <div class="preview-wrap">
             <img id="photo-preview" alt="Meal preview" />
@@ -232,6 +305,31 @@
             <button id="estimate-btn" class="button primary" type="button">Estimate from photo</button>
             <button id="clear-photo-btn" class="button" type="button">Clear photo</button>
             <span id="estimate-status" class="status">No estimate yet.</span>
+          </div>
+        </div>
+
+        <!-- Text mode -->
+        <div class="text-zone" id="text-mode">
+          <div class="quick-chips">
+            <span style="color:var(--ink3);font-size:0.72rem;font-weight:700;align-self:center;margin-right:0.2rem;">Quick add:</span>
+            <button class="chip" type="button" data-text="2 idli with sambar and coconut chutney">2 idli + sambar</button>
+            <button class="chip" type="button" data-text="2 roti with dal makhani">roti + dal makhani</button>
+            <button class="chip" type="button" data-text="1 cup rice with rasam and papad">rice + rasam</button>
+            <button class="chip" type="button" data-text="1 masala dosa with sambar and chutney">masala dosa</button>
+            <button class="chip" type="button" data-text="1 bowl poha with chai">poha + chai</button>
+            <button class="chip" type="button" data-text="1 bowl upma with coconut chutney">upma</button>
+            <button class="chip" type="button" data-text="1 cup curd rice with pickle">curd rice</button>
+            <button class="chip" type="button" data-text="1 bowl dal tadka with 2 roti">dal tadka + roti</button>
+          </div>
+          <textarea
+            id="text-meal-input"
+            class="text-input-area"
+            placeholder="Describe what you ate in plain English, e.g.&#10;• 2 roti with dal makhani and raita&#10;• 1 bowl vegetable biryani with boondi raita&#10;• Breakfast: 2 idli, sambar, coconut chutney, 1 chai&#10;&#10;Portions help (e.g. 'small bowl', '1 cup', '2 pieces')"
+          ></textarea>
+          <div class="actions">
+            <button id="estimate-text-btn" class="button primary" type="button">Estimate calories</button>
+            <button id="clear-text-btn" class="button" type="button">Clear</button>
+            <span id="text-estimate-status" class="status">No estimate yet.</span>
           </div>
         </div>
       </article>
@@ -332,6 +430,7 @@
     const WORKER_URL = "https://autumn-poetry-9d74.vvandana11.workers.dev";
     const STORE_KEY = "dt_meals_v1";
     let currentImage = null;
+    let currentMode = "photo"; // "photo" | "text"
 
     const $ = (id) => document.getElementById(id);
     const todayKey = () => new Date().toISOString().slice(0, 10);
@@ -401,7 +500,7 @@
         id: uid(),
         date: $("meal-date").value || todayKey(),
         time: $("meal-time").value || nowTime(),
-        source: currentImage ? "photo" : "manual",
+        source: currentMode === "photo" ? (currentImage ? "photo" : "manual") : "text",
         name: $("meal-name").value.trim() || "Meal",
         calories: num("calories"),
         caloriesLow: num("calories-low"),
@@ -450,6 +549,60 @@
         base64: compressed.split(",")[1],
         mediaType: "image/jpeg"
       };
+    }
+
+    async function estimateMealFromText() {
+      const description = $("text-meal-input").value.trim();
+      if (!description) {
+        $("text-estimate-status").textContent = "Type what you ate first.";
+        return;
+      }
+      $("text-estimate-status").textContent = "Estimating calories for Indian vegetarian meal...";
+      const systemPrompt = `You are a nutrition expert specialising in Indian vegetarian cuisine.
+You have deep knowledge of calories and macros for Indian vegetarian dishes — including South Indian (idli, dosa, sambar, rasam, upma, pongal, kootu, avial, curd rice, filter coffee), North Indian (roti, paratha, dal makhani, paneer dishes, rajma, chole, biryani, pulao, kheer), snacks (poha, chivda, murukku, bhel, pani puri, vada), and beverages (chai, lassi, buttermilk, coconut water).
+
+Standard reference portions (use these as defaults when portions are not specified):
+- 1 roti / chapati = 80–100 kcal, 3g protein, 15g carbs, 2g fat
+- 1 paratha (plain) = 150–180 kcal; stuffed (aloo/paneer) = 200–260 kcal
+- 1 cup cooked rice = 200–220 kcal, 4g protein, 45g carbs, 0.5g fat
+- 1 idli = 39–50 kcal, 2g protein, 8g carbs, 0.4g fat
+- 1 dosa (plain) = 120–140 kcal; masala dosa = 220–280 kcal
+- 1 small bowl dal (any) = 130–180 kcal, 8–10g protein
+- 1 small bowl sabzi / vegetable curry = 100–150 kcal
+- 1 small bowl sambar = 60–80 kcal
+- 1 cup curd/yogurt = 60–80 kcal; raita = 70–90 kcal
+- 1 cup paneer dish (rich, restaurant-style) = 250–350 kcal
+- 1 cup rajma/chole = 200–240 kcal
+- 1 cup vegetable biryani = 250–300 kcal
+- 1 cup poha = 180–220 kcal
+- 1 cup upma = 200–240 kcal
+- 1 chai with milk and sugar = 60–80 kcal
+- 1 cup filter coffee with milk = 50–70 kcal
+
+Return ONLY valid JSON with keys: name, calories, caloriesLow, caloriesHigh, protein, carbs, fat, fiber, confidence (low/medium/high), items (array of {name, portion, calories}), notes, verify.
+Be conservative. Use 'medium' confidence unless portions are very clear (then 'high') or very ambiguous (then 'low').`;
+
+      const userPrompt = `Estimate nutrition for this Indian vegetarian meal:\n\n${description}\n\nReturn JSON only.`;
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 800,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userPrompt }]
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error?.message || `API error ${res.status}`);
+        const text = json.content?.[0]?.text || "";
+        fillForm(parseEstimateText(text));
+        $("text-estimate-status").textContent = "Estimate ready. Review and edit before saving.";
+      } catch (error) {
+        $("text-estimate-status").textContent = `Estimate failed. ${error.message}`;
+      }
     }
 
     async function estimateMeal() {
@@ -516,6 +669,39 @@ Use realistic portion assumptions. If uncertain, give ranges and list what the u
         });
       });
     }
+
+    // Mode tabs
+    $("tab-photo").addEventListener("click", () => {
+      currentMode = "photo";
+      $("tab-photo").classList.add("active");
+      $("tab-text").classList.remove("active");
+      $("photo-mode").style.display = "";
+      $("text-mode").classList.remove("visible");
+    });
+    $("tab-text").addEventListener("click", () => {
+      currentMode = "text";
+      $("tab-text").classList.add("active");
+      $("tab-photo").classList.remove("active");
+      $("photo-mode").style.display = "none";
+      $("text-mode").classList.add("visible");
+    });
+
+    // Quick-add chips
+    document.querySelectorAll(".chip[data-text]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const area = $("text-meal-input");
+        const existing = area.value.trim();
+        area.value = existing ? `${existing}\n${chip.dataset.text}` : chip.dataset.text;
+        area.focus();
+      });
+    });
+
+    // Text mode buttons
+    $("estimate-text-btn").addEventListener("click", estimateMealFromText);
+    $("clear-text-btn").addEventListener("click", () => {
+      $("text-meal-input").value = "";
+      $("text-estimate-status").textContent = "No estimate yet.";
+    });
 
     $("photo-input").addEventListener("change", async (event) => {
       const file = event.target.files?.[0];
