@@ -622,6 +622,7 @@
         <div class="chat-header-name">Nutrition Assistant</div>
         <div class="chat-header-sub">Knows your meals today · Indian vegetarian</div>
       </div>
+      <button id="chat-clear" title="Clear chat history" aria-label="Clear chat" style="background:none;border:none;color:var(--ink3);font-size:0.7rem;font-weight:700;cursor:pointer;padding:0.2rem 0.4rem;border-radius:6px;transition:color 0.15s ease,background 0.15s ease;letter-spacing:0.04em;">CLEAR</button>
       <button class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
@@ -960,7 +961,68 @@ Use realistic portion assumptions. If uncertain, give ranges and list what the u
     render();
 
     // ── Chatbot ──────────────────────────────────────────────────
+    const CHAT_SESSION_KEY = "dt_chat_session_v1";
     const chatState = { open: false, history: [], busy: false };
+
+    // Persisted render log: [{role, text, type}]
+    // type: "normal" | "logged" | "warn"
+    function loadChatSession() {
+      try {
+        const raw = sessionStorage.getItem(CHAT_SESSION_KEY);
+        if (!raw) return null;
+        const saved = JSON.parse(raw);
+        // Only restore if it's from today (clear stale sessions from yesterday)
+        if (saved.date !== todayKey()) {
+          sessionStorage.removeItem(CHAT_SESSION_KEY);
+          return null;
+        }
+        return saved;
+      } catch { return null; }
+    }
+
+    function saveChatSession() {
+      try {
+        sessionStorage.setItem(CHAT_SESSION_KEY, JSON.stringify({
+          date: todayKey(),
+          history: chatState.history,
+          renderLog: chatState.renderLog
+        }));
+      } catch (e) {
+        console.warn("[MealTracker] Could not save chat session:", e);
+      }
+    }
+
+    // Restore render log from a saved session
+    function restoreChatMessages(renderLog) {
+      const msgs = $("chat-messages");
+      msgs.innerHTML = "";
+      renderLog.forEach(entry => {
+        if (entry.type === "logged") {
+          const div = document.createElement("div");
+          div.className = "chat-msg bot";
+          div.innerHTML = `
+            <div style="background:rgba(57,215,164,0.12);border:1px solid rgba(57,215,164,0.35);border-radius:12px;padding:0.55rem 0.85rem;font-size:0.78rem;color:#a9f5d4;display:flex;align-items:center;gap:0.5rem;">
+              <span style="font-size:1rem">✅</span>
+              <span>${escapeHtml(entry.text)}</span>
+            </div>`;
+          msgs.appendChild(div);
+        } else if (entry.type === "warn") {
+          const div = document.createElement("div");
+          div.className = "chat-msg bot";
+          div.innerHTML = `<div style="background:rgba(242,201,109,0.1);border:1px solid rgba(242,201,109,0.3);border-radius:10px;padding:0.45rem 0.75rem;font-size:0.72rem;color:#f2c96d;">${escapeHtml(entry.text)}</div>`;
+          msgs.appendChild(div);
+        } else {
+          const div = document.createElement("div");
+          div.className = `chat-msg ${entry.role}`;
+          const bubble = document.createElement("div");
+          bubble.className = "chat-bubble";
+          bubble.textContent = entry.text;
+          div.appendChild(bubble);
+          msgs.appendChild(div);
+        }
+      });
+      msgs.scrollTop = msgs.scrollHeight;
+    }
 
     function buildChatSystemPrompt() {
       const today = todayKey();
@@ -1018,7 +1080,13 @@ STRICT LIMITS:
       div.appendChild(bubble);
       msgs.appendChild(div);
       msgs.scrollTop = msgs.scrollHeight;
-      return bubble; // return so we can update it
+      // Persist to render log (only non-typing messages; typing gets updated in-place)
+      if (!typing) {
+        chatState.renderLog = chatState.renderLog || [];
+        chatState.renderLog.push({ role, text, type: "normal" });
+        saveChatSession();
+      }
+      return bubble; // caller updates text and calls saveChatSession() after
     }
 
     function hideSuggestions() {
@@ -1089,45 +1157,43 @@ STRICT LIMITS:
       }
       if (issues.length > 0) {
         console.warn("[MealTracker self-check]", issues);
-        // Show a subtle in-chat warning (not user-facing panic, just a flag)
+        const warnText = `⚠️ Logging issue detected: ${issues[0]} — meal was not saved. Please use the Text tab to log manually.`;
         const msgs = $("chat-messages");
         const warn = document.createElement("div");
         warn.className = "chat-msg bot";
-        warn.innerHTML = `<div style="background:rgba(242,201,109,0.1);border:1px solid rgba(242,201,109,0.3);border-radius:10px;padding:0.45rem 0.75rem;font-size:0.72rem;color:#f2c96d;">⚠️ Logging issue detected: ${escapeHtml(issues[0])} — meal was not saved. Please use the Text tab to log manually.</div>`;
+        warn.innerHTML = `<div style="background:rgba(242,201,109,0.1);border:1px solid rgba(242,201,109,0.3);border-radius:10px;padding:0.45rem 0.75rem;font-size:0.72rem;color:#f2c96d;">${escapeHtml(warnText)}</div>`;
         msgs.appendChild(warn);
         msgs.scrollTop = msgs.scrollHeight;
+        chatState.renderLog = chatState.renderLog || [];
+        chatState.renderLog.push({ role: "bot", text: warnText, type: "warn" });
+        saveChatSession();
       }
     }
 
     function chatAddLoggedConfirmation(meal) {
+      const text = `${meal.name} logged — ${Math.round(meal.calories)} kcal · ${Math.round(meal.protein)}g protein · ${Math.round(meal.carbs)}g carbs · ${Math.round(meal.fat)}g fat`;
       const msgs = $("chat-messages");
       const div = document.createElement("div");
       div.className = "chat-msg bot";
       div.innerHTML = `
-        <div style="
-          background: rgba(57,215,164,0.12);
-          border: 1px solid rgba(57,215,164,0.35);
-          border-radius: 12px;
-          padding: 0.55rem 0.85rem;
-          font-size: 0.78rem;
-          color: #a9f5d4;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        ">
+        <div style="background:rgba(57,215,164,0.12);border:1px solid rgba(57,215,164,0.35);border-radius:12px;padding:0.55rem 0.85rem;font-size:0.78rem;color:#a9f5d4;display:flex;align-items:center;gap:0.5rem;">
           <span style="font-size:1rem">✅</span>
           <span><strong>${escapeHtml(meal.name)}</strong> logged — ${Math.round(meal.calories)} kcal · ${Math.round(meal.protein)}g protein · ${Math.round(meal.carbs)}g carbs · ${Math.round(meal.fat)}g fat</span>
         </div>`;
       msgs.appendChild(div);
       msgs.scrollTop = msgs.scrollHeight;
+      chatState.renderLog = chatState.renderLog || [];
+      chatState.renderLog.push({ role: "bot", text, type: "logged" });
+      saveChatSession();
     }
 
     async function chatSend(text) {
       text = text.trim();
       if (!text || chatState.busy) return;
       hideSuggestions();
-      chatAddMessage("user", text);
+      chatAddMessage("user", text);          // also saves to renderLog + sessionStorage
       chatState.history.push({ role: "user", content: text });
+      saveChatSession();                      // persist immediately before API call
       $("chat-input").value = "";
       $("chat-input").style.height = "auto";
       chatState.busy = true;
@@ -1158,6 +1224,10 @@ STRICT LIMITS:
 
         // Store clean reply (no marker) in history so follow-ups have clean context
         chatState.history.push({ role: "assistant", content: displayText });
+        // Persist the bot reply to the render log now that it's finalised
+        chatState.renderLog = chatState.renderLog || [];
+        chatState.renderLog.push({ role: "bot", text: displayText || "(no reply)", type: "normal" });
+        saveChatSession();
 
         // Self-check every response for silent failures
         chatSelfCheck({ rawReply, displayText, loggedMeal, parseError });
@@ -1193,16 +1263,47 @@ STRICT LIMITS:
     function openChat() {
       chatState.open = true;
       $("chat-panel").classList.add("open");
-      // Show welcome message on first open
       if (chatState.history.length === 0) {
-        const meals = mealsForToday();
-        const t = totals(meals);
-        const greeting = meals.length > 0
-          ? `Hi! You've logged ${meals.length} meal${meals.length > 1 ? "s" : ""} today — ${Math.round(t.calories)} kcal so far. Ask me anything about your meals or food choices!`
-          : "Hi! No meals logged yet today. Ask me about what to eat, calorie counts, or whether a food fits your goals!";
-        chatAddMessage("bot", greeting);
+        // Try restoring from sessionStorage first
+        const saved = loadChatSession();
+        if (saved && saved.renderLog && saved.renderLog.length > 0) {
+          chatState.history = saved.history || [];
+          chatState.renderLog = saved.renderLog;
+          restoreChatMessages(chatState.renderLog);
+          hideSuggestions();
+          // Show a subtle "session restored" note at the bottom
+          const msgs = $("chat-messages");
+          const note = document.createElement("div");
+          note.style.cssText = "text-align:center;color:rgba(244,240,234,0.3);font-size:0.68rem;padding:0.3rem 0 0.1rem;";
+          note.textContent = "↑ restored from earlier this session";
+          msgs.appendChild(note);
+          msgs.scrollTop = msgs.scrollHeight;
+        } else {
+          // Fresh session — show welcome
+          chatState.renderLog = [];
+          const meals = mealsForToday();
+          const t = totals(meals);
+          const greeting = meals.length > 0
+            ? `Hi! You've logged ${meals.length} meal${meals.length > 1 ? "s" : ""} today — ${Math.round(t.calories)} kcal so far. Ask me anything about your meals or food choices!`
+            : "Hi! No meals logged yet today. Ask me about what to eat, calorie counts, or whether a food fits your goals!";
+          chatAddMessage("bot", greeting);
+        }
       }
       setTimeout(() => $("chat-input").focus(), 220);
+    }
+
+    function clearChatSession() {
+      sessionStorage.removeItem(CHAT_SESSION_KEY);
+      chatState.history = [];
+      chatState.renderLog = [];
+      $("chat-messages").innerHTML = "";
+      const meals = mealsForToday();
+      const t = totals(meals);
+      const greeting = meals.length > 0
+        ? `Chat cleared. You've had ${Math.round(t.calories)} kcal today. What would you like to know?`
+        : "Chat cleared. No meals logged yet today. What would you like to know?";
+      chatAddMessage("bot", greeting);
+      $("chat-suggestions").style.display = "";
     }
 
     function closeChat() {
@@ -1212,6 +1313,7 @@ STRICT LIMITS:
 
     $("chat-fab").addEventListener("click", () => chatState.open ? closeChat() : openChat());
     $("chat-close").addEventListener("click", closeChat);
+    $("chat-clear").addEventListener("click", clearChatSession);
 
     // Suggestion chips
     document.querySelectorAll(".chat-suggestion").forEach((btn) => {
