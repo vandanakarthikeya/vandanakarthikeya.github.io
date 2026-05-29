@@ -2,164 +2,682 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Estimator — v5 (Retuned + Benchmarks)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Transformation Estimator — Vandana Karthikeya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1419;
-    --panel: #1a2027;
-    --panel-2: #232a33;
-    --border: #2d3640;
-    --text: #e8eef5;
-    --text-dim: #8a96a3;
-    --accent: #4a9eff;
-    --accent-2: #b78aff;
-    --good: #5fd4a3;
-    --warn: #f5a623;
-    --danger: #ef5b5b;
+    --bg: #f6f9fc;
+    --bg-gradient: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+    --card: #ffffff;
+    --ink: #0a2540;
+    --ink-2: #425466;
+    --muted: #687385;
+    --muted-2: #8895a7;
+    --border: #e3e8ee;
+    --border-soft: #eef2f7;
+    --accent: #635bff;
+    --accent-2: #5a52e8;
+    --accent-soft: #ede9fe;
+    --good: #00b86b;
+    --good-soft: #d1fae5;
+    --warn: #f59e0b;
+    --warn-soft: #fef3c7;
+    --danger: #e0394a;
+    --danger-soft: #fee2e2;
+    --shadow-sm: 0 1px 2px rgba(10,37,64,0.04);
+    --shadow: 0 2px 8px rgba(10,37,64,0.06);
+    --shadow-lg: 0 8px 32px rgba(10,37,64,0.08);
+    --shadow-accent: 0 4px 12px rgba(99,91,255,0.25);
+    --radius: 12px;
+    --radius-sm: 8px;
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; font-size: 15px; line-height: 1.5; min-height: 100vh; }
-  .container { max-width: 760px; margin: 0 auto; padding: 32px 24px 80px; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-  h1 { font-size: 22px; margin: 0; font-weight: 600; }
-  .subtitle { color: var(--text-dim); margin: 4px 0 0; font-size: 13px; }
-  .dots { display: flex; gap: 6px; align-items: center; background: var(--panel); padding: 6px 10px; border-radius: 20px; font-size: 12px; color: var(--text-dim); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.2s; }
-  .dot.active { background: var(--accent); transform: scale(1.4); }
-  .dot.done { background: var(--good); }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin: 16px 0; }
-  .card-step { font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 600; }
-  .card-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
-  .card-help { color: var(--text-dim); margin-bottom: 20px; font-size: 14px; }
-  .workflow-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; margin: 4px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
-  .workflow-chip:hover { border-color: var(--accent); }
-  .workflow-chip.selected { background: rgba(74, 158, 255, 0.18); border-color: var(--accent); color: var(--text); }
-  .workflow-chip .check { color: var(--accent); }
-  .workflow-chip .hours { color: var(--text-dim); font-size: 11px; }
-  .workflow-group { margin: 16px 0; }
-  .workflow-group h3 { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 8px; }
-  .slider-row { margin: 22px 0; }
-  .slider-row > label { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
-  .slider-row .value-pill { color: var(--accent); }
-  .slider-row .desc { color: var(--text-dim); font-size: 13px; margin-bottom: 10px; }
-  .slider-track { position: relative; height: 36px; background: var(--panel-2); border-radius: 8px; padding: 4px; display: grid; gap: 4px; }
-  .slider-track.steps-3 { grid-template-columns: repeat(3, 1fr); }
-  .slider-track.steps-5 { grid-template-columns: repeat(5, 1fr); }
-  .slider-step { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); cursor: pointer; font-size: 13px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; padding: 0 8px; text-align: center; }
-  .slider-step:hover { color: var(--text); border-color: var(--accent); }
-  .slider-step.selected { background: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
-  .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-top: 6px; }
-  .slider-hint { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
-  .delivery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-  @media (max-width: 600px) { .delivery-grid { grid-template-columns: 1fr; } }
-  .delivery-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.15s; }
-  .delivery-card:hover { border-color: var(--accent); }
-  .delivery-card.selected { background: rgba(74, 158, 255, 0.12); border-color: var(--accent); }
-  .delivery-name { font-weight: 600; font-size: 14px; }
-  .delivery-rate { color: var(--accent); font-weight: 600; font-size: 13px; }
-  .delivery-desc { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
-  .rate-row { display: flex; align-items: center; gap: 12px; background: var(--panel-2); border-radius: 8px; padding: 12px; margin-top: 12px; flex-wrap: wrap; }
-  .rate-row > label { font-size: 13px; color: var(--text-dim); }
-  .rate-row input { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px; color: var(--text); font-size: 14px; width: 90px; }
-  .nav { display: flex; justify-content: space-between; margin-top: 24px; gap: 8px; flex-wrap: wrap; }
-  .btn { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.15s; }
-  .btn:hover:not(:disabled) { background: #3a8eef; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
-  .btn-link { background: none; color: var(--accent); border: none; cursor: pointer; font-size: 13px; padding: 8px; }
-  .btn-link:hover { text-decoration: underline; }
-  .tco-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
-  @media (max-width: 700px) { .tco-grid { grid-template-columns: 1fr; } }
-  .tco-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; }
-  .tco-tile.highlight { background: linear-gradient(180deg, rgba(183,138,255,0.10) 0%, rgba(74,158,255,0.06) 100%); border-color: var(--accent-2); }
-  .tco-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-  .tco-value { font-size: 30px; font-weight: 700; margin: 8px 0 2px; }
-  .tco-value.build { color: var(--accent); }
-  .tco-value.opex { color: var(--good); }
-  .tco-value.total { color: var(--accent-2); }
-  .tco-sub { font-size: 11px; color: var(--text-dim); }
-  .benchmark-box { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 16px 0; }
-  .benchmark-header { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-  .benchmark-bar-container { position: relative; height: 50px; margin: 12px 0; }
-  .benchmark-bar { position: absolute; top: 20px; left: 0; right: 0; height: 10px; background: linear-gradient(90deg, var(--good) 0%, var(--accent) 50%, var(--warn) 100%); border-radius: 5px; opacity: 0.4; }
-  .benchmark-tick { position: absolute; top: 14px; width: 2px; height: 22px; background: var(--text-dim); }
-  .benchmark-tick.estimate { background: var(--accent-2); width: 4px; height: 30px; top: 10px; box-shadow: 0 0 8px var(--accent-2); }
-  .benchmark-label { position: absolute; font-size: 10px; color: var(--text-dim); white-space: nowrap; }
-  .benchmark-label.top { top: -4px; }
-  .benchmark-label.bottom { bottom: -4px; }
-  .benchmark-table { width: 100%; font-size: 12px; color: var(--text-dim); margin-top: 12px; }
-  .benchmark-table td { padding: 4px 0; }
-  .benchmark-table td:last-child { text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
-  .benchmark-verdict { padding: 10px 12px; border-radius: 6px; margin-top: 12px; font-size: 13px; }
-  .verdict-low { background: rgba(95, 212, 163, 0.12); border-left: 3px solid var(--good); }
-  .verdict-mid { background: rgba(74, 158, 255, 0.12); border-left: 3px solid var(--accent); }
-  .verdict-high { background: rgba(245, 166, 35, 0.12); border-left: 3px solid var(--warn); }
-  .verdict-too_high { background: rgba(239, 91, 91, 0.12); border-left: 3px solid var(--danger); }
-  .result-why { background: var(--panel-2); border-left: 3px solid var(--accent); padding: 12px 14px; margin: 16px 0; font-size: 14px; border-radius: 4px; }
-  .wave-list { margin: 20px 0; }
-  .wave-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 10px 0; }
-  .wave-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
-  .wave-title { font-weight: 600; font-size: 15px; }
-  .wave-cost { color: var(--accent); font-weight: 600; }
-  .wave-items { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
-  .wave-kill { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
-  .disclosure { background: var(--panel); border: 1px dashed var(--border); border-radius: 8px; padding: 14px; margin: 20px 0; text-align: center; }
-  .disclosure h4 { margin: 0 0 4px; font-size: 14px; color: var(--text); }
-  .disclosure p { color: var(--text-dim); font-size: 13px; margin: 0; }
-  details { margin: 8px 0; }
-  details summary { cursor: pointer; color: var(--accent); font-size: 13px; padding: 6px 0; user-select: none; }
-  details summary:hover { text-decoration: underline; }
-  .math { font-family: ui-monospace, "SF Mono", Monaco, monospace; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 12px; color: var(--text-dim); white-space: pre-wrap; margin: 8px 0; line-height: 1.6; overflow-x: auto; }
-  .tighten-q { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 10px 0; }
-  .tighten-q-label { font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-  .tighten-q-options { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tighten-pill { padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; cursor: pointer; font-size: 12px; color: var(--text-dim); }
-  .tighten-pill:hover { border-color: var(--accent); }
-  .tighten-pill.selected { background: var(--accent); color: white; border-color: var(--accent); }
-  .grade-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-left: 6px; }
-  .grade-A { background: var(--good); color: #052; }
-  .grade-B { background: var(--accent); color: white; }
-  .grade-C { background: var(--warn); color: #322; }
-  .grade-D { background: var(--danger); color: white; }
-  .warn-callout { background: rgba(245, 166, 35, 0.12); border-left: 3px solid var(--warn); padding: 10px 12px; margin: 16px 0; font-size: 13px; border-radius: 4px; }
-  .price-fit-recommended { color: var(--good); font-size: 12px; font-weight: 600; }
-  .price-fit-acceptable { color: var(--text-dim); font-size: 12px; font-weight: 600; }
-  .price-fit-caution { color: var(--warn); font-size: 12px; font-weight: 600; }
-  .price-fit-not { color: var(--danger); font-size: 12px; font-weight: 600; }
-  .price-note { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
-  h3 { margin-top: 24px; margin-bottom: 8px; }
-  .tco-section { margin: 18px 0; }
-  .tco-section-label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
-  .pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .pill-opt { padding: 8px 14px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 18px; cursor: pointer; font-size: 13px; color: var(--text-dim); }
-  .pill-opt:hover { border-color: var(--accent); }
-  .pill-opt.selected { background: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
-  .helper-text { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
-  .opex-breakdown { font-size: 13px; color: var(--text-dim); }
-  .opex-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--border); }
-  .opex-row:last-child { border-bottom: none; }
-  .opex-row .label { color: var(--text); }
-  .opex-row .val { font-variant-numeric: tabular-nums; }
-  @media print { body { background: white; color: black; } .nav, .dots { display: none !important; } .card { border: 1px solid #ccc; } }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .top-bar {
+    border-bottom: 1px solid var(--border-soft);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.85);
+  }
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .back-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .top-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .top-badge {
+    font-size: 11px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-soft);
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 6px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .step-pill:hover { color: var(--ink); }
+  .step-pill.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .step-pill.done { color: var(--good); }
+  .step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-pill.active .step-num { background: var(--accent); color: white; }
+  .step-pill.done .step-num { background: var(--good); color: white; }
+  .step-divider { width: 16px; height: 1px; background: var(--border); }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-soft);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .card-num {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .card-help {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-left: 38px;
+  }
+  .card-body { padding: 24px 28px; }
+  .section-block { margin-bottom: 24px; }
+  .section-block:last-child { margin-bottom: 0; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-icon { font-size: 14px; }
+  .section-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    margin-bottom: 12px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    background: white;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+  }
+  .chip:hover {
+    border-color: #c1c9d2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(10,37,64,0.08);
+  }
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 600;
+    box-shadow: var(--shadow-accent);
+  }
+  .chip.active:hover { background: var(--accent-2); }
+  .chip-small { padding: 6px 12px; font-size: 12px; }
+  .slider-block { margin-bottom: 22px; }
+  .slider-block:last-child { margin-bottom: 0; }
+  .slider-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .slider-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  input[type="range"] {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    margin: 8px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(99,91,255,0.3);
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(99,91,255,0.3);
+  }
+  .slider-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted-2);
+    margin-top: 4px;
+  }
+  .slider-hint {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--accent-soft);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .input-label {
+    font-size: 13px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  input[type="number"], input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--ink);
+    font-family: inherit;
+    width: 140px;
+    transition: border-color 0.15s;
+  }
+  input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .input-suffix {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .result-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .result-header {
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #635bff 0%, #4a44d6 100%);
+    color: white;
+  }
+  .result-header-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .result-header-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .result-body { padding: 28px; background: white; }
+  .result-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .metric {
+    padding: 20px 18px;
+    background: white;
+    border-right: 1px solid var(--border-soft);
+  }
+  .metric:last-child { border-right: none; }
+  .metric.highlighted {
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border: none;
+  }
+  .metric-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .metric.highlighted .metric-label { color: var(--accent); }
+  .metric-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .metric.highlighted .metric-value { color: var(--accent); font-size: 30px; }
+  .metric-sub {
+    font-size: 12px;
+    color: var(--muted-2);
+    margin-top: 3px;
+  }
+  .grade-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    flex-wrap: wrap;
+  }
+  .grade-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .grade-A { background: var(--good-soft); color: #006b40; }
+  .grade-B { background: var(--accent-soft); color: var(--accent); }
+  .grade-C { background: var(--warn-soft); color: #7c5300; }
+  .grade-D { background: var(--danger-soft); color: #9b1c2b; }
+  .grade-text {
+    font-size: 13px;
+    color: var(--ink-2);
+    flex: 1;
+  }
+  .range-text {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .why-line {
+    font-size: 13px;
+    color: var(--ink-2);
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .benchmark-verdict {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .benchmark-verdict.aligned { color: var(--good); }
+  .benchmark-verdict.under { color: var(--warn); }
+  .benchmark-verdict.over { color: var(--danger); }
+  .benchmark-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .bench-item {
+    text-align: center;
+    padding: 10px;
+    background: var(--bg);
+    border-radius: 6px;
+  }
+  .bench-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .bench-value { font-size: 15px; font-weight: 700; color: var(--ink); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  details {
+    margin-top: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+  }
+  details summary {
+    cursor: pointer;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: '▸';
+    transition: transform 0.15s;
+    color: var(--muted);
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  details summary:hover { color: var(--accent-2); }
+  details .details-content {
+    padding: 0 16px 16px;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .math-block {
+    font-family: 'SF Mono', Monaco, ui-monospace, monospace;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    font-size: 11px;
+    color: var(--ink-2);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  .wave-item {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 10px 0;
+  }
+  .wave-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .wave-title { font-weight: 600; font-size: 14px; color: var(--ink); }
+  .wave-cost { color: var(--accent); font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .wave-items { color: var(--ink-2); font-size: 12px; margin-top: 4px; }
+  .wave-kill { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .btn {
+    padding: 11px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, #635bff 0%, #5a52e8 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(99,91,255,0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,91,255,0.35);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-secondary {
+    background: white;
+    color: var(--ink-2);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover {
+    border-color: #c1c9d2;
+    color: var(--ink);
+  }
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+  }
+  .empty-state-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state-text { font-size: 14px; }
+  .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: white;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    margin-left: 6px;
+    min-width: 20px;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .pricing-card {
+    padding: 14px 16px;
+    background: white;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+  }
+  .pricing-name { font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+  .pricing-fit { font-size: 12px; font-weight: 600; }
+  .pricing-fit.recommended { color: var(--good); }
+  .pricing-fit.acceptable { color: var(--ink-2); }
+  .pricing-fit.caution { color: var(--warn); }
+  .pricing-fit.not { color: var(--danger); }
+  .pricing-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 720px) {
+    .container { padding: 20px 16px 60px; }
+    .hero h1 { font-size: 24px; }
+    .hero-sub { font-size: 14px; }
+    .card-header, .card-body { padding-left: 20px; padding-right: 20px; }
+    .result-body { padding: 20px; }
+    .result-metrics { grid-template-columns: 1fr; }
+    .metric { border-right: none; border-bottom: 1px solid var(--border-soft); }
+    .metric:last-child { border-bottom: none; }
+    .benchmark-data { grid-template-columns: 1fr; gap: 8px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .stepper { gap: 2px; }
+    .step-pill { padding: 4px 10px 4px 4px; font-size: 12px; }
+    .step-divider { width: 8px; }
+  }
+  @media print {
+    body { background: white; }
+    .top-bar, .stepper, .nav-row, .btn { display: none !important; }
+  }
 </style>
 </head>
 <body>
-<div class="container" id="app"></div>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <a href="index.html#pocs" class="back-link">← Back to AI Lab</a>
+    <div class="top-title">AI Transformation Estimator</div>
+    <span class="top-badge">v6</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-eyebrow">PMO &amp; Estimation Tools</div>
+    <h1>Estimate Your AI Transformation</h1>
+    <p class="hero-sub">Build cost, annual OpEx, and 3-year TCO — calibrated to delivery vintage, foundation infra, and public-data benchmarks.</p>
+  </div>
+
+  <div class="stepper" id="stepper"></div>
+
+  <div id="app"></div>
+
+</div>
 
 <script>
-/* ========================================================================
- * AI Estimator v5 — Retuned defaults + delivery vintage + foundation slider + benchmarks
- * ====================================================================== */
-
-// ============ DATA ============
-
-// RETUNED: Base hours reduced ~35% from v4. Anchored at modern team with AI tooling,
-// not 2022 consultancy SDLC. Vintage toggle scales further.
 const WORKFLOWS = {
   'Healthcare — Payer': [
-    { id: 'prior_auth', name: 'Prior authorization', hours: 1500, value: 'high', tokenWeight: 'high', benchmark: { low: 400000, median: 900000, high: 2500000, source: 'Industry case studies, payer prior-auth automation 2024-26' } },
-    { id: 'claims_adj', name: 'Claims adjudication', hours: 2000, value: 'high', tokenWeight: 'high', benchmark: { low: 600000, median: 1400000, high: 3500000, source: 'AWS/Premera-style transformations' } },
-    { id: 'member_eng', name: 'Member engagement', hours: 1000, value: 'med', tokenWeight: 'high', benchmark: { low: 250000, median: 600000, high: 1500000, source: 'Member chatbot deployments' } },
+    { id: 'prior_auth', name: 'Prior authorization', hours: 1500, value: 'high', tokenWeight: 'high', benchmark: { low: 400000, median: 900000, high: 2500000 } },
+    { id: 'claims_adj', name: 'Claims adjudication', hours: 2000, value: 'high', tokenWeight: 'high', benchmark: { low: 600000, median: 1400000, high: 3500000 } },
+    { id: 'member_eng', name: 'Member engagement', hours: 1000, value: 'med', tokenWeight: 'high', benchmark: { low: 250000, median: 600000, high: 1500000 } },
     { id: 'appeals', name: 'Appeals & grievances', hours: 1100, value: 'med', tokenWeight: 'med', benchmark: { low: 300000, median: 700000, high: 1800000 } },
     { id: 'fwa', name: 'Fraud, waste & abuse', hours: 1700, value: 'high', tokenWeight: 'med', benchmark: { low: 500000, median: 1200000, high: 3000000 } },
     { id: 'risk_adj', name: 'Risk adjustment / HCC', hours: 1600, value: 'high', tokenWeight: 'med', benchmark: { low: 450000, median: 1100000, high: 2800000 } },
@@ -167,10 +685,10 @@ const WORKFLOWS = {
     { id: 'utilization', name: 'Utilization mgmt', hours: 1500, value: 'high', tokenWeight: 'high', benchmark: { low: 400000, median: 1000000, high: 2400000 } }
   ],
   'Healthcare — Provider': [
-    { id: 'clinical_docs', name: 'Clinical documentation / scribe', hours: 1100, value: 'high', tokenWeight: 'high', benchmark: { low: 300000, median: 750000, high: 1800000, source: 'Ambient scribe deployments (Nuance/Abridge style)' } },
+    { id: 'clinical_docs', name: 'Clinical documentation / scribe', hours: 1100, value: 'high', tokenWeight: 'high', benchmark: { low: 300000, median: 750000, high: 1800000 } },
     { id: 'rcm', name: 'Revenue cycle / coding', hours: 1500, value: 'high', tokenWeight: 'med', benchmark: { low: 400000, median: 1000000, high: 2500000 } },
     { id: 'patient_eng', name: 'Patient engagement', hours: 900, value: 'med', tokenWeight: 'high', benchmark: { low: 200000, median: 550000, high: 1300000 } },
-    { id: 'cds', name: 'Clinical decision support', hours: 2000, value: 'high', tokenWeight: 'med', benchmark: { low: 600000, median: 1500000, high: 4000000, source: 'CDS adds clinical validation overhead' } },
+    { id: 'cds', name: 'Clinical decision support', hours: 2000, value: 'high', tokenWeight: 'med', benchmark: { low: 600000, median: 1500000, high: 4000000 } },
     { id: 'denials', name: 'Denials management', hours: 1300, value: 'high', tokenWeight: 'med', benchmark: { low: 350000, median: 850000, high: 2000000 } },
     { id: 'inbox', name: 'Physician inbox triage', hours: 800, value: 'med', tokenWeight: 'high', benchmark: { low: 200000, median: 500000, high: 1100000 } }
   ],
@@ -178,7 +696,7 @@ const WORKFLOWS = {
     { id: 'copilot', name: 'In-product copilot', hours: 1100, value: 'high', tokenWeight: 'high', benchmark: { low: 250000, median: 650000, high: 1500000 } },
     { id: 'doc_intel', name: 'Document intelligence', hours: 1000, value: 'high', tokenWeight: 'high', benchmark: { low: 200000, median: 550000, high: 1400000 } },
     { id: 'nlq', name: 'Natural language analytics', hours: 900, value: 'med', tokenWeight: 'med', benchmark: { low: 200000, median: 500000, high: 1200000 } },
-    { id: 'agent', name: 'Workflow agent', hours: 1800, value: 'high', tokenWeight: 'very_high', benchmark: { low: 500000, median: 1300000, high: 3500000, source: 'Agentic systems are still expensive and uncertain' } }
+    { id: 'agent', name: 'Workflow agent', hours: 1800, value: 'high', tokenWeight: 'very_high', benchmark: { low: 500000, median: 1300000, high: 3500000 } }
   ],
   'Generic / Other': [
     { id: 'gen_doc', name: 'Document processing', hours: 900, value: 'med', tokenWeight: 'med', benchmark: { low: 150000, median: 450000, high: 1100000 } },
@@ -188,31 +706,31 @@ const WORKFLOWS = {
     { id: 'gen_agent', name: 'Multi-step agent', hours: 2000, value: 'high', tokenWeight: 'very_high', benchmark: { low: 500000, median: 1400000, high: 3800000 } }
   ]
 };
-
+const GROUP_ICONS = {
+  'Healthcare — Payer': '🏥',
+  'Healthcare — Provider': '🩺',
+  'Healthcare — SaaS': '💻',
+  'Generic / Other': '📋'
+};
 const DELIVERY_MODELS = [
-  { id: 'consulting_onshore', name: 'Onshore consulting', defaultRate: 200, desc: 'Tier-1/2 US/EU consultancy', baseAdjust: 1.0 },
-  { id: 'consulting_hybrid', name: 'Hybrid (onshore + nearshore)', defaultRate: 140, desc: 'Mix US lead + LATAM/EE delivery', baseAdjust: 0.95 },
-  { id: 'consulting_offshore', name: 'Offshore consulting', defaultRate: 75, desc: 'India / SE Asia delivery', baseAdjust: 1.05 },
-  { id: 'internal_team', name: 'Internal team (fully-loaded)', defaultRate: 115, desc: 'Your own engineers, fully-loaded cost', baseAdjust: 0.75 },
-  { id: 'big4', name: 'Big-4 / Tier-1 strategy', defaultRate: 350, desc: 'McKinsey/BCG/Deloitte premium', baseAdjust: 1.15 },
-  { id: 'boutique_ai', name: 'AI-specialist boutique', defaultRate: 220, desc: 'Specialist firm, often faster', baseAdjust: 0.85 }
+  { id: 'consulting_onshore', name: 'Onshore consulting', defaultRate: 200, baseAdjust: 1.0 },
+  { id: 'consulting_hybrid', name: 'Hybrid (on + nearshore)', defaultRate: 140, baseAdjust: 0.95 },
+  { id: 'consulting_offshore', name: 'Offshore consulting', defaultRate: 75, baseAdjust: 1.05 },
+  { id: 'internal_team', name: 'Internal team', defaultRate: 115, baseAdjust: 0.75 },
+  { id: 'big4', name: 'Big-4 / strategy', defaultRate: 350, baseAdjust: 1.15 },
+  { id: 'boutique_ai', name: 'AI-specialist boutique', defaultRate: 220, baseAdjust: 0.85 }
 ];
-
-// NEW: Delivery vintage — scales base hours by how modern the toolchain is
 const VINTAGES = [
-  { id: 'classic_sdlc', name: '2020 SDLC', desc: 'Waterfall-ish, manual code, large teams, formal stage gates', mult: 1.40 },
-  { id: 'modern_2024', name: '2024 modern', desc: 'Cloud-native, ML platforms, CI/CD, code copilots', mult: 1.00 },
-  { id: 'ai_augmented', name: '2026 AI-augmented', desc: 'Cursor/Claude Code, 2-3 senior engineers replacing 6, AI test gen', mult: 0.55 },
-  { id: 'buy_first', name: 'SaaS / configure', desc: 'Buy commercial product, configure rather than build', mult: 0.20 }
+  { id: 'classic_sdlc', name: '2020 SDLC', mult: 1.40 },
+  { id: 'modern_2024', name: '2024 modern', mult: 1.00 },
+  { id: 'ai_augmented', name: '2026 AI-augmented', mult: 0.55 },
+  { id: 'buy_first', name: 'SaaS / configure', mult: 0.20 }
 ];
-
-// NEW: Foundation infrastructure presets — replaces the constant ratio
 const FOUNDATION_PRESETS = [
-  { id: 'greenfield', name: 'Greenfield', ratio: 0.55, desc: 'No data platform, no MLOps, no AI org capability yet — building it all' },
-  { id: 'partial', name: 'Partial infra', ratio: 0.30, desc: 'Some data platform, basic MLOps, learning AI governance' },
-  { id: 'mature', name: 'Mature infra', ratio: 0.12, desc: 'Modern data platform + MLOps + AI CoE already in place' }
+  { id: 'greenfield', name: 'Greenfield', ratio: 0.55, desc: 'No data platform, no MLOps yet' },
+  { id: 'partial', name: 'Partial infra', ratio: 0.30, desc: 'Some platform, basic MLOps' },
+  { id: 'mature', name: 'Mature infra', ratio: 0.12, desc: 'Modern stack + MLOps + AI CoE' }
 ];
-
 const CLOUD_OPTIONS = [
   { id: 'aws', name: 'AWS', factor: 1.00 },
   { id: 'azure', name: 'Azure', factor: 1.02 },
@@ -220,51 +738,42 @@ const CLOUD_OPTIONS = [
   { id: 'multi', name: 'Multi-cloud', factor: 1.15 },
   { id: 'on_prem', name: 'On-prem / hybrid', factor: 0.70 }
 ];
-
 const INFERENCE_OPTIONS = [
-  { id: 'public_api', name: 'Public API (OpenAI/Anthropic)', factor: 1.00, desc: 'Lowest setup, highest per-token' },
-  { id: 'cloud_native', name: 'Cloud-native (Bedrock/Vertex)', factor: 1.10, desc: 'Better data residency' },
-  { id: 'private', name: 'Private deployment (HIPAA)', factor: 2.80, desc: 'Required for sensitive PHI' },
-  { id: 'open_source', name: 'Self-hosted open source', factor: 0.55, desc: 'Lowest per-token, high GPU cost' }
+  { id: 'public_api', name: 'Public API (OpenAI/Anthropic)', factor: 1.00 },
+  { id: 'cloud_native', name: 'Cloud-native (Bedrock/Vertex)', factor: 1.10 },
+  { id: 'private', name: 'Private (HIPAA)', factor: 2.80 },
+  { id: 'open_source', name: 'Self-hosted OSS', factor: 0.55 }
 ];
-
 const VOLUME_OPTIONS = [
-  { id: 'low', name: 'Low', desc: '~5K calls/mo', monthly: 5000 },
-  { id: 'med', name: 'Medium', desc: '~50K/mo', monthly: 50000 },
-  { id: 'high', name: 'High', desc: '~500K/mo', monthly: 500000 },
-  { id: 'very_high', name: 'Very high', desc: '~5M/mo', monthly: 5000000 }
+  { id: 'low', name: 'Low (~5K/mo)', monthly: 5000 },
+  { id: 'med', name: 'Med (~50K/mo)', monthly: 50000 },
+  { id: 'high', name: 'High (~500K/mo)', monthly: 500000 },
+  { id: 'very_high', name: 'Very high (~5M/mo)', monthly: 5000000 }
 ];
-
 const LICENSE_TIERS = [
-  { id: 'minimal', name: 'Minimal', annual: 30000, desc: 'Open-source heavy, few licensed tools' },
-  { id: 'standard', name: 'Standard', annual: 120000, desc: 'Snowflake/Databricks + ML platform + monitoring' },
-  { id: 'enterprise', name: 'Enterprise', annual: 350000, desc: 'Full data stack + ML platform + security + compliance tooling' },
-  { id: 'premium', name: 'Premium', annual: 700000, desc: 'Big-name everything, multiple AI platforms' }
+  { id: 'minimal', name: 'Minimal', annual: 30000 },
+  { id: 'standard', name: 'Standard', annual: 120000 },
+  { id: 'enterprise', name: 'Enterprise', annual: 350000 },
+  { id: 'premium', name: 'Premium', annual: 700000 }
 ];
-
 const SLIDER_DEFS = [
   { key: 'data_readiness', label: 'Data readiness', desc: "How clean and governed is the data you'll need?",
-    labels: ['Greenfield mess', 'Mostly clean & governed'],
-    hints: ['1 — No catalog, mixed quality', '2 — Some governance, cleanup needed', '3 — Mixed — usable but uneven', '4 — Good — lineage, owners, decent quality', '5 — Clean, cataloged, owned, governed'] },
+    hints: ['No catalog, mixed quality', 'Some governance, cleanup needed', 'Mixed — usable but uneven', 'Good — lineage, owners, decent quality', 'Clean, cataloged, governed'] },
   { key: 'ai_maturity', label: 'AI maturity of the org', desc: 'Has the organization done this before?',
-    labels: ['First project', 'Scaling production AI'],
-    hints: ['1 — Exploring, no production AI', '2 — Pilots underway, learning', '3 — First production deployments', '4 — Multiple production AI, MLOps maturing', '5 — AI core to operating model'] },
+    hints: ['Exploring, no production AI', 'Pilots underway, learning', 'First production deployments', 'Multiple production AI, MLOps maturing', 'AI core to operating model'] },
   { key: 'regulatory', label: 'Regulatory burden', desc: 'How much compliance & oversight applies?',
-    labels: ['None', 'FDA SaMD / heavy clinical'],
-    hints: ['1 — None / minimal', '2 — Standard enterprise (SOX, PCI)', '3 — HIPAA', '4 — HIPAA + state medical boards', '5 — FDA SaMD / clinical decision-making'] }
+    hints: ['None / minimal', 'Standard enterprise (SOX, PCI)', 'HIPAA', 'HIPAA + state medical boards', 'FDA SaMD / clinical decision-making'] }
 ];
-
 const TIGHTEN_QS = [
-  { key: 'team_exists', label: 'Do you have an existing AI/ML team?',
-    options: [{ v: 'yes', l: 'Yes (5+ people)' }, { v: 'partial', l: 'Partial (1–4)' }, { v: 'no', l: 'No' }] },
-  { key: 'mlops_in_place', label: 'Is MLOps tooling in place?',
+  { key: 'team_exists', label: 'Existing AI/ML team?',
+    options: [{ v: 'yes', l: 'Yes (5+)' }, { v: 'partial', l: 'Partial (1–4)' }, { v: 'no', l: 'No' }] },
+  { key: 'mlops_in_place', label: 'MLOps tooling in place?',
     options: [{ v: 'yes', l: 'Yes' }, { v: 'partial', l: 'Some' }, { v: 'no', l: 'No' }] },
   { key: 'data_platform', label: 'Data platform?',
-    options: [{ v: 'modern', l: 'Modern (Snowflake/Databricks/etc.)' }, { v: 'legacy', l: 'Legacy / on-prem' }, { v: 'mixed', l: 'Mixed' }] },
-  { key: 'buy_first', label: 'Open to buying SaaS where possible?',
-    options: [{ v: 'yes', l: 'Yes — buy first' }, { v: 'no', l: 'No — custom build' }, { v: 'mixed', l: 'Mixed' }] }
+    options: [{ v: 'modern', l: 'Modern' }, { v: 'legacy', l: 'Legacy' }, { v: 'mixed', l: 'Mixed' }] },
+  { key: 'buy_first', label: 'Open to SaaS where possible?',
+    options: [{ v: 'yes', l: 'Yes' }, { v: 'no', l: 'No, custom build' }, { v: 'mixed', l: 'Mixed' }] }
 ];
-
 const TOKEN_WEIGHT_MAP = {
   low: { tokensPerCall: 2000, costPer1K: 0.003 },
   med: { tokensPerCall: 4000, costPer1K: 0.005 },
@@ -272,15 +781,13 @@ const TOKEN_WEIGHT_MAP = {
   very_high: { tokensPerCall: 25000, costPer1K: 0.007 }
 };
 
-// ============ STATE ============
-
 let state = {
   step: 0,
   workflows: {},
   sliders: { data_readiness: 3, ai_maturity: 3, regulatory: 2 },
   delivery: 'consulting_hybrid',
-  vintage: 'modern_2024',       // NEW
-  foundation: 'partial',         // NEW
+  vintage: 'modern_2024',
+  foundation: 'partial',
   rateOverride: null,
   tighten: {},
   cloud: 'aws',
@@ -291,14 +798,13 @@ let state = {
   supportPct: 18
 };
 
-function setState(patch) { if (typeof patch === 'function') patch = patch(state); state = Object.assign({}, state, patch); render(); }
-function updatePath(path, value) {
-  const keys = path.split('.'); const next = JSON.parse(JSON.stringify(state)); let cur = next;
-  for (let i = 0; i < keys.length - 1; i++) { if (cur[keys[i]] === undefined) cur[keys[i]] = {}; cur = cur[keys[i]]; }
-  cur[keys[keys.length - 1]] = value; state = next; render();
-}
+const STEPS = ['Workflows', 'Refine', 'Delivery', 'TCO', 'Result'];
 
-// ============ ENGINE ============
+function setState(patch) {
+  if (typeof patch === 'function') patch = patch(state);
+  state = Object.assign({}, state, patch);
+  render();
+}
 
 function sliderMult(value, minVal, maxVal) { const t = (value - 1) / 4; return minVal + t * (maxVal - minVal); }
 
@@ -318,8 +824,6 @@ function computeBuildEstimate() {
 
   const rate = state.rateOverride !== null ? state.rateOverride : delivery.defaultRate;
 
-  // FIX: data readiness no longer double-counts inside foundations.
-  // It applies a softer multiplier (1.25 max instead of 1.5) and is the ONLY data-multiplier.
   const dataMult = sliderMult(state.sliders.data_readiness, 1.25, 0.90);
   const matMult = sliderMult(state.sliders.ai_maturity, 1.20, 0.95);
   const regMult = sliderMult(state.sliders.regulatory, 0.95, 1.30);
@@ -339,7 +843,6 @@ function computeBuildEstimate() {
   let benchmarkLow = 0, benchmarkMed = 0, benchmarkHigh = 0;
 
   for (const w of selected) {
-    // Apply vintage to base hours BEFORE multipliers
     const adjustedHours = w.hours * vintage.mult * delivery.baseAdjust;
     totalBaseHours += w.hours * vintage.mult;
     const cost = adjustedHours * rate * dataMult;
@@ -352,15 +855,12 @@ function computeBuildEstimate() {
     }
   }
 
-  // FIX: Foundation ratio now from preset, not auto-scaling formula
-  // Foundations still scale with workflow count (sub-linear) but anchored to preset
   const N = selected.length;
-  // For >1 workflow, foundations are shared. Apply a mild N-decay.
-  const foundationScale = N === 0 ? 0 : 1.0 + (N - 1) * 0.15; // 1 wf = 1.0x, 3 wf = 1.3x, 5 wf = 1.6x
+  const foundationScale = N === 0 ? 0 : 1.0 + (N - 1) * 0.15;
   const foundations = workflowCost * foundationPreset.ratio * foundationScale * regMult * matMult;
 
   const subtotal = (workflowCost + foundations) * tightAdjust;
-  const contingency = subtotal * 0.10; // reduced from 12 to 10
+  const contingency = subtotal * 0.10;
   const total = subtotal + contingency;
 
   let tightCount = 0; for (const k in state.tighten) if (state.tighten[k]) tightCount++;
@@ -376,29 +876,26 @@ function computeBuildEstimate() {
   const pillars = { workflows: workflowCost, foundations, contingency };
 
   const mathStr =
-`BUILD COST (one-time)
-Selected: ${N} workflow${N>1?'s':''}
-  Catalog hours: ${selected.reduce((a, b) => a + b.hours, 0).toLocaleString()} (raw)
-  × Vintage [${vintage.name}]: ×${vintage.mult}
-  × Delivery baseAdjust: ×${delivery.baseAdjust}
-  = ${Math.round(totalBaseHours * delivery.baseAdjust).toLocaleString()} effective hours
-Rate: $${rate}/hr
+'BUILD COST (one-time)\n' +
+'Selected: ' + N + ' workflow' + (N>1?'s':'') + '\n' +
+'  Catalog hours: ' + selected.reduce((a, b) => a + b.hours, 0).toLocaleString() + ' (raw)\n' +
+'  × Vintage [' + vintage.name + ']: ×' + vintage.mult + '\n' +
+'  × Delivery baseAdjust: ×' + delivery.baseAdjust + '\n' +
+'  = ' + Math.round(totalBaseHours * delivery.baseAdjust).toLocaleString() + ' effective hours\n' +
+'Rate: $' + rate + '/hr\n\n' +
+'Multipliers:\n' +
+'  Data readiness:  ×' + dataMult.toFixed(2) + '\n' +
+'  AI maturity:     ×' + matMult.toFixed(2) + '\n' +
+'  Regulatory:      ×' + regMult.toFixed(2) + '\n\n' +
+'Workflow cost   = $' + Math.round(workflowCost).toLocaleString() + '\n' +
+'Foundations     = $' + Math.round(foundations).toLocaleString() + ' (' + foundationPreset.name + ', ratio ' + foundationPreset.ratio + ')\n' +
+'Tightening adj  = ×' + tightAdjust.toFixed(2) + '\n' +
+'+ Contingency   = ×1.10 (10%)\n\n' +
+'BUILD TOTAL (P50) = $' + Math.round(total).toLocaleString() + '\n' +
+'Range ±' + (range*100).toFixed(0) + '%  →  P10: $' + Math.round(p10).toLocaleString() + ', P90: $' + Math.round(p90).toLocaleString() + '\n' +
+'Grade: ' + grade;
 
-Multipliers:
-  Data readiness:  ×${dataMult.toFixed(2)}
-  AI maturity:     ×${matMult.toFixed(2)}  (applied to foundations only)
-  Regulatory:      ×${regMult.toFixed(2)}  (applied to foundations only)
-
-Workflow cost   = effective hours × rate × dataMult = $${Math.round(workflowCost).toLocaleString()}
-Foundations     = workflowCost × ${foundationPreset.ratio} [${foundationPreset.name}] × ${foundationScale.toFixed(2)} [N-scale] × regMult × matMult = $${Math.round(foundations).toLocaleString()}
-Tightening adj  = ×${tightAdjust.toFixed(2)}
-+ Contingency   = ×1.10 (10%)
-
-BUILD TOTAL (P50) = $${Math.round(total).toLocaleString()}
-Range ±${(range*100).toFixed(0)}%  →  P10: $${Math.round(p10).toLocaleString()}, P90: $${Math.round(p90).toLocaleString()}
-Grade: ${grade}`;
-
-  const whyParts = [`${N} workflow${N>1?'s':''}`, vintage.name.toLowerCase()];
+  const whyParts = [N + ' workflow' + (N>1?'s':''), vintage.name.toLowerCase()];
   if (dataMult > 1.05) whyParts.push('messy data');
   if (dataMult < 0.95) whyParts.push('clean data');
   if (regMult > 1.10) whyParts.push('heavy regulatory load');
@@ -406,9 +903,8 @@ Grade: ${grade}`;
   if (matMult < 1.0) whyParts.push('mature AI org');
   if (foundationPreset.id === 'greenfield') whyParts.push('greenfield foundations');
   if (foundationPreset.id === 'mature') whyParts.push('mature infra');
-  whyParts.push(`${delivery.name.toLowerCase()} at $${rate}/hr`);
+  whyParts.push(delivery.name.toLowerCase() + ' at $' + rate + '/hr');
 
-  // Build benchmark from per-workflow public data
   let benchmark = null;
   if (benchmarkMed > 0) {
     benchmark = { low: benchmarkLow, median: benchmarkMed, high: benchmarkHigh };
@@ -432,20 +928,17 @@ function computeOpEx(buildEst) {
   const license = LICENSE_TIERS.find(l => l.id === state.license) || LICENSE_TIERS[1];
 
   let inferenceAnnual = 0;
-  let inferenceDetail = [];
   for (const w of buildEst.workflowBreakdown) {
     const tw = TOKEN_WEIGHT_MAP[w.tokenWeight || 'med'];
-    const monthlyCalls = volume.monthly;
-    const annualCost = monthlyCalls * 12 * tw.tokensPerCall * (tw.costPer1K / 1000) * inference.factor;
+    const annualCost = volume.monthly * 12 * tw.tokensPerCall * (tw.costPer1K / 1000) * inference.factor;
     inferenceAnnual += annualCost;
-    inferenceDetail.push({ name: w.name, cost: annualCost, tokenWeight: w.tokenWeight });
   }
 
   let cloudAnnual;
   if (state.cloudSpendOverride !== null && state.cloudSpendOverride > 0) {
     cloudAnnual = state.cloudSpendOverride * 12;
   } else {
-    cloudAnnual = 3000 * buildEst.N * 12 * cloud.factor; // dropped from 4000 to 3000
+    cloudAnnual = 3000 * buildEst.N * 12 * cloud.factor;
   }
 
   const licenseAnnual = license.annual;
@@ -453,511 +946,542 @@ function computeOpEx(buildEst) {
   const annualTotal = inferenceAnnual + cloudAnnual + licenseAnnual + supportAnnual;
 
   const math =
-`ANNUAL OPEX (recurring)
-Inference / LLM tokens:
-${inferenceDetail.map(d => `  ${d.name} [${d.tokenWeight}]: $${Math.round(d.cost).toLocaleString()}/yr`).join('\n')}
-  Inference subtotal: $${Math.round(inferenceAnnual).toLocaleString()}/yr
-  (volume: ${volume.name} ${volume.desc} × ${inference.name})
-
-Cloud infra: $${Math.round(cloudAnnual).toLocaleString()}/yr
-  (${cloud.name}, factor ×${cloud.factor}, $${Math.round(cloudAnnual/12).toLocaleString()}/mo)
-
-Licenses & tooling: $${licenseAnnual.toLocaleString()}/yr  (${license.name} tier)
-
-Support / ongoing (${state.supportPct}% of build):
-  $${Math.round(supportAnnual).toLocaleString()}/yr
-
-ANNUAL OPEX TOTAL: $${Math.round(annualTotal).toLocaleString()}/yr`;
+'ANNUAL OPEX (recurring)\n' +
+'Inference / LLM:  $' + Math.round(inferenceAnnual).toLocaleString() + '/yr\n' +
+'  (volume: ' + volume.name + ' × ' + inference.name + ')\n\n' +
+'Cloud infra:     $' + Math.round(cloudAnnual).toLocaleString() + '/yr\n' +
+'  (' + cloud.name + ', $' + Math.round(cloudAnnual/12).toLocaleString() + '/mo)\n\n' +
+'Licenses:        $' + licenseAnnual.toLocaleString() + '/yr  (' + license.name + ')\n\n' +
+'Support (' + state.supportPct + '%): $' + Math.round(supportAnnual).toLocaleString() + '/yr\n\n' +
+'ANNUAL OPEX: $' + Math.round(annualTotal).toLocaleString() + '/yr';
 
   return { empty: false, inference: inferenceAnnual, cloud: cloudAnnual, license: licenseAnnual, support: supportAnnual, annualTotal, math };
 }
 
 function compute3YrTCO(buildEst, opex) {
   if (buildEst.empty) return 0;
-  const yr1Opex = opex.annualTotal * 0.5;
-  const yr23Opex = opex.annualTotal * 2;
-  return buildEst.p50 + yr1Opex + yr23Opex;
+  return buildEst.p50 + (opex.annualTotal * 0.5) + (opex.annualTotal * 2);
 }
 
 function computeWaves(est) {
-  if (est.empty) return null;
-  const items = est.workflowBreakdown.slice().sort((a, b) => {
-    const valScore = v => v === 'high' ? 3 : v === 'med' ? 2 : 1;
-    return valScore(b.value) - valScore(a.value);
+  if (est.empty) return [];
+  const sortedByValue = est.workflowBreakdown.slice().sort((a, b) => {
+    const valScore = { high: 3, med: 2, low: 1 };
+    return valScore[b.value] - valScore[a.value];
   });
-  const w1 = items.slice(0, Math.min(2, items.length));
-  const w2 = items.slice(2, Math.min(5, items.length));
-  const w3 = items.slice(5);
-  const sumCost = arr => arr.reduce((a, b) => a + b.cost, 0);
-  return {
-    wave1: { items: w1, duration: '3–6 mo', cost: sumCost(w1) + est.pillars.foundations * 0.5 },
-    wave2: { items: w2, duration: '6–12 mo', cost: sumCost(w2) + est.pillars.foundations * 0.3 },
-    wave3: { items: w3, duration: '12–24 mo', cost: sumCost(w3) + est.pillars.foundations * 0.2 }
-  };
-}
-
-function pricingForGrade(grade) {
-  if (grade === 'B') return [
-    { model: 'Fixed price per stage', fit: 'recommended', note: '15% contingency built in' },
-    { model: 'Hybrid (fixed + outcome)', fit: 'recommended', note: 'Default for transformation' },
-    { model: 'T&M', fit: 'acceptable', note: 'Lower margin but no risk' }
-  ];
-  if (grade === 'C') return [
-    { model: 'T&M with cap', fit: 'recommended', note: 'Discovery stage' },
-    { model: 'Hybrid (fixed + outcome)', fit: 'acceptable', note: 'Add 20–25% contingency' },
-    { model: 'Fixed price', fit: 'caution', note: 'Risk to consultant' }
-  ];
-  return [
-    { model: 'T&M (discovery only)', fit: 'recommended', note: 'Sell discovery first' },
-    { model: 'Fixed price', fit: 'not', note: 'You will lose money' },
-    { model: 'Outcome-based', fit: 'not', note: 'No measurable baseline yet' }
-  ];
-}
-
-function benchmarkVerdict(est) {
-  if (!est.benchmark) return null;
-  const { low, median, high } = est.benchmark;
-  const v = est.p50;
-  if (v < low * 0.8) return { kind: 'low', msg: `Your estimate is below the public-data range (${fmt(low)}–${fmt(high)}). May be under-scoped — consider whether you've missed eval, integration, or change management.` };
-  if (v < median) return { kind: 'mid', msg: `Your estimate (${fmt(v)}) sits in the lower half of public-data range (median ${fmt(median)}). Reasonable for a modern team with good infra.` };
-  if (v < high) return { kind: 'mid', msg: `Your estimate (${fmt(v)}) is in the upper half of public-data range (median ${fmt(median)}, high ${fmt(high)}). Defensible if regulatory/data complexity is real.` };
-  if (v < high * 1.3) return { kind: 'high', msg: `Your estimate (${fmt(v)}) is above the public-data high (${fmt(high)}). Likely consultancy-priced or covers extensive foundation buildout. Sanity-check with a smaller pilot first.` };
-  return { kind: 'too_high', msg: `Your estimate is ${(v/median).toFixed(1)}× the public median (${fmt(median)}). Strongly consider: simpler vintage, mature infra preset, fewer workflows, or buy-vs-build.` };
-}
-
-// ============ HELPERS ============
-
-function fmt(n) {
-  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
-  if (n >= 1000) return '$' + Math.round(n/1000).toLocaleString() + 'K';
-  return '$' + Math.round(n).toLocaleString();
-}
-function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function selectedWorkflowCount() { let n = 0; for (const id in state.workflows) if (state.workflows[id] && state.workflows[id].selected) n++; return n; }
-function tightenAnswered() { let n = 0; for (const k in state.tighten) if (state.tighten[k]) n++; return n; }
-
-// ============ RENDERERS ============
-
-function renderHeader() {
-  const totalSteps = 5;
-  let dotsHtml = '';
-  for (let i = 0; i < totalSteps; i++) {
-    const cls = i === state.step ? 'dot active' : (i < state.step ? 'dot done' : 'dot');
-    dotsHtml += `<div class="${cls}"></div>`;
+  const waves = [];
+  if (sortedByValue.length >= 1) {
+    const w1 = sortedByValue.slice(0, Math.min(2, sortedByValue.length));
+    waves.push({ name: 'Wave 1 — Foundations + first workflow', items: w1, months: '0–6', kill: 'No measurable user adoption or quality gain by month 4 → stop', cost: w1.reduce((s, w) => s + w.cost, 0) + est.pillars.foundations });
   }
-  return `
-    <div class="header">
-      <div>
-        <h1>AI Estimator — v5</h1>
-        <p class="subtitle">Retuned defaults · Delivery vintage · Foundation slider · Public benchmarks</p>
-      </div>
-      <div class="dots">${dotsHtml}<span style="margin-left:6px">${state.step + 1} / ${totalSteps}</span></div>
-    </div>
-  `;
+  if (sortedByValue.length >= 3) {
+    const w2 = sortedByValue.slice(2, 4);
+    waves.push({ name: 'Wave 2 — Expand to adjacent workflows', items: w2, months: '6–12', kill: 'Wave 1 metrics regress or wave 2 cost overruns >40%', cost: w2.reduce((s, w) => s + w.cost, 0) });
+  }
+  if (sortedByValue.length >= 5) {
+    const w3 = sortedByValue.slice(4);
+    waves.push({ name: 'Wave 3 — Long tail / lower-value workflows', items: w3, months: '12–18', kill: 'Lower-value workflows not delivering — drop instead of scaling', cost: w3.reduce((s, w) => s + w.cost, 0) });
+  }
+  return waves;
 }
 
-function renderWorkflowCard() {
-  const n = selectedWorkflowCount();
-  let groupsHtml = '';
-  for (const industry in WORKFLOWS) {
-    let chipsHtml = '';
-    for (const wf of WORKFLOWS[industry]) {
-      const sel = state.workflows[wf.id] && state.workflows[wf.id].selected;
-      chipsHtml += `
-        <div class="workflow-chip${sel ? ' selected' : ''}" data-action="toggle-workflow" data-id="${wf.id}" data-industry="${escapeHtml(industry)}">
-          ${sel ? '<span class="check">✓</span>' : ''}
-          ${escapeHtml(wf.name)}
-          <span class="hours">· ${wf.hours}h base</span>
-        </div>
-      `;
-    }
-    groupsHtml += `<div class="workflow-group"><h3>${escapeHtml(industry)}</h3><div>${chipsHtml}</div></div>`;
-  }
-  const warn = n > 6 ? `<div class="warn-callout">⚠️ ${n} workflows selected. Above 6, you're likely over-stretching. Consider phasing in waves.</div>` : '';
-  return `
-    <div class="card">
-      <div class="card-step">Card 1 of 4</div>
-      <h2 class="card-title">Pick the workflows you want to transform</h2>
-      <p class="card-help">Base hours retuned for a modern team. The vintage card (next) scales further. McKinsey pattern: 1–3 domains, ~3–6 use cases. Selected: ${n}.</p>
-      ${groupsHtml}
-      ${warn}
-    </div>
-  `;
-}
-
-function renderSlidersCard() {
-  let html = `
-    <div class="card">
-      <div class="card-step">Card 2 of 4</div>
-      <h2 class="card-title">Rate three things + foundation infra</h2>
-      <p class="card-help">3 is neutral on the sliders. Foundation choice is the biggest lever — most over-estimation comes from building things you already have.</p>
-  `;
-  for (const s of SLIDER_DEFS) {
-    const cur = state.sliders[s.key];
-    let stepsHtml = '';
-    for (let v = 1; v <= 5; v++) stepsHtml += `<div class="slider-step${cur === v ? ' selected' : ''}" data-action="set-slider" data-key="${s.key}" data-value="${v}">${v}</div>`;
-    html += `
-      <div class="slider-row">
-        <label><span>${escapeHtml(s.label)}</span><span class="value-pill">${cur}/5</span></label>
-        <div class="desc">${escapeHtml(s.desc)}</div>
-        <div class="slider-track steps-5">${stepsHtml}</div>
-        <div class="slider-labels"><span>${escapeHtml(s.labels[0])}</span><span>${escapeHtml(s.labels[1])}</span></div>
-        <div class="slider-hint">${escapeHtml(s.hints[cur - 1])}</div>
-      </div>
-    `;
-  }
-
-  // Foundation preset (3-step slider)
-  let foundationStepsHtml = '';
-  for (const f of FOUNDATION_PRESETS) {
-    foundationStepsHtml += `<div class="slider-step${state.foundation === f.id ? ' selected' : ''}" data-action="set-foundation" data-id="${f.id}">${escapeHtml(f.name)}</div>`;
-  }
-  const curFoundation = FOUNDATION_PRESETS.find(f => f.id === state.foundation);
-  html += `
-    <div class="slider-row">
-      <label><span>Existing foundation infrastructure</span><span class="value-pill">${(curFoundation.ratio*100).toFixed(0)}% ratio</span></label>
-      <div class="desc">How much of the data + MLOps + AI org platform already exists?</div>
-      <div class="slider-track steps-3">${foundationStepsHtml}</div>
-      <div class="slider-hint">${escapeHtml(curFoundation.desc)}</div>
-    </div>
-  `;
-
-  html += `</div>`;
-  return html;
-}
-
-function renderDeliveryCard() {
-  const selected = DELIVERY_MODELS.find(d => d.id === state.delivery);
-  const usingDefault = state.rateOverride === null;
-  const rateValue = usingDefault ? selected.defaultRate : state.rateOverride;
-  const curVintage = VINTAGES.find(v => v.id === state.vintage);
-
-  let modelsHtml = '';
-  for (const d of DELIVERY_MODELS) {
-    modelsHtml += `
-      <div class="delivery-card${state.delivery === d.id ? ' selected' : ''}" data-action="select-delivery" data-id="${d.id}">
-        <div class="delivery-name">${escapeHtml(d.name)}</div>
-        <div class="delivery-rate">$${d.defaultRate}/hr default</div>
-        <div class="delivery-desc">${escapeHtml(d.desc)}</div>
-      </div>
-    `;
-  }
-
-  // Vintage selector
-  let vintageHtml = '';
-  for (const v of VINTAGES) {
-    vintageHtml += `<div class="pill-opt${state.vintage === v.id ? ' selected' : ''}" data-action="set-vintage" data-id="${v.id}" title="${escapeHtml(v.desc)}">${escapeHtml(v.name)} <span style="color:var(--text-dim);font-weight:normal">(×${v.mult})</span></div>`;
-  }
-
-  return `
-    <div class="card">
-      <div class="card-step">Card 3 of 4</div>
-      <h2 class="card-title">Who's doing the build — and how modern is the toolchain?</h2>
-      <p class="card-help">Delivery model sets the rate. Vintage scales the hours.</p>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Delivery model</div>
-        <div class="delivery-grid">${modelsHtml}</div>
-        <div class="rate-row">
-          <label>Blended rate:</label>
-          <span>$</span>
-          <input type="number" id="rate-input" value="${rateValue}" data-action="set-rate" />
-          <span>/hr</span>
-          ${!usingDefault ? '<button class="btn-link" data-action="reset-rate">Reset to default</button>' : ''}
-        </div>
-      </div>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Delivery vintage</div>
-        <div class="pill-row">${vintageHtml}</div>
-        <div class="helper-text"><strong>${escapeHtml(curVintage.name)}:</strong> ${escapeHtml(curVintage.desc)} — scales base hours by ×${curVintage.mult}</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderTcoCard() {
-  let cloudHtml = '';
-  for (const c of CLOUD_OPTIONS) cloudHtml += `<div class="pill-opt${state.cloud === c.id ? ' selected' : ''}" data-action="set-cloud" data-id="${c.id}">${escapeHtml(c.name)}</div>`;
-  let infHtml = '';
-  for (const i of INFERENCE_OPTIONS) {
-    const factorLabel = i.factor !== 1 ? ` (×${i.factor})` : '';
-    infHtml += `<div class="pill-opt${state.inference === i.id ? ' selected' : ''}" data-action="set-inference" data-id="${i.id}" title="${escapeHtml(i.desc)}">${escapeHtml(i.name)}${factorLabel}</div>`;
-  }
-  let volHtml = '';
-  for (const v of VOLUME_OPTIONS) volHtml += `<div class="pill-opt${state.volume === v.id ? ' selected' : ''}" data-action="set-volume" data-id="${v.id}">${escapeHtml(v.name)} <span style="color:var(--text-dim);font-weight:normal">${escapeHtml(v.desc)}</span></div>`;
-  let licHtml = '';
-  for (const l of LICENSE_TIERS) licHtml += `<div class="pill-opt${state.license === l.id ? ' selected' : ''}" data-action="set-license" data-id="${l.id}" title="${escapeHtml(l.desc)}">${escapeHtml(l.name)} <span style="color:var(--text-dim);font-weight:normal">($${(l.annual/1000)}K/yr)</span></div>`;
-
-  const cloudOverrideUsing = state.cloudSpendOverride !== null && state.cloudSpendOverride > 0;
-
-  return `
-    <div class="card">
-      <div class="card-step">Card 4 of 4</div>
-      <h2 class="card-title">Run-cost / TCO inputs</h2>
-      <p class="card-help">These don't affect build cost — they project ongoing OpEx after launch.</p>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Cloud provider</div>
-        <div class="pill-row">${cloudHtml}</div>
-        <div class="helper-text">Baseline cloud spend ~$3K/mo per workflow. Override if you have actuals.</div>
-        <div class="rate-row" style="margin-top:10px">
-          <label>Override cloud spend ($/month, optional):</label>
-          <input type="number" id="cloud-override-input" value="${cloudOverrideUsing ? state.cloudSpendOverride : ''}" placeholder="auto" data-action="set-cloud-override" />
-          ${cloudOverrideUsing ? '<button class="btn-link" data-action="reset-cloud-override">Reset</button>' : ''}
-        </div>
-      </div>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Inference deployment</div>
-        <div class="pill-row">${infHtml}</div>
-        <div class="helper-text">Private deployment ~2.8× public API — required for high PHI exposure.</div>
-      </div>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Expected production volume (per workflow)</div>
-        <div class="pill-row">${volHtml}</div>
-      </div>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Software licenses & tooling stack</div>
-        <div class="pill-row">${licHtml}</div>
-      </div>
-
-      <div class="tco-section">
-        <div class="tco-section-label">Ongoing support cost (% of build per year)</div>
-        <div class="rate-row">
-          <input type="number" id="support-input" value="${state.supportPct}" data-action="set-support" min="0" max="50" />
-          <span>% of build / year</span>
-        </div>
-        <div class="helper-text">Industry norm 15–25%.</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderBenchmarkBox(est) {
-  if (!est.benchmark) return '';
-  const { low, median, high } = est.benchmark;
-  const verdict = benchmarkVerdict(est);
-  // Plot range from low/2 to high*1.5 so we can show outliers
-  const plotMin = low * 0.6;
-  const plotMax = high * 1.5;
-  const pct = (v) => Math.max(0, Math.min(100, ((v - plotMin) / (plotMax - plotMin)) * 100));
-
-  return `
-    <div class="benchmark-box">
-      <div class="benchmark-header">
-        <span>📊 Public-data sanity check</span>
-      </div>
-      <div class="benchmark-bar-container">
-        <div class="benchmark-bar"></div>
-        <div class="benchmark-tick" style="left: ${pct(low)}%"></div>
-        <div class="benchmark-label top" style="left: ${pct(low)}%; transform: translateX(-50%)">Low</div>
-        <div class="benchmark-label bottom" style="left: ${pct(low)}%; transform: translateX(-50%)">${fmt(low)}</div>
-        <div class="benchmark-tick" style="left: ${pct(median)}%"></div>
-        <div class="benchmark-label top" style="left: ${pct(median)}%; transform: translateX(-50%)">Median</div>
-        <div class="benchmark-label bottom" style="left: ${pct(median)}%; transform: translateX(-50%)">${fmt(median)}</div>
-        <div class="benchmark-tick" style="left: ${pct(high)}%"></div>
-        <div class="benchmark-label top" style="left: ${pct(high)}%; transform: translateX(-50%)">High</div>
-        <div class="benchmark-label bottom" style="left: ${pct(high)}%; transform: translateX(-50%)">${fmt(high)}</div>
-        <div class="benchmark-tick estimate" style="left: ${pct(est.p50)}%"></div>
-        <div class="benchmark-label top" style="left: ${pct(est.p50)}%; transform: translateX(-50%); color: var(--accent-2); font-weight: 600;">You</div>
-      </div>
-      <div class="benchmark-verdict verdict-${verdict.kind}">${escapeHtml(verdict.msg)}</div>
-      <details>
-        <summary>How the benchmarks are built</summary>
-        <div class="helper-text" style="padding:8px">Sums public-data ranges for each selected workflow. Sources: documented healthcare AI deployments (Premera prior auth, ambient scribe rollouts, Olive AI public filings), CB Insights deal data, vendor case studies. Low = lean modern team; Median = typical mid-sized implementation; High = full enterprise rollout with consulting overhead. These are <em>build cost</em> benchmarks — comparable to your P50 build number.</div>
-      </details>
-    </div>
-  `;
-}
-
-function renderResultCard() {
-  const est = computeBuildEstimate();
-  if (est.empty) return `<div class="card"><h2 class="card-title">Select workflows first</h2><p class="card-help">Go back to Card 1.</p></div>`;
-
-  const opex = computeOpEx(est);
-  const tco3 = compute3YrTCO(est, opex);
-  const waves = computeWaves(est);
-  const pricing = pricingForGrade(est.grade);
-  const gradeClass = 'grade-' + est.grade.charAt(0);
-  const benchmarkBox = renderBenchmarkBox(est);
-
-  let wavesHtml = '';
-  if (waves) {
-    const waveDefs = [
-      { key: 'wave1', name: 'Wave 1 — Quick wins', data: waves.wave1, kill: 'If pilots miss KPI threshold, stop & re-scope domains.' },
-      { key: 'wave2', name: 'Wave 2 — Strategic builds', data: waves.wave2, kill: "If MLOps platform isn't stable from Wave 1, defer." },
-      { key: 'wave3', name: 'Wave 3 — Scale & optimize', data: waves.wave3, kill: 'If foundations exceed 120% of plan, consolidate.' }
-    ].filter(w => w.data.items.length > 0);
-    let waveItems = '';
-    for (const w of waveDefs) {
-      waveItems += `<div class="wave-item">
-        <div class="wave-header"><span class="wave-title">${escapeHtml(w.name)} · ${escapeHtml(w.data.duration)}</span><span class="wave-cost">${fmt(w.data.cost)}</span></div>
-        <div class="wave-items">${w.data.items.map(i => escapeHtml(i.name)).join(', ')}</div>
-        <div class="wave-kill"><strong>Kill criteria:</strong> ${escapeHtml(w.kill)}</div>
-      </div>`;
-    }
-    wavesHtml = `<h3>Sequenced wave plan (build cost)</h3><div class="wave-list">${waveItems}</div>`;
-  }
-
-  let pricingHtml = '';
-  for (const p of pricing) {
-    const fitClass = `price-fit-${p.fit === 'not' ? 'not' : p.fit}`;
-    const fitLabel = p.fit === 'not' ? 'NOT ADVISED' : p.fit.toUpperCase();
-    pricingHtml += `<div class="wave-item">
-      <div class="wave-header"><span class="wave-title">${escapeHtml(p.model)}</span><span class="${fitClass}">${fitLabel}</span></div>
-      <div class="price-note">${escapeHtml(p.note)}</div>
-    </div>`;
-  }
-
-  const ta = tightenAnswered();
-  const tightenHeader = ta === 0 ? 'Want tighter precision? Answer 4 quick questions →' : (ta < 4 ? `Tightening… ${ta} of 4 answered` : `✓ Tightened — grade ${est.grade}`);
-  const tightenSub = ta < 4 ? 'Each question shrinks the range and tightens the grade.' : 'Maximum tightening reached for quick mode.';
-  let tightenHtml = '';
-  for (const q of TIGHTEN_QS) {
-    let opts = '';
-    for (const o of q.options) {
-      const sel = state.tighten[q.key] === o.v;
-      opts += `<div class="tighten-pill${sel ? ' selected' : ''}" data-action="toggle-tighten" data-key="${q.key}" data-value="${o.v}">${escapeHtml(o.l)}</div>`;
-    }
-    tightenHtml += `<div class="tighten-q"><div class="tighten-q-label">${escapeHtml(q.label)}</div><div class="tighten-q-options">${opts}</div></div>`;
-  }
-
-  const opexBreakdown = `
-    <div class="opex-breakdown">
-      <div class="opex-row"><span class="label">Inference / LLM tokens</span><span class="val">${fmt(opex.inference)}/yr</span></div>
-      <div class="opex-row"><span class="label">Cloud infrastructure</span><span class="val">${fmt(opex.cloud)}/yr</span></div>
-      <div class="opex-row"><span class="label">Licenses & tooling</span><span class="val">${fmt(opex.license)}/yr</span></div>
-      <div class="opex-row"><span class="label">Ongoing support (${state.supportPct}% of build)</span><span class="val">${fmt(opex.support)}/yr</span></div>
-      <div class="opex-row" style="font-weight:600;color:var(--text);border-top:2px solid var(--accent);padding-top:8px;margin-top:4px"><span>Annual OpEx total</span><span>${fmt(opex.annualTotal)}/yr</span></div>
-    </div>
-  `;
-
-  return `
-    <div class="card">
-      <div class="tco-grid">
-        <div class="tco-tile">
-          <div class="tco-label">Build (one-time)</div>
-          <div class="tco-value build">${fmt(est.p50)}</div>
-          <div class="tco-sub">Range: ${fmt(est.p10)} — ${fmt(est.p90)} <span class="grade-badge ${gradeClass}">${est.grade}</span></div>
-        </div>
-        <div class="tco-tile">
-          <div class="tco-label">Annual OpEx</div>
-          <div class="tco-value opex">${fmt(opex.annualTotal)}</div>
-          <div class="tco-sub">/year (steady state)</div>
-        </div>
-        <div class="tco-tile highlight">
-          <div class="tco-label">3-Year TCO</div>
-          <div class="tco-value total">${fmt(tco3)}</div>
-          <div class="tco-sub">Build + 2.5 yrs OpEx</div>
-        </div>
-      </div>
-
-      ${benchmarkBox}
-
-      <div class="result-why"><strong>Why this number:</strong> ${escapeHtml(est.why)}</div>
-
-      <h3>Annual OpEx breakdown</h3>
-      ${opexBreakdown}
-
-      <details>
-        <summary>Show the math (build + OpEx)</summary>
-        <div class="math">${escapeHtml(est.math)}\n\n${escapeHtml(opex.math)}\n\n3-YR TCO = ${fmt(est.p50)} build + ${fmt(opex.annualTotal * 0.5)} (yr1 @ 50% ramp) + ${fmt(opex.annualTotal * 2)} (yr2-3 full) = ${fmt(tco3)}</div>
-      </details>
-
-      ${wavesHtml}
-
-      <h3>Pricing options at grade ${est.grade}</h3>
-      <div>${pricingHtml}</div>
-
-      <div class="disclosure">
-        <h4>${tightenHeader}</h4>
-        <p>${tightenSub}</p>
-      </div>
-      ${tightenHtml}
-    </div>
-  `;
-}
-
-function renderNav() {
-  const totalSteps = 5;
-  if (state.step === totalSteps - 1) {
-    return `<div class="nav">
-      <button class="btn btn-secondary" data-action="back">← Adjust inputs</button>
-      <button class="btn btn-secondary" data-action="print">Print / PDF</button>
-    </div>`;
-  }
-  const canAdvance = state.step !== 0 || selectedWorkflowCount() > 0;
-  const nextLabel = state.step === totalSteps - 2 ? 'See estimate →' : 'Next →';
-  return `<div class="nav">
-    <button class="btn btn-secondary" data-action="back" ${state.step === 0 ? 'disabled' : ''}>← Back</button>
-    <button class="btn" data-action="next" ${!canAdvance ? 'disabled' : ''}>${nextLabel}</button>
-  </div>`;
-}
+function fmt(n) { if (!n || n === 0) return '$0'; if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M'; if (n >= 1e3) return '$' + Math.round(n/1e3) + 'K'; return '$' + Math.round(n).toLocaleString(); }
+function fmtRange(p10, p90) { return fmt(p10) + ' – ' + fmt(p90); }
 
 function render() {
+  renderStepper();
   const app = document.getElementById('app');
-  let body = '';
-  if (state.step === 0) body = renderWorkflowCard();
-  else if (state.step === 1) body = renderSlidersCard();
-  else if (state.step === 2) body = renderDeliveryCard();
-  else if (state.step === 3) body = renderTcoCard();
-  else if (state.step === 4) body = renderResultCard();
-  app.innerHTML = renderHeader() + body + renderNav();
+  app.innerHTML = '';
+  const step = state.step;
+  if (step === 0) app.appendChild(renderStep1());
+  else if (step === 1) app.appendChild(renderStep2());
+  else if (step === 2) app.appendChild(renderStep3());
+  else if (step === 3) app.appendChild(renderStep4());
+  else if (step === 4) app.appendChild(renderResult());
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ============ EVENTS ============
-
-document.addEventListener('click', e => {
-  const target = e.target.closest('[data-action]');
-  if (!target) return;
-  const action = target.getAttribute('data-action');
-
-  if (action === 'next') setState({ step: Math.min(4, state.step + 1) });
-  else if (action === 'back') setState({ step: Math.max(0, state.step - 1) });
-  else if (action === 'print') window.print();
-  else if (action === 'toggle-workflow') {
-    const id = target.getAttribute('data-id');
-    const industry = target.getAttribute('data-industry');
-    const current = state.workflows[id];
-    if (current && current.selected) {
-      const next = Object.assign({}, state.workflows); delete next[id]; setState({ workflows: next });
-    } else {
-      let wf = null;
-      for (const ind in WORKFLOWS) { const found = WORKFLOWS[ind].find(w => w.id === id); if (found) { wf = found; break; } }
-      if (wf) {
-        const next = Object.assign({}, state.workflows);
-        next[id] = Object.assign({ selected: true, industry }, wf);
-        setState({ workflows: next });
-      }
+function renderStepper() {
+  const stepper = document.getElementById('stepper');
+  stepper.innerHTML = '';
+  STEPS.forEach((name, i) => {
+    if (i > 0) {
+      const div = document.createElement('span');
+      div.className = 'step-divider';
+      stepper.appendChild(div);
     }
-  }
-  else if (action === 'set-slider') updatePath('sliders.' + target.getAttribute('data-key'), parseInt(target.getAttribute('data-value')));
-  else if (action === 'set-foundation') setState({ foundation: target.getAttribute('data-id') });
-  else if (action === 'set-vintage') setState({ vintage: target.getAttribute('data-id') });
-  else if (action === 'select-delivery') setState({ delivery: target.getAttribute('data-id'), rateOverride: null });
-  else if (action === 'reset-rate') setState({ rateOverride: null });
-  else if (action === 'toggle-tighten') {
-    const key = target.getAttribute('data-key'); const value = target.getAttribute('data-value');
-    const next = Object.assign({}, state.tighten);
-    if (next[key] === value) delete next[key]; else next[key] = value;
-    setState({ tighten: next });
-  }
-  else if (action === 'set-cloud') setState({ cloud: target.getAttribute('data-id') });
-  else if (action === 'set-inference') setState({ inference: target.getAttribute('data-id') });
-  else if (action === 'set-volume') setState({ volume: target.getAttribute('data-id') });
-  else if (action === 'set-license') setState({ license: target.getAttribute('data-id') });
-  else if (action === 'reset-cloud-override') setState({ cloudSpendOverride: null });
-});
+    const pill = document.createElement('div');
+    pill.className = 'step-pill' + (i === state.step ? ' active' : (i < state.step ? ' done' : ''));
+    pill.onclick = () => setState({ step: i });
+    pill.innerHTML = '<span class="step-num">' + (i < state.step ? '✓' : (i + 1)) + '</span>' + name;
+    stepper.appendChild(pill);
+  });
+}
 
-document.addEventListener('change', e => {
-  const action = e.target.getAttribute && e.target.getAttribute('data-action');
-  if (action === 'set-rate') { const v = parseFloat(e.target.value); setState({ rateOverride: isNaN(v) ? null : v }); }
-  else if (action === 'set-cloud-override') { const v = parseFloat(e.target.value); setState({ cloudSpendOverride: isNaN(v) || v === 0 ? null : v }); }
-  else if (action === 'set-support') { const v = parseFloat(e.target.value); setState({ supportPct: isNaN(v) ? 18 : Math.max(0, Math.min(50, v)) }); }
-});
+function selectedCount() {
+  return Object.values(state.workflows).filter(w => w && w.selected).length;
+}
+
+function renderStep1() {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const count = selectedCount();
+  card.innerHTML =
+    '<div class="card-header">' +
+      '<div class="card-header-row">' +
+        '<div class="card-num">1</div>' +
+        '<div class="card-title">Pick workflows to transform' + (count ? '<span class="count-badge">' + count + '</span>' : '') + '</div>' +
+      '</div>' +
+      '<div class="card-help">Select all that apply. You can refine the estimate at each step.</div>' +
+    '</div>' +
+    '<div class="card-body" id="step1-body"></div>';
+
+  const body = card.querySelector('#step1-body');
+  Object.keys(WORKFLOWS).forEach(groupName => {
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.innerHTML = '<div class="section-label"><span class="section-icon">' + (GROUP_ICONS[groupName]||'•') + '</span>' + groupName + '</div>';
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    WORKFLOWS[groupName].forEach(w => {
+      const chip = document.createElement('div');
+      const isSelected = state.workflows[w.id] && state.workflows[w.id].selected;
+      chip.className = 'chip' + (isSelected ? ' active' : '');
+      chip.textContent = w.name;
+      chip.onclick = () => {
+        const newWorkflows = JSON.parse(JSON.stringify(state.workflows));
+        if (newWorkflows[w.id] && newWorkflows[w.id].selected) {
+          delete newWorkflows[w.id];
+        } else {
+          newWorkflows[w.id] = Object.assign({}, w, { selected: true });
+        }
+        setState({ workflows: newWorkflows });
+      };
+      chips.appendChild(chip);
+    });
+    block.appendChild(chips);
+    body.appendChild(block);
+  });
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  nav.innerHTML = '<span></span>' +
+    '<button class="btn btn-primary" id="next1"' + (count === 0 ? ' disabled' : '') + '>Continue to Refine →</button>';
+  body.appendChild(nav);
+  nav.querySelector('#next1').onclick = () => setState({ step: 1 });
+  return card;
+}
+
+function renderStep2() {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML =
+    '<div class="card-header">' +
+      '<div class="card-header-row">' +
+        '<div class="card-num">2</div>' +
+        '<div class="card-title">Refine the context</div>' +
+      '</div>' +
+      '<div class="card-help">These drive the multipliers. Most effort comes from data readiness + regulatory load + foundation infra.</div>' +
+    '</div>' +
+    '<div class="card-body" id="step2-body"></div>';
+  const body = card.querySelector('#step2-body');
+
+  SLIDER_DEFS.forEach(s => {
+    const block = document.createElement('div');
+    block.className = 'slider-block';
+    const value = state.sliders[s.key];
+    block.innerHTML =
+      '<div class="slider-label">' + s.label + '</div>' +
+      '<div class="slider-desc">' + s.desc + '</div>' +
+      '<input type="range" min="1" max="5" step="1" value="' + value + '">' +
+      '<div class="slider-scale"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>' +
+      '<div class="slider-hint">Level ' + value + ': ' + s.hints[value-1] + '</div>';
+    const input = block.querySelector('input');
+    input.oninput = (e) => {
+      const v = parseInt(e.target.value);
+      const newSliders = Object.assign({}, state.sliders);
+      newSliders[s.key] = v;
+      setState({ sliders: newSliders });
+    };
+    body.appendChild(block);
+  });
+
+  const found = document.createElement('div');
+  found.className = 'section-block';
+  found.style.marginTop = '28px';
+  found.innerHTML =
+    '<div class="section-label"><span class="section-icon">🏗️</span>Foundation infrastructure</div>' +
+    '<div class="section-desc">Pick the closest to your current state.</div>';
+  const foundChips = document.createElement('div');
+  foundChips.className = 'chips';
+  FOUNDATION_PRESETS.forEach(f => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.foundation === f.id ? ' active' : '');
+    chip.innerHTML = f.name + ' <span style="opacity:0.7;font-weight:400">· ' + f.desc + '</span>';
+    chip.onclick = () => setState({ foundation: f.id });
+    foundChips.appendChild(chip);
+  });
+  found.appendChild(foundChips);
+  body.appendChild(found);
+
+  const tighten = document.createElement('div');
+  tighten.className = 'section-block';
+  tighten.style.marginTop = '28px';
+  tighten.innerHTML =
+    '<div class="section-label"><span class="section-icon">🎯</span>Tighten the estimate (optional)</div>' +
+    '<div class="section-desc">Answer 2+ for a tighter range. 4+ moves you to Grade B (±40%).</div>';
+  TIGHTEN_QS.forEach(q => {
+    const qBlock = document.createElement('div');
+    qBlock.style.marginTop = '14px';
+    qBlock.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;">' + q.label + '</div>';
+    const opts = document.createElement('div');
+    opts.className = 'chips';
+    q.options.forEach(o => {
+      const chip = document.createElement('div');
+      chip.className = 'chip chip-small' + (state.tighten[q.key] === o.v ? ' active' : '');
+      chip.textContent = o.l;
+      chip.onclick = () => {
+        const newTighten = Object.assign({}, state.tighten);
+        if (newTighten[q.key] === o.v) delete newTighten[q.key];
+        else newTighten[q.key] = o.v;
+        setState({ tighten: newTighten });
+      };
+      opts.appendChild(chip);
+    });
+    qBlock.appendChild(opts);
+    tighten.appendChild(qBlock);
+  });
+  body.appendChild(tighten);
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  nav.innerHTML =
+    '<button class="btn btn-secondary" onclick="setState({step:0})">← Back</button>' +
+    '<button class="btn btn-primary" onclick="setState({step:2})">Continue to Delivery →</button>';
+  body.appendChild(nav);
+  return card;
+}
+
+function renderStep3() {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML =
+    '<div class="card-header">' +
+      '<div class="card-header-row">' +
+        '<div class="card-num">3</div>' +
+        '<div class="card-title">Delivery model &amp; vintage</div>' +
+      '</div>' +
+      '<div class="card-help">Who is doing the work, and how modern is the toolchain.</div>' +
+    '</div>' +
+    '<div class="card-body" id="step3-body"></div>';
+  const body = card.querySelector('#step3-body');
+
+  const delivery = document.createElement('div');
+  delivery.className = 'section-block';
+  delivery.innerHTML = '<div class="section-label"><span class="section-icon">👥</span>Delivery model</div>';
+  const deliveryChips = document.createElement('div');
+  deliveryChips.className = 'chips';
+  DELIVERY_MODELS.forEach(d => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.delivery === d.id ? ' active' : '');
+    chip.innerHTML = d.name + ' <span style="opacity:0.7;font-weight:400">· $' + d.defaultRate + '/hr</span>';
+    chip.onclick = () => setState({ delivery: d.id, rateOverride: null });
+    deliveryChips.appendChild(chip);
+  });
+  delivery.appendChild(deliveryChips);
+  const rateOverride = document.createElement('div');
+  rateOverride.className = 'input-row';
+  rateOverride.innerHTML =
+    '<span class="input-label">Override rate:</span>' +
+    '<input type="number" placeholder="auto" value="' + (state.rateOverride || '') + '">' +
+    '<span class="input-suffix">$/hr (blank = default)</span>';
+  delivery.appendChild(rateOverride);
+  rateOverride.querySelector('input').onchange = (e) => {
+    const v = e.target.value;
+    setState({ rateOverride: v === '' ? null : parseFloat(v) });
+  };
+  body.appendChild(delivery);
+
+  const vintage = document.createElement('div');
+  vintage.className = 'section-block';
+  vintage.style.marginTop = '28px';
+  vintage.innerHTML =
+    '<div class="section-label"><span class="section-icon">⚡</span>Delivery vintage</div>' +
+    '<div class="section-desc">How modern is the toolchain? AI-augmented teams can be 2-3× faster than 2020 SDLC.</div>';
+  const vintageChips = document.createElement('div');
+  vintageChips.className = 'chips';
+  VINTAGES.forEach(v => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.vintage === v.id ? ' active' : '');
+    chip.innerHTML = v.name + ' <span style="opacity:0.7;font-weight:400">· ×' + v.mult + '</span>';
+    chip.onclick = () => setState({ vintage: v.id });
+    vintageChips.appendChild(chip);
+  });
+  vintage.appendChild(vintageChips);
+  body.appendChild(vintage);
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  nav.innerHTML =
+    '<button class="btn btn-secondary" onclick="setState({step:1})">← Back</button>' +
+    '<button class="btn btn-primary" onclick="setState({step:3})">Continue to TCO →</button>';
+  body.appendChild(nav);
+  return card;
+}
+
+function renderStep4() {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML =
+    '<div class="card-header">' +
+      '<div class="card-header-row">' +
+        '<div class="card-num">4</div>' +
+        '<div class="card-title">3-Year TCO inputs</div>' +
+      '</div>' +
+      '<div class="card-help">Build cost is one-time. These drive the recurring annual OpEx.</div>' +
+    '</div>' +
+    '<div class="card-body" id="step4-body"></div>';
+  const body = card.querySelector('#step4-body');
+
+  function makeChipGroup(label, icon, items, currentKey, idKey, render, onclick) {
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.style.marginTop = block.previousElementSibling ? '24px' : '0';
+    block.innerHTML = '<div class="section-label"><span class="section-icon">' + icon + '</span>' + label + '</div>';
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    items.forEach(i => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (state[currentKey] === i[idKey] ? ' active' : '');
+      chip.innerHTML = render(i);
+      chip.onclick = () => onclick(i);
+      chips.appendChild(chip);
+    });
+    block.appendChild(chips);
+    return block;
+  }
+
+  const inf = makeChipGroup('Inference deployment', '🧠', INFERENCE_OPTIONS, 'inference', 'id',
+    i => i.name + ' <span style="opacity:0.7;font-weight:400">· ×' + i.factor + '</span>',
+    i => setState({ inference: i.id }));
+  body.appendChild(inf);
+
+  const vol = makeChipGroup('Call volume', '📊', VOLUME_OPTIONS, 'volume', 'id',
+    v => v.name,
+    v => setState({ volume: v.id }));
+  vol.style.marginTop = '24px';
+  body.appendChild(vol);
+
+  const cloud = makeChipGroup('Cloud provider', '☁️', CLOUD_OPTIONS, 'cloud', 'id',
+    c => c.name + ' <span style="opacity:0.7;font-weight:400">· ×' + c.factor + '</span>',
+    c => setState({ cloud: c.id }));
+  cloud.style.marginTop = '24px';
+  const cloudOverride = document.createElement('div');
+  cloudOverride.className = 'input-row';
+  cloudOverride.innerHTML =
+    '<span class="input-label">Override monthly cloud:</span>' +
+    '<input type="number" placeholder="auto" value="' + (state.cloudSpendOverride || '') + '">' +
+    '<span class="input-suffix">$/mo (blank = $3K × N)</span>';
+  cloud.appendChild(cloudOverride);
+  cloudOverride.querySelector('input').onchange = (e) => {
+    const v = e.target.value;
+    setState({ cloudSpendOverride: v === '' ? null : parseFloat(v) });
+  };
+  body.appendChild(cloud);
+
+  const lic = makeChipGroup('License & tooling tier', '📦', LICENSE_TIERS, 'license', 'id',
+    l => l.name + ' <span style="opacity:0.7;font-weight:400">· $' + (l.annual/1000) + 'K/yr</span>',
+    l => setState({ license: l.id }));
+  lic.style.marginTop = '24px';
+  body.appendChild(lic);
+
+  const sup = document.createElement('div');
+  sup.className = 'section-block';
+  sup.style.marginTop = '24px';
+  sup.innerHTML =
+    '<div class="section-label"><span class="section-icon">🔧</span>Annual support / ongoing</div>' +
+    '<div class="input-row">' +
+      '<span class="input-label">% of build cost:</span>' +
+      '<input type="number" value="' + state.supportPct + '" min="0" max="50">' +
+      '<span class="input-suffix">% (typical: 15-20%)</span>' +
+    '</div>';
+  sup.querySelector('input').onchange = (e) => {
+    setState({ supportPct: parseFloat(e.target.value) || 18 });
+  };
+  body.appendChild(sup);
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  nav.innerHTML =
+    '<button class="btn btn-secondary" onclick="setState({step:2})">← Back</button>' +
+    '<button class="btn btn-primary" onclick="setState({step:4})">See Estimate →</button>';
+  body.appendChild(nav);
+  return card;
+}
+
+function renderResult() {
+  const wrap = document.createElement('div');
+  const est = computeBuildEstimate();
+
+  if (est.empty) {
+    wrap.innerHTML =
+      '<div class="card"><div class="card-body">' +
+        '<div class="empty-state">' +
+          '<div class="empty-state-icon">📊</div>' +
+          '<div class="empty-state-text">No workflows selected yet.<br>Go back to Step 1 to pick some.</div>' +
+          '<button class="btn btn-primary" style="margin-top:20px;" onclick="setState({step:0})">← Back to Workflows</button>' +
+        '</div>' +
+      '</div></div>';
+    return wrap;
+  }
+
+  const opex = computeOpEx(est);
+  const tco3y = compute3YrTCO(est, opex);
+
+  const resultCard = document.createElement('div');
+  resultCard.className = 'result-card';
+  resultCard.innerHTML =
+    '<div class="result-header">' +
+      '<div class="result-header-eyebrow">Your Estimate</div>' +
+      '<div class="result-header-title">' + est.N + ' workflow' + (est.N>1?'s':'') + ' · ' + est.delivery.name + ' · ' + est.vintage.name + '</div>' +
+    '</div>' +
+    '<div class="result-body">' +
+      '<div class="result-metrics">' +
+        '<div class="metric">' +
+          '<div class="metric-label">Build (One-Time)</div>' +
+          '<div class="metric-value">' + fmt(est.p50) + '</div>' +
+          '<div class="metric-sub">Range ' + fmtRange(est.p10, est.p90) + '</div>' +
+        '</div>' +
+        '<div class="metric highlighted">' +
+          '<div class="metric-label">3-Year TCO</div>' +
+          '<div class="metric-value">' + fmt(tco3y) + '</div>' +
+          '<div class="metric-sub">Build + 2.5 yr OpEx</div>' +
+        '</div>' +
+        '<div class="metric">' +
+          '<div class="metric-label">Annual OpEx</div>' +
+          '<div class="metric-value">' + fmt(opex.annualTotal) + '</div>' +
+          '<div class="metric-sub">Steady state</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grade-row">' +
+        '<span class="grade-badge grade-' + est.grade.replace(/[+-]/,'') + '">Grade ' + est.grade + '</span>' +
+        '<span class="grade-text">' + (est.grade === 'B' ? 'Tight estimate (±40%) — well-informed inputs' : est.grade === 'C' ? 'Standard estimate (±70%) — typical pre-discovery' : 'Wide estimate (±100%) — early/exploratory') + '</span>' +
+        '<span class="range-text">±' + (est.range*100).toFixed(0) + '%</span>' +
+      '</div>' +
+      '<div class="why-line">' + est.why + '</div>' +
+    '</div>';
+  wrap.appendChild(resultCard);
+
+  if (est.benchmark) {
+    const benchCard = document.createElement('div');
+    benchCard.className = 'card';
+    const ratio = est.p50 / est.benchmark.median;
+    let verdict, verdictClass, message;
+    if (ratio > 1.5) { verdict = 'Higher than benchmark'; verdictClass = 'over'; message = 'Your estimate is ' + ratio.toFixed(1) + '× the public benchmark median. Either you have non-standard requirements, or there is room to challenge the assumptions.'; }
+    else if (ratio < 0.65) { verdict = 'Lower than benchmark'; verdictClass = 'under'; message = 'Your estimate is ' + ratio.toFixed(1) + '× the public benchmark median. Verify nothing is missing — common gaps: change management, integration, post-launch support.'; }
+    else { verdict = 'Aligned with public benchmarks'; verdictClass = 'aligned'; message = 'Your estimate sits comfortably within the public-data range. Use the median as your default conversation anchor.'; }
+    benchCard.innerHTML =
+      '<div class="card-header">' +
+        '<div class="card-header-row">' +
+          '<div class="card-num" style="background:var(--good);">✓</div>' +
+          '<div class="card-title">Public-Data Benchmark Check</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-body">' +
+        '<div class="benchmark-verdict ' + verdictClass + '">' + verdict + '</div>' +
+        '<div style="font-size:13px;color:var(--ink-2);margin-bottom:12px;">' + message + '</div>' +
+        '<div class="benchmark-data">' +
+          '<div class="bench-item"><div class="bench-label">Low</div><div class="bench-value">' + fmt(est.benchmark.low) + '</div></div>' +
+          '<div class="bench-item" style="background:var(--accent-soft);"><div class="bench-label">Median</div><div class="bench-value" style="color:var(--accent);">' + fmt(est.benchmark.median) + '</div></div>' +
+          '<div class="bench-item"><div class="bench-label">High</div><div class="bench-value">' + fmt(est.benchmark.high) + '</div></div>' +
+        '</div>' +
+      '</div>';
+    wrap.appendChild(benchCard);
+  }
+
+  const waves = computeWaves(est);
+  if (waves.length > 0) {
+    const waveCard = document.createElement('div');
+    waveCard.className = 'card';
+    let waveHtml =
+      '<div class="card-header">' +
+        '<div class="card-header-row">' +
+          '<div class="card-num" style="background:var(--warn);">📅</div>' +
+          '<div class="card-title">Suggested Wave Plan</div>' +
+        '</div>' +
+        '<div class="card-help">Break the build into phases with kill criteria. Don&rsquo;t commit to all waves upfront.</div>' +
+      '</div>' +
+      '<div class="card-body">';
+    waves.forEach(w => {
+      waveHtml +=
+        '<div class="wave-item">' +
+          '<div class="wave-header">' +
+            '<div class="wave-title">' + w.name + '</div>' +
+            '<div class="wave-cost">' + fmt(w.cost) + ' · ' + w.months + ' mo</div>' +
+          '</div>' +
+          '<div class="wave-items">' + w.items.map(i => i.name).join(' · ') + '</div>' +
+          '<div class="wave-kill">⚠️ Kill criteria: ' + w.kill + '</div>' +
+        '</div>';
+    });
+    waveHtml += '</div>';
+    waveCard.innerHTML = waveHtml;
+    wrap.appendChild(waveCard);
+  }
+
+  const pricingCard = document.createElement('div');
+  pricingCard.className = 'card';
+  const range = est.range;
+  const tightCount = Object.keys(state.tighten).length;
+  let pricingHtml =
+    '<div class="card-header">' +
+      '<div class="card-header-row">' +
+        '<div class="card-num" style="background:var(--good);">💰</div>' +
+        '<div class="card-title">Pricing Model Fit</div>' +
+      '</div>' +
+      '<div class="card-help">Which pricing structure fits this estimate&rsquo;s uncertainty grade.</div>' +
+    '</div>' +
+    '<div class="card-body">' +
+      '<div class="pricing-grid">';
+  const pricings = [
+    { name: 'Fixed Price', fit: range > 0.5 ? 'not' : 'recommended', note: range > 0.5 ? 'Too wide (±' + (range*100).toFixed(0) + '%) — you would absorb risk' : 'Tight enough to commit safely' },
+    { name: 'T&M / Time-and-Materials', fit: range > 0.5 ? 'recommended' : 'acceptable', note: range > 0.5 ? 'Right structure for this uncertainty' : 'Workable but client carries more risk' },
+    { name: 'Outcome-Based', fit: tightCount >= 4 ? 'recommended' : 'caution', note: tightCount >= 4 ? 'Tight enough estimate to define outcomes' : 'Need more discovery to define KPIs' },
+    { name: 'Hybrid (Discovery + T&M)', fit: 'recommended', note: 'Often the best default for AI projects' }
+  ];
+  pricings.forEach(p => {
+    pricingHtml +=
+      '<div class="pricing-card">' +
+        '<div class="pricing-name">' + p.name + '</div>' +
+        '<div class="pricing-fit ' + p.fit + '">' + (p.fit === 'recommended' ? '✓ Recommended' : p.fit === 'acceptable' ? '~ Acceptable' : p.fit === 'caution' ? '⚠ Caution' : '✗ Not recommended') + '</div>' +
+        '<div class="pricing-note">' + p.note + '</div>' +
+      '</div>';
+  });
+  pricingHtml += '</div></div>';
+  pricingCard.innerHTML = pricingHtml;
+  wrap.appendChild(pricingCard);
+
+  const mathCard = document.createElement('div');
+  mathCard.className = 'card';
+  mathCard.innerHTML =
+    '<div class="card-body" style="padding:16px 24px;">' +
+      '<details>' +
+        '<summary>Show the full math</summary>' +
+        '<div class="details-content">' +
+          '<div class="math-block">' + est.math + '</div>' +
+          '<div class="math-block">' + opex.math + '</div>' +
+        '</div>' +
+      '</details>' +
+    '</div>';
+  wrap.appendChild(mathCard);
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  nav.innerHTML =
+    '<button class="btn btn-secondary" onclick="setState({step:3})">← Edit TCO Inputs</button>' +
+    '<button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>';
+  wrap.appendChild(nav);
+  return wrap;
+}
 
 render();
 </script>
