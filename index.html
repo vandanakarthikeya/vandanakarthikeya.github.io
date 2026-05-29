@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -494,6 +493,7 @@
         .gi-voice { background: rgba(139,92,246,0.12); }
         .gi-clinical { background: rgba(6,182,212,0.12); }
         .gi-itsm { background: rgba(245,158,11,0.12); }
+        .gi-pmo { background: rgba(74,158,255,0.12); }
         .gi-scripture { background: rgba(236,72,153,0.12); }
         .coming-soon-card { background: rgba(0,0,0,0.05); border: 2px dashed rgba(0,0,0,0.18); border-radius: 16px; padding: 2rem 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; transition: all 0.2s; }
         .coming-soon-card:hover { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.3); }
@@ -1513,11 +1513,79 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════ -->
-        <!-- GROUP 5: Beyond Healthcare -->
+        <!-- GROUP 5: PMO & Estimation Tools -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="group-header fade-up">
+            <div class="group-icon gi-pmo">📊</div>
+            <div class="group-num">Group 05</div>
+            <div class="group-title">PMO & Estimation Tools</div>
+            <div class="group-subtitle">Project estimation, capacity planning, and program-management tools for AI transformation and modernization initiatives</div>
+        </div>
+        <div class="poc-gallery">
+            <div class="poc-grid">
+
+                <!-- AI Estimation Framework (LIVE) -->
+                <div class="poc-card fade-up">
+                    <div class="poc-preview">
+                        <div class="poc-preview-inner" style="background: linear-gradient(135deg, #4a9eff22, #b78aff22);">
+                            <div class="poc-preview-mockup">
+                                <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+                                <div class="mockup-lines">
+                                    <div class="mockup-line long teal-l"></div><div class="mockup-line medium accent"></div><div class="mockup-line short"></div><div class="mockup-line long accent"></div><div class="mockup-line medium teal-l"></div><div class="mockup-line short accent"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="poc-badge free">Available</span>
+                    </div>
+                    <div class="poc-content">
+                        <div class="poc-category">AI Transformation Estimation</div>
+                        <div class="poc-title">AI Transformation Estimation Framework</div>
+                        <div class="poc-desc">Three-card estimator for AI build &amp; transformation projects. Generates build cost, annual OpEx, and 3-year TCO with public-data benchmarks. Includes delivery vintage, foundation infra slider, wave plan, and pricing-model recommendations tied to uncertainty grade.</div>
+                        <div class="poc-tags"><span class="poc-tag">Build vs TCO</span><span class="poc-tag">Wave Planning</span><span class="poc-tag">Onshore/Offshore</span><span class="poc-tag">Public Benchmarks</span></div>
+                        <div class="card-engagement">
+                            <button class="upvote-btn" onclick="toggleUpvote(this,'ai-estimator')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-ai-estimator">0</span></button>
+                            <button class="feedback-link" onclick="openFeedback('ai-estimator','AI Estimation Framework')" title="Send feedback">💬 Feedback</button>
+                        </div>
+                        <div class="poc-actions"><a href="ai-estimation-framework.html" class="poc-btn poc-btn-get" style="flex:1;text-align:center;text-decoration:none;display:block;padding:0.6rem 1rem;">Open App →</a></div>
+                    </div>
+                </div>
+
+                <!-- Engineering Capacity Planner (COMING SOON) -->
+                <div class="coming-soon-card fade-up stagger-1">
+                    <div class="cs-icon">👥</div>
+                    <div class="cs-title">Engineering Capacity Planner</div>
+                    <div class="cs-desc">Headcount &amp; skill-mix planning tool — model team scaling against a portfolio of initiatives, identify gaps between demand and supply, and simulate ramp-up timelines for hiring vs contracting.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'capacity-planner')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-capacity-planner">0</span></button><button class="feedback-link" onclick="openFeedback('capacity-planner','Capacity Planner')">💬 Feedback</button></div>
+                </div>
+
+                <!-- RAID Log (COMING SOON) -->
+                <div class="coming-soon-card fade-up stagger-2">
+                    <div class="cs-icon">⚠️</div>
+                    <div class="cs-title">RAID Log &amp; Risk Register</div>
+                    <div class="cs-desc">Interactive RAID (Risks, Assumptions, Issues, Dependencies) log with severity scoring, owner tracking, mitigation cost estimation, and exportable program risk register for steering committees.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'raid-log')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-raid-log">0</span></button><button class="feedback-link" onclick="openFeedback('raid-log','RAID Log')">💬 Feedback</button></div>
+                </div>
+
+                <!-- Stage-Gate Tracker (COMING SOON) -->
+                <div class="coming-soon-card fade-up stagger-3">
+                    <div class="cs-icon">🚦</div>
+                    <div class="cs-title">Stage-Gate Decision Tracker</div>
+                    <div class="cs-desc">Track AI initiatives through discovery → POC → pilot → production gates with kill criteria, evidence requirements, and re-estimation at each checkpoint. Based on Checkpoint Sizing methodology.</div>
+                    <div class="cs-badge">Coming Soon</div>
+                    <div class="cs-engagement"><button class="upvote-btn" onclick="toggleUpvote(this,'stage-gate')" title="Upvote"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-stage-gate">0</span></button><button class="feedback-link" onclick="openFeedback('stage-gate','Stage-Gate Tracker')">💬 Feedback</button></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- GROUP 6: Beyond Healthcare -->
         <!-- ═══════════════════════════════════════════════ -->
         <div class="group-header fade-up">
             <div class="group-icon gi-scripture">🕉️</div>
-            <div class="group-num">Group 05</div>
+            <div class="group-num">Group 06</div>
             <div class="group-title">Beyond Healthcare</div>
             <div class="group-subtitle">Personal analytics, Sanskrit learning, Vedic chanting practice, and scripture study applications</div>
         </div>
@@ -1535,7 +1603,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="poc-badge avail">Available</span>
+                        <span class="poc-badge free">Available</span>
                     </div>
                     <div class="poc-content">
                         <div class="poc-category">Personal Health Analytics</div>
@@ -1546,7 +1614,7 @@
                             <button class="upvote-btn" onclick="toggleUpvote(this,'health')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-health">0</span></button>
                             <button class="feedback-link" onclick="openFeedback('health','Personal Health Dashboard')" title="Send feedback">💬 Feedback</button>
                         </div>
-                        <div class="poc-actions"><a href="personal-health-dashboard.html" class="poc-btn poc-btn-primary" style="flex:1;text-align:center;text-decoration:none;display:block;padding:0.6rem 1rem;">Open App →</a></div>
+                        <div class="poc-actions"><a href="personal-health-dashboard.html" class="poc-btn poc-btn-get" style="flex:1;text-align:center;text-decoration:none;display:block;padding:0.6rem 1rem;">Open App →</a></div>
                     </div>
                 </div>
 
@@ -1561,7 +1629,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="poc-badge avail">New</span>
+                        <span class="poc-badge free">New</span>
                     </div>
                     <div class="poc-content">
                         <div class="poc-category">Healthy Digital Twin</div>
@@ -1572,7 +1640,7 @@
                             <button class="upvote-btn" onclick="toggleUpvote(this,'digital-twin')" title="Upvote this tool"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-digital-twin">0</span></button>
                             <button class="feedback-link" onclick="openFeedback('digital-twin','Healthy Digital Twin')" title="Send feedback">💬 Feedback</button>
                         </div>
-                        <div class="poc-actions"><a href="healthy-digital-twin.html" class="poc-btn poc-btn-primary" style="flex:1;text-align:center;text-decoration:none;display:block;padding:0.6rem 1rem;">Open App →</a></div>
+                        <div class="poc-actions"><a href="healthy-digital-twin.html" class="poc-btn poc-btn-get" style="flex:1;text-align:center;text-decoration:none;display:block;padding:0.6rem 1rem;">Open App →</a></div>
                     </div>
                 </div>
 
@@ -1875,6 +1943,15 @@
                 <div class="idea-desc">Compare build vs. buy vs. outsource scenarios with TCO modeling, vendor risk scoring, SLA benchmarking, and Opex/Capex impact simulation — grounded in $20M+ cost optimization experience.</div>
                 <div class="idea-impact"><span id="flames-vendor-roi">🔥🔥🔥</span></div>
                 <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'vendor-roi')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-vendor-roi">0</span></button><button class="feedback-link" onclick="openFeedback('vendor-roi','Vendor ROI Analyzer')">💬 Suggest</button></div>
+            </div>
+
+            <!-- NEW: PMO Tools Suite -->
+            <div class="idea-card fade-up">
+                <div class="idea-num">13</div>
+                <div class="idea-title">PMO Tools Suite for AI Transformation</div>
+                <div class="idea-desc">Complete program-management toolkit for AI transformation — estimation framework (live), capacity planner, RAID log, and stage-gate tracker. Built from 28 years of $30M+ portfolio management and AI delivery experience.</div>
+                <div class="idea-impact"><span id="flames-pmo-suite">🔥🔥🔥</span></div>
+                <div class="cs-engagement" style="margin-top:0.6rem"><button class="upvote-btn" onclick="toggleUpvote(this,'pmo-suite')" title="Vote for this"><span class="uv-icon">▲</span> <span class="uv-count" id="uv-pmo-suite">0</span></button><button class="feedback-link" onclick="openFeedback('pmo-suite','PMO Tools Suite')">💬 Suggest</button></div>
             </div>
 
         </div>
