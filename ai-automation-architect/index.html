@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automation Architect | Estimator and Decision Tool</title>
+<meta name="description" content="A decision-support estimator that recommends what AI automation to build, the right stack, expected cost, timeline, risk, and go/no-go guidance.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-2: #eef3f7;
+    --ink: #13202f;
+    --muted: #64758a;
+    --line: #dce4ec;
+    --line-2: #edf2f6;
+    --blue: #1e5f99;
+    --blue-2: #17466f;
+    --green: #17816d;
+    --green-2: #dff5ee;
+    --gold: #a96813;
+    --gold-2: #fff1d6;
+    --red: #a33c3c;
+    --red-2: #fde7e7;
+    --purple: #6b4aa0;
+    --purple-2: #eee9f7;
+    --shadow: 0 12px 28px rgba(31, 48, 69, 0.08);
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
+
+  .app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: #172230;
+    color: #f6f8fb;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #62b3d8, #66c3a2);
+    display: grid;
+    place-items: center;
+    color: #12202f;
+    font-weight: 800;
+  }
+
+  .brand-title { font-weight: 800; letter-spacing: 0; line-height: 1.1; }
+  .brand-sub { color: #b8c4d0; font-size: 12px; margin-top: 3px; }
+
+  .nav-group {
+    display: grid;
+    gap: 8px;
+  }
+
+  .nav-button {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #dbe6ef;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 650;
+    font-size: 13px;
+  }
+
+  .nav-button.active {
+    background: #f6f8fb;
+    color: #172230;
+    border-color: #f6f8fb;
+  }
+
+  .mode-card {
+    margin-top: auto;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .mode-label {
+    color: #b8c4d0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 750;
+  }
+
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .mode-toggle button {
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 7px;
+    background: rgba(255,255,255,0.06);
+    color: #dbe6ef;
+    padding: 8px 6px;
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .mode-toggle button.active {
+    background: #66c3a2;
+    color: #12202f;
+    border-color: #66c3a2;
+  }
+
+  main {
+    min-width: 0;
+  }
+
+  .top-strip {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(246,248,251,0.9);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .home-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 750;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    text-decoration: none;
+  }
+
+  .btn.primary {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+  }
+
+  .btn.green {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+  }
+
+  .btn.ghost {
+    background: transparent;
+  }
+
+  .content {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
+    gap: 22px;
+    align-items: stretch;
+    margin-bottom: 22px;
+  }
+
+  .hero-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+  }
+
+  .eyebrow {
+    color: var(--green);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  h1, h2, h3, p { margin-top: 0; }
+  h1 {
+    font-size: clamp(30px, 4.4vw, 54px);
+    line-height: 1.02;
+    letter-spacing: 0;
+    margin-bottom: 14px;
+  }
+
+  .hero-copy {
+    color: var(--muted);
+    max-width: 760px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .visual-panel {
+    background: #142130;
+    color: white;
+    border-radius: var(--radius);
+    border: 1px solid #223349;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    display: grid;
+    align-content: space-between;
+    min-height: 310px;
+    overflow: hidden;
+  }
+
+  .decision-map {
+    display: grid;
+    gap: 12px;
+  }
+
+  .map-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .map-node {
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .map-arrow {
+    color: #82d3b3;
+    font-weight: 800;
+  }
+
+  .visual-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .visual-metric {
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .visual-metric strong {
+    display: block;
+    font-size: 18px;
+  }
+
+  .visual-metric span {
+    color: #b8c4d0;
+    font-size: 11px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  .section {
+    margin-top: 22px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 12px;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+
+  .section-head p {
+    color: var(--muted);
+    margin: 4px 0 0;
+    font-size: 13px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(31,48,69,0.03);
+  }
+
+  .card.pad { padding: 18px; }
+
+  .option-card {
+    text-align: left;
+    width: 100%;
+    min-height: 158px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+
+  .option-card:hover, .option-card.selected {
+    border-color: var(--blue);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .option-card.selected {
+    outline: 3px solid rgba(30, 95, 153, .12);
+  }
+
+  .option-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+
+  .option-card h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+  }
+
+  .option-card p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 750;
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+
+  .badge.green { background: var(--green-2); color: var(--green); }
+  .badge.gold { background: var(--gold-2); color: var(--gold); }
+  .badge.purple { background: var(--purple-2); color: var(--purple); }
+  .badge.red { background: var(--red-2); color: var(--red); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  select, input, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 11px;
+    background: white;
+    color: var(--ink);
+    min-height: 42px;
+  }
+
+  textarea {
+    min-height: 88px;
+    resize: vertical;
+  }
+
+  .range-line {
+    display: grid;
+    grid-template-columns: 1fr 76px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  input[type="range"] {
+    padding: 0;
+    min-height: 28px;
+    accent-color: var(--blue);
+  }
+
+  .readout {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 8px;
+    text-align: center;
+    color: var(--blue);
+    background: #f9fbfd;
+    font-weight: 800;
+    font-size: 12px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .summary-tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 13px;
+  }
+
+  .summary-tile span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 5px;
+  }
+
+  .summary-tile strong {
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  .recommendation {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .score-ring {
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    margin: 2px auto 14px;
+    background: conic-gradient(var(--green) var(--score), #e6edf3 0);
+    display: grid;
+    place-items: center;
+  }
+
+  .score-ring div {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    background: white;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    font-weight: 800;
+    color: var(--green);
+  }
+
+  .score-ring small {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .stack-table th, .stack-table td {
+    border-bottom: 1px solid var(--line-2);
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .stack-table th {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .price-card {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    display: grid;
+    gap: 12px;
+  }
+
+  .price-card.featured {
+    border-color: var(--blue);
+    outline: 3px solid rgba(30,95,153,.12);
+  }
+
+  .price {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .feature-list li {
+    display: flex;
+    gap: 8px;
+  }
+
+  .feature-list li::before {
+    content: "✓";
+    color: var(--green);
+    font-weight: 900;
+  }
+
+  .chat-launcher {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 40;
+    border: none;
+    background: var(--green);
+    color: white;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+    font-weight: 900;
+    font-size: 18px;
+  }
+
+  .chat-panel {
+    position: fixed;
+    right: 22px;
+    bottom: 88px;
+    width: min(420px, calc(100vw - 32px));
+    height: min(620px, calc(100vh - 120px));
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 24px 70px rgba(24,36,50,.22);
+    z-index: 41;
+    display: none;
+    overflow: hidden;
+  }
+
+  .chat-panel.open { display: grid; grid-template-rows: auto auto 1fr auto; }
+
+  .chat-head {
+    background: #172230;
+    color: white;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .chat-head strong { display: block; }
+  .chat-head span { display: block; color: #b8c4d0; font-size: 12px; }
+
+  .chat-close {
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.08);
+    color: white;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .chat-messages {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    overflow: auto;
+    background: #f9fbfd;
+  }
+
+  .message {
+    max-width: 88%;
+    border-radius: 8px;
+    padding: 10px 11px;
+    font-size: 13px;
+    white-space: pre-wrap;
+  }
+
+  .message.bot {
+    background: white;
+    border: 1px solid var(--line);
+  }
+
+  .message.user {
+    background: var(--blue);
+    color: white;
+    margin-left: auto;
+  }
+
+  .quick-prompts {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 10px 14px 0;
+    background: white;
+  }
+
+  .quick-prompts button {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: white;
+    padding: 6px 9px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 750;
+  }
+
+  .chat-form {
+    border-top: 1px solid var(--line);
+    background: white;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 980px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar {
+      position: static;
+      height: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .nav-group { grid-template-columns: repeat(4, minmax(0, 1fr)); flex: 1; }
+    .mode-card { margin-top: 0; min-width: 260px; }
+    .hero, .recommendation { grid-template-columns: 1fr; }
+    .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 680px) {
+    .content, .top-inner { padding-left: 14px; padding-right: 14px; }
+    .nav-group { grid-template-columns: 1fr 1fr; }
+    .grid.two, .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid { grid-template-columns: 1fr; }
+    .hero-panel, .visual-panel { padding: 18px; }
+    .top-inner, .section-head { align-items: flex-start; flex-direction: column; }
+    .map-row { grid-template-columns: 1fr; }
+    .map-arrow { display: none; }
+  }
+
+  @media print {
+    .sidebar, .top-strip, .chat-launcher, .chat-panel, .hero-actions, .top-actions { display: none !important; }
+    .app-shell { display: block; }
+    .content { max-width: none; padding: 0; }
+    .card, .hero-panel, .visual-panel { box-shadow: none; break-inside: avoid; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">AA</div>
+      <div>
+        <div class="brand-title">AI Automation Architect</div>
+        <div class="brand-sub">Decision estimator, not a workflow builder</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <button class="nav-button active" data-jump="#discover">⌂ Discover</button>
+      <button class="nav-button" data-jump="#intake">▣ Intake</button>
+      <button class="nav-button" data-jump="#recommendation">◇ Recommendation</button>
+      <button class="nav-button" data-jump="#plans">◈ Plans</button>
+    </div>
+    <div class="mode-card">
+      <div class="mode-label">Product mode</div>
+      <div class="mode-toggle" role="group" aria-label="Product mode">
+        <button id="mvpMode" class="active" type="button">MVP</button>
+        <button id="fullMode" type="button">Full</button>
+      </div>
+      <p id="modeHelp" style="margin:10px 0 0;color:#b8c4d0;font-size:12px;">MVP mode gives a fast recommendation with a smaller input set.</p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-strip">
+      <div class="top-inner">
+        <a class="home-link" href="../index.html">← Back to portfolio</a>
+        <div class="top-actions">
+          <button class="btn ghost" id="resetBtn" type="button">Reset</button>
+          <button class="btn" id="copyBtn" type="button">Copy memo</button>
+          <button class="btn primary" id="printBtn" type="button">Export PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <section class="hero" id="discover">
+        <div class="hero-panel">
+          <div class="eyebrow">AI automation decision platform</div>
+          <h1>Find what to automate, what to build, what stack to use, and what it may cost.</h1>
+          <p class="hero-copy">This estimator helps business owners, operators, and executives make a practical go/no-go decision before spending money on an AI automation build.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#intake">Start assessment</a>
+            <button class="btn" type="button" id="sampleBtn">Load sample business</button>
+            <button class="btn green" type="button" id="openChatTop">Ask the architect</button>
+          </div>
+        </div>
+        <div class="visual-panel" aria-label="Decision flow preview">
+          <div>
+            <div class="eyebrow" style="color:#82d3b3;">How the estimator thinks</div>
+            <div class="decision-map">
+              <div class="map-row">
+                <div class="map-node">Business size and risk</div>
+                <div class="map-arrow">→</div>
+                <div class="map-node">Build option shortlist</div>
+              </div>
+              <div class="map-row">
+                <div class="map-node">Workflow pain and volume</div>
+                <div class="map-arrow">→</div>
+                <div class="map-node">Stack and hosting fit</div>
+              </div>
+              <div class="map-row">
+                <div class="map-node">Data sensitivity and integrations</div>
+                <div class="map-arrow">→</div>
+                <div class="map-node">Cost, timeline, and risk</div>
+              </div>
+            </div>
+          </div>
+          <div class="visual-metrics">
+            <div class="visual-metric"><strong id="visualCost">$0</strong><span>Monthly estimate</span></div>
+            <div class="visual-metric"><strong id="visualTimeline">0 wks</strong><span>Build timeline</span></div>
+            <div class="visual-metric"><strong id="visualScore">0</strong><span>Decision score</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>Choose a Starting Point</h2>
+            <p>Pick the closest business outcome. The recommendation will adapt as you answer the intake.</p>
+          </div>
+          <span class="badge green" id="selectedOptionBadge">No option selected</span>
+        </div>
+        <div class="grid four" id="optionGrid"></div>
+      </section>
+
+      <section class="section card pad" id="intake">
+        <div class="section-head">
+          <div>
+            <h2>Assessment Intake</h2>
+            <p>MVP mode uses the essentials. Full mode adds governance, data, and monetization-grade detail.</p>
+          </div>
+          <span class="badge purple" id="modeBadge">MVP Explorer</span>
+        </div>
+        <div class="form-grid">
+          <label>Business size
+            <select id="businessSize"></select>
+          </label>
+          <label>Industry
+            <select id="industry"></select>
+          </label>
+          <label>Primary audience
+            <select id="audience"></select>
+          </label>
+          <label>Monthly users or affected staff
+            <div class="range-line">
+              <input id="users" type="range" min="10" max="20000" step="10" value="100">
+              <div class="readout" id="usersOut">100</div>
+            </div>
+          </label>
+          <label>Monthly AI interactions
+            <div class="range-line">
+              <input id="aiVolume" type="range" min="100" max="200000" step="100" value="5000">
+              <div class="readout" id="aiVolumeOut">5k</div>
+            </div>
+          </label>
+          <label>Number of integrations
+            <div class="range-line">
+              <input id="integrations" type="range" min="0" max="25" step="1" value="3">
+              <div class="readout" id="integrationsOut">3</div>
+            </div>
+          </label>
+          <label>Data sensitivity
+            <select id="sensitivity"></select>
+          </label>
+          <label>Budget range
+            <select id="budget"></select>
+          </label>
+          <label>Technical maturity
+            <select id="maturity"></select>
+          </label>
+          <label class="full-only">Compliance need
+            <select id="compliance"></select>
+          </label>
+          <label class="full-only">Human approval need
+            <select id="approval"></select>
+          </label>
+          <label class="full-only">Timeline pressure
+            <select id="timelinePressure"></select>
+          </label>
+        </div>
+        <div style="margin-top:14px;">
+          <label>Describe the workflow or business pain
+            <textarea id="pain" placeholder="Example: We manually review inbound leads, copy details into a spreadsheet, send follow-up emails, and lose track of hot prospects."></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="summary-grid">
+          <div class="summary-tile"><span>Recommended build</span><strong id="summaryBuild">Select an option</strong></div>
+          <div class="summary-tile"><span>Monthly run cost</span><strong id="summaryCost">$0</strong></div>
+          <div class="summary-tile"><span>Timeline</span><strong id="summaryTimeline">0 weeks</strong></div>
+          <div class="summary-tile"><span>Risk</span><strong id="summaryRisk">Unknown</strong></div>
+          <div class="summary-tile"><span>Decision</span><strong id="summaryDecision">Pending</strong></div>
+        </div>
+      </section>
+
+      <section class="section recommendation" id="recommendation">
+        <div class="card pad">
+          <div class="section-head">
+            <div>
+              <h2>Architecture Recommendation</h2>
+              <p>Generated from the selected build type, business size, usage, risk, and budget.</p>
+            </div>
+          </div>
+          <div id="recommendationBody"></div>
+        </div>
+
+        <div class="card pad">
+          <div class="score-ring" id="scoreRing" style="--score:0%;">
+            <div><span id="scoreValue">0</span><small>fit score</small></div>
+          </div>
+          <div id="scoreNarrative" style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;">Complete the intake to generate a score.</div>
+          <table class="stack-table" aria-label="Stack recommendation">
+            <thead><tr><th>Layer</th><th>Recommendation</th></tr></thead>
+            <tbody id="stackRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section card pad">
+        <div class="section-head">
+          <div>
+            <h2>Cost and Phase Plan</h2>
+            <p>Ranges are directional estimates for planning. Vendor pricing changes often and should be refreshed before purchase.</p>
+          </div>
+        </div>
+        <div class="grid three" id="phaseGrid"></div>
+      </section>
+
+      <section class="section" id="plans">
+        <div class="section-head">
+          <div>
+            <h2>Monetization Model for This Product</h2>
+            <p>Use the MVP as a lead capture and trust builder, then monetize deeper reports, implementation handoff, and consultant tooling.</p>
+          </div>
+        </div>
+        <div class="plan-grid">
+          <div class="price-card">
+            <span class="badge green">MVP Explorer</span>
+            <h3>Free</h3>
+            <div class="price">$0</div>
+            <ul class="feature-list">
+              <li>Basic build recommendation</li>
+              <li>Simple cost and timeline estimate</li>
+              <li>Limited canned options</li>
+              <li>Chatbot guidance</li>
+            </ul>
+            <a class="btn" href="#intake">Use free explorer</a>
+          </div>
+          <div class="price-card featured">
+            <span class="badge purple">Full Version</span>
+            <h3>Decision Report</h3>
+            <div class="price">$49</div>
+            <ul class="feature-list">
+              <li>Full stack comparison</li>
+              <li>Risk, compliance, and ROI sections</li>
+              <li>Exportable architecture memo</li>
+              <li>Vendor handoff checklist</li>
+            </ul>
+            <a class="btn primary" href="mailto:Vandana_karthik@yahoo.com?subject=AI%20Automation%20Architect%20Decision%20Report">Request full report</a>
+          </div>
+          <div class="price-card">
+            <span class="badge gold">Advisor</span>
+            <h3>Consultant Pack</h3>
+            <div class="price">$199</div>
+            <ul class="feature-list">
+              <li>Multiple client assessments</li>
+              <li>White-label report language</li>
+              <li>Editable pricing assumptions</li>
+              <li>Implementation lead capture</li>
+            </ul>
+            <a class="btn green" href="mailto:Vandana_karthik@yahoo.com?subject=AI%20Automation%20Architect%20Consultant%20Pack">Request consultant pack</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open architect chatbot">AI</button>
+<aside class="chat-panel" id="chatPanel" aria-label="Architect chatbot">
+  <div class="chat-head">
+    <div>
+      <strong>Automation Architect</strong>
+      <span>Ask about stack, cost, risk, or what to build first.</span>
+    </div>
+    <button class="chat-close" id="chatClose" type="button" aria-label="Close chatbot">×</button>
+  </div>
+  <div class="quick-prompts">
+    <button type="button" data-prompt="What should I build first?">What first?</button>
+    <button type="button" data-prompt="Explain the cost estimate.">Cost</button>
+    <button type="button" data-prompt="What is the lowest risk MVP?">Lowest risk</button>
+    <button type="button" data-prompt="How do I monetize this?">Monetize</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <form class="chat-form" id="chatForm">
+    <input id="chatInput" type="text" placeholder="Ask a decision question..." autocomplete="off">
+    <button class="btn primary" type="submit">Send</button>
+  </form>
+</aside>
+
+<script>
+const buildOptions = [
+  { id: "website-new", title: "Brand-new company website", icon: "▦", fit: "New or unclear online presence", complexity: 2, value: 62, tags: ["Lead capture", "SEO", "Public"] },
+  { id: "website-revamp", title: "Revamp existing website", icon: "◫", fit: "Outdated site or weak conversion", complexity: 2, value: 66, tags: ["Conversion", "Content", "Public"] },
+  { id: "manual-flow", title: "Automate a manual workflow", icon: "▣", fit: "Copy, paste, approvals, routing", complexity: 3, value: 82, tags: ["Operations", "ROI", "Internal"] },
+  { id: "support-chatbot", title: "Customer support chatbot", icon: "◇", fit: "Repeated customer questions", complexity: 3, value: 76, tags: ["Support", "Self-service", "Public"] },
+  { id: "knowledge-assistant", title: "Internal knowledge assistant", icon: "⌕", fit: "Employees cannot find answers", complexity: 3, value: 74, tags: ["Docs", "Search", "Internal"] },
+  { id: "document-processing", title: "Document processing automation", icon: "▤", fit: "PDFs, forms, invoices, contracts", complexity: 4, value: 84, tags: ["Extraction", "Review", "Data"] },
+  { id: "lead-qualification", title: "Sales lead qualification", icon: "◈", fit: "Slow lead review and follow-up", complexity: 3, value: 80, tags: ["CRM", "Email", "Sales"] },
+  { id: "reporting-dashboard", title: "Reporting dashboard", icon: "▥", fit: "Manual spreadsheet reporting", complexity: 3, value: 72, tags: ["Analytics", "Alerts", "Ops"] },
+  { id: "intake-scheduling", title: "Appointment or intake automation", icon: "◷", fit: "Forms, scheduling, reminders", complexity: 3, value: 78, tags: ["Forms", "Calendar", "CRM"] },
+  { id: "compliance-review", title: "Compliance or review assistant", icon: "▧", fit: "Regulated review or audit trail", complexity: 5, value: 70, tags: ["Governance", "Approval", "Risk"] },
+  { id: "voice-call", title: "Voice or call summary workflow", icon: "◉", fit: "High phone volume or call notes", complexity: 4, value: 73, tags: ["Voice", "Summary", "Tickets"] },
+  { id: "not-sure", title: "Not sure, recommend for me", icon: "?", fit: "Start with guided discovery", complexity: 2, value: 60, tags: ["Discovery", "Prioritize", "MVP"] }
+];
+
+const optionText = {
+  businessSize: [
+    ["very-small", "Very small: fewer than 20 people"],
+    ["small", "Small: fewer than 100 people"],
+    ["medium", "Medium: 500 to 2,000 people"],
+    ["large", "Large: 2,000 to 10,000 people"],
+    ["very-large", "Very large: 10,000+ people"]
+  ],
+  industry: ["Healthcare", "Professional services", "Retail or ecommerce", "Financial services", "Manufacturing", "Real estate", "Education", "Nonprofit", "Technology", "Other"],
+  audience: ["Internal employees", "External customers", "Both internal and external"],
+  sensitivity: ["Public or marketing data", "Internal business data", "Confidential data", "Regulated data"],
+  budget: ["Under $500/month", "$500-$2,000/month", "$2,000-$10,000/month", "$10,000+/month"],
+  maturity: ["No technical team", "Power users or ops team", "Small engineering team", "Enterprise IT team"],
+  compliance: ["None known", "SOC 2 or vendor review", "HIPAA or healthcare controls", "PCI or financial controls", "GDPR or regional privacy"],
+  approval: ["No approval needed", "Human review for edge cases", "Human approval before action", "Formal audit and approval workflow"],
+  timelinePressure: ["Prototype in 1-2 weeks", "MVP in 4-8 weeks", "Production in 2-4 months", "Enterprise rollout in 6+ months"]
+};
+
+const state = {
+  mode: "mvp",
+  buildId: "not-sure"
+};
+
+const $ = (id) => document.getElementById(id);
+const money = (n) => "$" + Math.round(n).toLocaleString();
+const compact = (n) => n >= 1000 ? Math.round(n / 1000) + "k" : n.toLocaleString();
+
+function populateSelect(id, values) {
+  const el = $(id);
+  const pairs = values.map(v => Array.isArray(v) ? v : [v, v]);
+  el.innerHTML = pairs.map(([value, label]) => `<option value="${value}">${label}</option>`).join("");
+}
+
+function init() {
+  Object.entries(optionText).forEach(([id, values]) => populateSelect(id, values));
+  renderOptions();
+  attachEvents();
+  loadSaved();
+  applyMode();
+  calculate();
+  botSay("I can help you decide what to build, estimate cost, compare stacks, or shape an MVP. Pick a canned option and I will use that context.");
+}
+
+function renderOptions() {
+  $("optionGrid").innerHTML = buildOptions.map(opt => `
+    <button class="option-card" type="button" data-option="${opt.id}">
+      <div class="option-icon">${opt.icon}</div>
+      <h3>${opt.title}</h3>
+      <p>${opt.fit}</p>
+      <div class="badge-row">${opt.tags.map(tag => `<span class="badge">${tag}</span>`).join("")}</div>
+    </button>
+  `).join("");
+}
+
+function attachEvents() {
+  document.querySelectorAll("[data-jump]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelector(btn.dataset.jump).scrollIntoView({ behavior: "smooth" });
+    });
+  });
+
+  $("optionGrid").addEventListener("click", event => {
+    const card = event.target.closest("[data-option]");
+    if (!card) return;
+    state.buildId = card.dataset.option;
+    calculate();
+  });
+
+  ["businessSize","industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"].forEach(id => {
+    $(id).addEventListener("input", calculate);
+  });
+
+  $("mvpMode").addEventListener("click", () => setMode("mvp"));
+  $("fullMode").addEventListener("click", () => setMode("full"));
+  $("printBtn").addEventListener("click", () => window.print());
+  $("copyBtn").addEventListener("click", copyMemo);
+  $("resetBtn").addEventListener("click", resetAll);
+  $("sampleBtn").addEventListener("click", loadSample);
+  $("chatLauncher").addEventListener("click", openChat);
+  $("openChatTop").addEventListener("click", openChat);
+  $("chatClose").addEventListener("click", () => $("chatPanel").classList.remove("open"));
+  $("chatForm").addEventListener("submit", handleChat);
+  document.querySelectorAll("[data-prompt]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      $("chatInput").value = btn.dataset.prompt;
+      $("chatForm").requestSubmit();
+    });
+  });
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  applyMode();
+  calculate();
+}
+
+function applyMode() {
+  $("mvpMode").classList.toggle("active", state.mode === "mvp");
+  $("fullMode").classList.toggle("active", state.mode === "full");
+  $("modeBadge").textContent = state.mode === "mvp" ? "MVP Explorer" : "Full Advisor";
+  $("modeHelp").textContent = state.mode === "mvp"
+    ? "MVP mode gives a fast recommendation with a smaller input set."
+    : "Full mode adds risk, governance, approval, and implementation detail.";
+  document.querySelectorAll(".full-only").forEach(el => el.classList.toggle("hidden", state.mode === "mvp"));
+}
+
+function getInputs() {
+  return {
+    build: buildOptions.find(o => o.id === state.buildId) || buildOptions.at(-1),
+    businessSize: $("businessSize").value,
+    industry: $("industry").value,
+    audience: $("audience").value,
+    users: Number($("users").value),
+    aiVolume: Number($("aiVolume").value),
+    integrations: Number($("integrations").value),
+    sensitivity: $("sensitivity").value,
+    budget: $("budget").value,
+    maturity: $("maturity").value,
+    compliance: $("compliance").value,
+    approval: $("approval").value,
+    timelinePressure: $("timelinePressure").value,
+    pain: $("pain").value.trim()
+  };
+}
+
+function complexityMultiplier(input) {
+  let multiplier = 1 + input.build.complexity * 0.18;
+  if (["medium","large","very-large"].includes(input.businessSize)) multiplier += 0.35;
+  if (input.sensitivity.includes("Confidential")) multiplier += 0.22;
+  if (input.sensitivity.includes("Regulated")) multiplier += 0.45;
+  if (input.integrations > 8) multiplier += 0.28;
+  if (state.mode === "full") multiplier += 0.12;
+  return multiplier;
+}
+
+function recommendTier(input) {
+  if (["large","very-large"].includes(input.businessSize) || input.sensitivity.includes("Regulated") || input.compliance.includes("HIPAA") || input.compliance.includes("PCI")) return "Enterprise / Governed";
+  if (input.businessSize === "medium" || input.integrations > 6 || input.budget.includes("2,000") || input.budget.includes("10,000")) return "Balanced / Scalable";
+  return "Fast / Low Cost";
+}
+
+function costModel(input) {
+  const tier = recommendTier(input);
+  const mult = complexityMultiplier(input);
+  const ai = Math.max(25, input.aiVolume * (input.sensitivity.includes("Regulated") ? 0.012 : 0.006));
+  const hosting = tier === "Enterprise / Governed" ? 1600 : tier === "Balanced / Scalable" ? 420 : 85;
+  const database = tier === "Enterprise / Governed" ? 1400 : tier === "Balanced / Scalable" ? 220 : 40;
+  const automation = input.integrations * (tier === "Enterprise / Governed" ? 110 : tier === "Balanced / Scalable" ? 55 : 18);
+  const monitoring = tier === "Enterprise / Governed" ? 900 : tier === "Balanced / Scalable" ? 160 : 0;
+  const monthlyLow = (ai + hosting + database + automation + monitoring) * 0.72;
+  const monthlyHigh = (ai + hosting + database + automation + monitoring) * mult;
+  const buildLow = (input.build.complexity * 1800 + input.integrations * 650) * (tier === "Enterprise / Governed" ? 4.5 : tier === "Balanced / Scalable" ? 2.1 : 0.8);
+  const buildHigh = buildLow * (tier === "Enterprise / Governed" ? 2.8 : 2.2);
+  const weeks = Math.max(2, Math.round(input.build.complexity * 1.8 + input.integrations * 0.45 + (tier === "Enterprise / Governed" ? 8 : tier === "Balanced / Scalable" ? 3 : 0)));
+  return { tier, monthlyLow, monthlyHigh, buildLow, buildHigh, weeks };
+}
+
+function scoreModel(input, costs) {
+  let score = input.build.value;
+  if (input.pain.length > 35) score += 5;
+  if (input.integrations <= 5) score += 5;
+  if (input.aiVolume > 10000) score += 4;
+  if (input.sensitivity.includes("Regulated")) score -= 12;
+  if (input.approval.includes("Formal")) score -= 6;
+  if (input.budget.includes("Under") && costs.tier !== "Fast / Low Cost") score -= 15;
+  if (state.mode === "full") score += 3;
+  return Math.max(35, Math.min(94, Math.round(score)));
+}
+
+function riskLabel(input, costs) {
+  let points = input.build.complexity;
+  if (input.sensitivity.includes("Regulated")) points += 3;
+  if (input.integrations > 8) points += 2;
+  if (["large","very-large"].includes(input.businessSize)) points += 2;
+  if (input.approval.includes("Formal")) points += 1;
+  if (points >= 9) return "High";
+  if (points >= 6) return "Medium";
+  return "Low";
+}
+
+function stackFor(input, tier) {
+  if (tier === "Enterprise / Governed") {
+    return {
+      Frontend: "Custom React/Next.js or enterprise portal",
+      Backend: "AWS, Azure, or GCP with governed APIs",
+      Database: "Postgres, SQL Server, Oracle, Snowflake, or Databricks",
+      AI: "Azure OpenAI, AWS Bedrock, Vertex AI, or approved private endpoint",
+      Automation: "ServiceNow, Power Platform, Pega, or enterprise workflow layer",
+      Security: "SSO, RBAC, audit logs, retention, human approval controls"
+    };
+  }
+  if (tier === "Balanced / Scalable") {
+    return {
+      Frontend: "Next.js, React, Retool, or a polished low-code app",
+      Backend: "Supabase, Neon, Cloud Run, or serverless APIs",
+      Database: "Managed Postgres with pgvector if knowledge search is needed",
+      AI: "OpenAI or Anthropic with logging, evals, and fallback model routing",
+      Automation: "Make, n8n, Zapier, or custom serverless orchestration",
+      Security: "Clerk/Auth0/Supabase Auth, role-based access, usage monitoring"
+    };
+  }
+  return {
+    Frontend: "Lovable, Replit, Webflow, Framer, or lightweight static app",
+    Backend: "Supabase, Firebase, Airtable, or no-code database",
+    Database: "Supabase Postgres, Airtable, Google Sheets, or Firebase",
+    AI: "OpenAI, Anthropic, or Gemini API with simple usage limits",
+    Automation: "Zapier, Make, n8n Cloud, or simple email/form automations",
+    Security: "Basic access controls, no sensitive data in MVP"
+  };
+}
+
+function decisionText(score, risk) {
+  if (score >= 78 && risk !== "High") return "Proceed";
+  if (score >= 65) return "Validate first";
+  return "Pause";
+}
+
+function phases(input, costs) {
+  const paidDetail = state.mode === "full"
+    ? "Includes compliance notes, vendor handoff checklist, and ROI assumptions."
+    : "Upgrade full mode to add vendor handoff and deeper compliance detail.";
+  return [
+    { title: "Phase 1: Decision MVP", cost: `${money(costs.buildLow * .18)}-${money(costs.buildLow * .35)}`, text: `Confirm the use case, map the workflow, and build a click-through or lightweight automation. ${paidDetail}` },
+    { title: "Phase 2: Production Pilot", cost: `${money(costs.buildLow * .55)}-${money(costs.buildHigh * .55)}`, text: "Connect real tools, add human review, measure time saved, and test with a small user group." },
+    { title: "Phase 3: Scale and Govern", cost: `${money(costs.buildLow)}-${money(costs.buildHigh)}`, text: "Add monitoring, permissions, audit trail, operational support, and scale controls before broad rollout." }
+  ];
+}
+
+function calculate() {
+  const input = getInputs();
+  const costs = costModel(input);
+  const score = scoreModel(input, costs);
+  const risk = riskLabel(input, costs);
+  const decision = decisionText(score, risk);
+  const stack = stackFor(input, costs.tier);
+
+  $("usersOut").textContent = compact(input.users);
+  $("aiVolumeOut").textContent = compact(input.aiVolume);
+  $("integrationsOut").textContent = input.integrations;
+  $("selectedOptionBadge").textContent = input.build.title;
+  document.querySelectorAll(".option-card").forEach(card => card.classList.toggle("selected", card.dataset.option === input.build.id));
+
+  $("summaryBuild").textContent = input.build.title;
+  $("summaryCost").textContent = `${money(costs.monthlyLow)}-${money(costs.monthlyHigh)}`;
+  $("summaryTimeline").textContent = `${costs.weeks}-${costs.weeks + 4} weeks`;
+  $("summaryRisk").textContent = risk;
+  $("summaryDecision").textContent = decision;
+  $("visualCost").textContent = `${money(costs.monthlyLow)}`;
+  $("visualTimeline").textContent = `${costs.weeks} wks`;
+  $("visualScore").textContent = score;
+
+  $("scoreValue").textContent = score;
+  $("scoreRing").style.setProperty("--score", score + "%");
+  $("scoreNarrative").textContent = `${decision}: ${costs.tier} is the best-fit architecture lane with ${risk.toLowerCase()} delivery risk.`;
+
+  $("stackRows").innerHTML = Object.entries(stack).map(([layer, rec]) => `<tr><td><strong>${layer}</strong></td><td>${rec}</td></tr>`).join("");
+
+  const firstStep = input.build.id === "not-sure"
+    ? "Run a short discovery sprint and compare 3 candidate automations before building."
+    : `Start with ${input.build.title.toLowerCase()} as the primary build.`;
+
+  $("recommendationBody").innerHTML = `
+    <h3>${decision}: ${input.build.title}</h3>
+    <p>${firstStep} This is recommended for a ${input.businessSize.replace("-", " ")} organization in ${input.industry.toLowerCase()} serving ${input.audience.toLowerCase()}.</p>
+    <div class="grid two">
+      <div class="card pad">
+        <span class="badge green">Primary path</span>
+        <h3>${costs.tier}</h3>
+        <p>Use this lane because the current mix of users, data sensitivity, integrations, and budget points to this level of control.</p>
+      </div>
+      <div class="card pad">
+        <span class="badge ${risk === "High" ? "red" : risk === "Medium" ? "gold" : "green"}">${risk} risk</span>
+        <h3>${money(costs.buildLow)}-${money(costs.buildHigh)} build range</h3>
+        <p>Expected monthly run cost is ${money(costs.monthlyLow)}-${money(costs.monthlyHigh)} before enterprise procurement, custom security, or premium support.</p>
+      </div>
+    </div>
+    <p style="margin-top:14px;"><strong>Recommended first milestone:</strong> prove one measurable outcome, such as hours saved, faster response time, higher lead conversion, fewer manual errors, or lower ticket volume.</p>
+  `;
+
+  $("phaseGrid").innerHTML = phases(input, costs).map(phase => `
+    <div class="card pad">
+      <span class="badge purple">${phase.cost}</span>
+      <h3>${phase.title}</h3>
+      <p style="color:var(--muted);font-size:13px;">${phase.text}</p>
+    </div>
+  `).join("");
+
+  saveState();
+}
+
+function saveState() {
+  const ids = ["businessSize","industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"];
+  const data = { mode: state.mode, buildId: state.buildId };
+  ids.forEach(id => data[id] = $(id).value);
+  localStorage.setItem("aiAutomationArchitect", JSON.stringify(data));
+}
+
+function loadSaved() {
+  try {
+    const data = JSON.parse(localStorage.getItem("aiAutomationArchitect") || "{}");
+    if (data.mode) state.mode = data.mode;
+    if (data.buildId) state.buildId = data.buildId;
+    Object.keys(data).forEach(id => { if ($(id)) $(id).value = data[id]; });
+  } catch {}
+}
+
+function resetAll() {
+  localStorage.removeItem("aiAutomationArchitect");
+  state.mode = "mvp";
+  state.buildId = "not-sure";
+  $("businessSize").value = "small";
+  $("industry").value = "Healthcare";
+  $("audience").value = "Internal employees";
+  $("users").value = 100;
+  $("aiVolume").value = 5000;
+  $("integrations").value = 3;
+  $("sensitivity").value = "Internal business data";
+  $("budget").value = "$500-$2,000/month";
+  $("maturity").value = "Power users or ops team";
+  $("compliance").value = "None known";
+  $("approval").value = "Human review for edge cases";
+  $("timelinePressure").value = "MVP in 4-8 weeks";
+  $("pain").value = "";
+  applyMode();
+  calculate();
+}
+
+function loadSample() {
+  state.mode = "full";
+  state.buildId = "lead-qualification";
+  $("businessSize").value = "small";
+  $("industry").value = "Professional services";
+  $("audience").value = "External customers";
+  $("users").value = 250;
+  $("aiVolume").value = 18000;
+  $("integrations").value = 5;
+  $("sensitivity").value = "Confidential data";
+  $("budget").value = "$2,000-$10,000/month";
+  $("maturity").value = "Small engineering team";
+  $("compliance").value = "SOC 2 or vendor review";
+  $("approval").value = "Human review for edge cases";
+  $("timelinePressure").value = "MVP in 4-8 weeks";
+  $("pain").value = "Inbound leads arrive from the website, email, and referrals. The team manually reviews each lead, updates the CRM, drafts follow-up emails, and loses track of high-value prospects.";
+  applyMode();
+  calculate();
+}
+
+function buildMemo() {
+  const input = getInputs();
+  const costs = costModel(input);
+  const score = scoreModel(input, costs);
+  const risk = riskLabel(input, costs);
+  const decision = decisionText(score, risk);
+  const stack = stackFor(input, costs.tier);
+  return [
+    "AI Automation Architect Decision Memo",
+    "",
+    `Recommended build: ${input.build.title}`,
+    `Decision: ${decision}`,
+    `Fit score: ${score}/100`,
+    `Architecture lane: ${costs.tier}`,
+    `Risk: ${risk}`,
+    `Monthly run cost: ${money(costs.monthlyLow)}-${money(costs.monthlyHigh)}`,
+    `Build estimate: ${money(costs.buildLow)}-${money(costs.buildHigh)}`,
+    `Timeline: ${costs.weeks}-${costs.weeks + 4} weeks`,
+    "",
+    "Recommended stack:",
+    ...Object.entries(stack).map(([k,v]) => `- ${k}: ${v}`),
+    "",
+    `Business context: ${input.businessSize}, ${input.industry}, ${input.audience}`,
+    `Pain point: ${input.pain || "Not provided"}`
+  ].join("\n");
+}
+
+async function copyMemo() {
+  await navigator.clipboard.writeText(buildMemo());
+  $("copyBtn").textContent = "Copied";
+  setTimeout(() => $("copyBtn").textContent = "Copy memo", 1200);
+}
+
+function openChat() {
+  $("chatPanel").classList.add("open");
+  $("chatInput").focus();
+}
+
+function botSay(text) {
+  const msg = document.createElement("div");
+  msg.className = "message bot";
+  msg.textContent = text;
+  $("chatMessages").appendChild(msg);
+  $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+}
+
+function userSay(text) {
+  const msg = document.createElement("div");
+  msg.className = "message user";
+  msg.textContent = text;
+  $("chatMessages").appendChild(msg);
+  $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+}
+
+function handleChat(event) {
+  event.preventDefault();
+  const text = $("chatInput").value.trim();
+  if (!text) return;
+  $("chatInput").value = "";
+  userSay(text);
+  setTimeout(() => botSay(chatResponse(text)), 180);
+}
+
+function chatResponse(text) {
+  const input = getInputs();
+  const costs = costModel(input);
+  const score = scoreModel(input, costs);
+  const risk = riskLabel(input, costs);
+  const lower = text.toLowerCase();
+  if (lower.includes("cost")) {
+    return `Your current estimate is ${money(costs.monthlyLow)}-${money(costs.monthlyHigh)} per month and ${money(costs.buildLow)}-${money(costs.buildHigh)} to build. The biggest drivers are ${input.integrations} integrations, ${compact(input.aiVolume)} monthly AI interactions, and the ${input.sensitivity.toLowerCase()} setting.`;
+  }
+  if (lower.includes("risk") || lower.includes("lowest")) {
+    return `Lowest-risk MVP: limit the first version to one workflow, one approval point, and 2-3 integrations. For your current setup, I would start with ${input.build.title.toLowerCase()} in the ${costs.tier} lane and avoid regulated or irreversible actions until the pilot proves value.`;
+  }
+  if (lower.includes("monet")) {
+    return "Monetization path: keep MVP free for lead capture, charge $49 for a full decision report, offer $199/month consultant workspaces, and capture implementation leads for vetted builders or your own service package.";
+  }
+  if (lower.includes("stack") || lower.includes("tool")) {
+    const stack = stackFor(input, costs.tier);
+    return `Best-fit stack lane: ${costs.tier}.\nFrontend: ${stack.Frontend}\nBackend: ${stack.Backend}\nAI: ${stack.AI}\nAutomation: ${stack.Automation}`;
+  }
+  if (lower.includes("first") || lower.includes("build")) {
+    return `Build first: ${input.build.title}. Current fit score is ${score}/100 with ${risk.toLowerCase()} risk. The first milestone should prove a measurable business result before expanding scope.`;
+  }
+  return `Based on the current assessment, I recommend ${input.build.title} using the ${costs.tier} lane. Fit score is ${score}/100, risk is ${risk.toLowerCase()}, and the planning estimate is ${money(costs.monthlyLow)}-${money(costs.monthlyHigh)} per month. Ask me about cost, stack, risk, or monetization for more detail.`;
+}
+
+init();
+</script>
+</body>
+</html>

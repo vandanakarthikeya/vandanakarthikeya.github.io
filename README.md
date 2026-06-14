@@ -31,7 +31,13 @@ VP-level Engineering, Data & Ops leader with 26+ years solving real-world busine
 - Root Cause Analysis (RCA) Builder
 - Change Advisory Board (CAB) Simulator
 
-### Group 05 — Scripture Translators & Tutors
+### Group 05 — PMO & Estimation Tools
+| App | File | Description |
+|-----|------|-------------|
+| **AI Automation Architect** | `ai-automation-architect/index.html` | Decision-support estimator that recommends what AI automation to build, which stack to use, expected cost, delivery timeline, risk, and proceed/validate/pause guidance. Includes MVP and full-version modes plus an interactive architect chatbot. |
+| **AI Transformation Estimation Framework** | `ai-estimation-framework.html` | Three-card estimator for AI build and transformation projects with build cost, annual OpEx, 3-year TCO, wave planning, and pricing-model recommendations. |
+
+### Group 06 — Scripture Translators & Tutors
 | App | File | Description |
 |-----|------|-------------|
 | **श्री रुद्रम् — Śrī Rudram Learning App** | `rudram-app.html` | Vedic chanting tutor with svara-marked Devanagari text, embedded reference audio, recording capability, and pronunciation practice for Namakam & Chamakam. |
@@ -49,9 +55,12 @@ VP-level Engineering, Data & Ops leader with 26+ years solving real-world busine
 ├── hl7-fhir-mapper.html               # Group 1: HL7 FHIR Mapper
 ├── ivr-call-flow-designer.html         # Group 2: IVR Designer
 ├── healthcare-translator.html          # Group 2: Healthcare Translator
-├── rudram-app.html                     # Group 5: Rudram Learning App
-├── bhagavatam-skandha1.html            # Group 5: Bhagavatam Skandha 1
-├── sundarar-nayanar.html               # Group 5: Sundarar Nayanar
+├── ai-automation-architect/
+│   └── index.html                      # Group 5: AI Automation Architect
+├── ai-estimation-framework.html        # Group 5: AI Transformation Estimator
+├── rudram-app.html                     # Group 6: Rudram Learning App
+├── bhagavatam-skandha1.html            # Group 6: Bhagavatam Skandha 1
+├── sundarar-nayanar.html               # Group 6: Sundarar Nayanar
 └── README.md                           # This file
 ```
 
