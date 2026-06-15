@@ -504,6 +504,13 @@
     font-weight: 650;
   }
 
+  .inline-note {
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 750;
+    margin-top: 8px;
+  }
+
   .choice-chip {
     border: 1px solid var(--line);
     background: white;
@@ -890,12 +897,12 @@
       <button class="nav-button" data-jump="#plans">◈ Plans</button>
     </div>
     <div class="mode-card">
-      <div class="mode-label">Product mode</div>
-      <div class="mode-toggle" role="group" aria-label="Product mode">
-        <button id="mvpMode" class="active" type="button">MVP</button>
-        <button id="fullMode" type="button">Full</button>
+      <div class="mode-label">Estimator version</div>
+      <div class="mode-toggle" role="group" aria-label="Estimator version">
+        <button id="mvpMode" type="button">MVP page</button>
+        <button id="fullMode" class="active" type="button">Full</button>
       </div>
-      <p id="modeHelp" style="margin:10px 0 0;color:#b8c4d0;font-size:12px;">MVP mode gives a fast recommendation with a smaller input set.</p>
+      <p id="modeHelp" style="margin:10px 0 0;color:#b8c4d0;font-size:12px;">This is the full estimator. Use the MVP page for the simplest flow.</p>
     </div>
   </aside>
 
@@ -924,6 +931,7 @@
           </div>
           <div class="hero-actions">
             <a class="btn primary" href="#selection">Choose outcomes</a>
+            <a class="btn green" href="mvp.html">Open simplified MVP</a>
             <button class="btn" type="button" id="sampleBtn">Load sample business</button>
             <button class="btn green" type="button" id="openChatTop">Ask the architect</button>
           </div>
@@ -939,6 +947,7 @@
           <span class="badge green" id="selectedOptionBadge">No option selected</span>
         </div>
         <div class="grid four" id="optionGrid"></div>
+        <div class="inline-note" id="conflictNotice"></div>
         <div class="selection-actions">
           <div class="selection-hint" id="selectionHint">Select at least one option to continue.</div>
           <div class="hero-actions">
@@ -1167,7 +1176,7 @@ const optionText = {
 };
 
 const state = {
-  mode: "mvp",
+  mode: "full",
   buildIds: [],
   businessSizes: ["small"],
   stage: "selection"
@@ -1241,7 +1250,7 @@ function attachEvents() {
     $(id).addEventListener("input", calculate);
   });
 
-  $("mvpMode").addEventListener("click", () => setMode("mvp"));
+  $("mvpMode").addEventListener("click", () => { window.location.href = "mvp.html"; });
   $("fullMode").addEventListener("click", () => setMode("full"));
   $("continueBtn").addEventListener("click", () => {
     if (!state.buildIds.length) state.buildIds = ["not-sure"];
@@ -1296,17 +1305,26 @@ function applyMode() {
   $("fullMode").classList.toggle("active", state.mode === "full");
   $("modeBadge").textContent = state.mode === "mvp" ? "MVP Explorer" : "Full Advisor";
   $("modeHelp").textContent = state.mode === "mvp"
-    ? "MVP mode gives a fast recommendation with a smaller input set."
-    : "Full mode adds risk, governance, approval, and implementation detail.";
+    ? "Open the MVP page for a simpler guided estimate."
+    : "This is the full estimator. Use the MVP page for the simplest flow.";
   document.querySelectorAll(".full-only").forEach(el => el.classList.toggle("hidden", state.mode === "mvp"));
 }
 
 function toggleBuildOption(id) {
+  $("conflictNotice").textContent = "";
   if (id === "not-sure") {
     state.buildIds = state.buildIds.includes("not-sure") ? [] : ["not-sure"];
     return;
   }
   state.buildIds = state.buildIds.filter(item => item !== "not-sure");
+  if (id === "website-new" && state.buildIds.includes("website-revamp")) {
+    state.buildIds = state.buildIds.filter(item => item !== "website-revamp");
+    $("conflictNotice").textContent = "A brand-new website and a website revamp are alternatives. The revamp option was removed.";
+  }
+  if (id === "website-revamp" && state.buildIds.includes("website-new")) {
+    state.buildIds = state.buildIds.filter(item => item !== "website-new");
+    $("conflictNotice").textContent = "A brand-new website and a website revamp are alternatives. The new-website option was removed.";
+  }
   if (state.buildIds.includes(id)) {
     state.buildIds = state.buildIds.filter(item => item !== id);
   } else {
@@ -1565,7 +1583,7 @@ function saveState() {
 function loadSaved() {
   try {
     const data = JSON.parse(localStorage.getItem("aiAutomationArchitect") || "{}");
-    if (data.mode) state.mode = data.mode;
+    if (data.mode) state.mode = data.mode === "mvp" ? "full" : data.mode;
     if (Array.isArray(data.buildIds)) state.buildIds = data.buildIds;
     else if (data.buildId) state.buildIds = [data.buildId];
     if (Array.isArray(data.businessSizes)) state.businessSizes = [data.businessSizes[0] || "small"];
@@ -1577,7 +1595,7 @@ function loadSaved() {
 
 function resetAll() {
   localStorage.removeItem("aiAutomationArchitect");
-  state.mode = "mvp";
+  state.mode = "full";
   state.buildIds = [];
   state.businessSizes = ["small"];
   state.stage = "selection";

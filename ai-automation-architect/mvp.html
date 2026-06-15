@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automation Architect MVP</title>
+<meta name="description" content="Simple MVP estimator for deciding which AI automation to build, with stack fit, cost breakdown, and setup estimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --ink: #152233;
+    --muted: #66778c;
+    --line: #dfe7ef;
+    --blue: #1f6099;
+    --green: #17816d;
+    --green-soft: #ddf4ed;
+    --gold: #9b6616;
+    --gold-soft: #fff2d9;
+    --red: #a33b3b;
+    --red-soft: #fde8e8;
+    --shadow: 0 14px 34px rgba(35, 50, 70, .08);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+  }
+
+  button, select, input, textarea { font: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .back {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: var(--green-soft);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .hero, .section, .results {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow {
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  h1, h2, h3, p { margin-top: 0; }
+  h1 {
+    font-size: clamp(30px, 5vw, 48px);
+    line-height: 1.04;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .sub {
+    color: var(--muted);
+    max-width: 760px;
+    margin-bottom: 0;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .step {
+    border: 1px solid var(--line);
+    background: #f9fbfd;
+    border-radius: 8px;
+    padding: 12px;
+    display: grid;
+    gap: 4px;
+  }
+
+  .step strong {
+    font-size: 13px;
+  }
+
+  .step span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .choice {
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: left;
+    min-height: 108px;
+  }
+
+  .choice strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .choice span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .choice.selected {
+    border-color: var(--blue);
+    outline: 3px solid rgba(31, 96, 153, .12);
+  }
+
+  .choice.conflict {
+    border-color: var(--red);
+    background: var(--red-soft);
+  }
+
+  .note {
+    margin-top: 10px;
+    color: var(--gold);
+    background: var(--gold-soft);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+  }
+
+  .note.show { display: block; }
+
+  .form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  select, input, textarea {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-height: 42px;
+    padding: 10px;
+    background: white;
+    color: var(--ink);
+    width: 100%;
+  }
+
+  input[type="range"] {
+    padding: 0;
+    accent-color: var(--blue);
+  }
+
+  textarea {
+    min-height: 88px;
+    resize: vertical;
+  }
+
+  .range-row {
+    display: grid;
+    grid-template-columns: 1fr 72px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .readout {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-height: 42px;
+    display: grid;
+    place-items: center;
+    color: var(--blue);
+    font-weight: 800;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    color: var(--ink);
+    padding: 10px 13px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .btn.primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+  }
+
+  .btn.green {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .metric {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    background: #fbfdff;
+  }
+
+  .metric span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .metric strong {
+    font-size: 18px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  th, td {
+    border-bottom: 1px solid #edf2f6;
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .results {
+    display: none;
+  }
+
+  .results.show {
+    display: block;
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 760px) {
+    .steps, .grid, .form, .summary, .two {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="shell">
+  <div class="top">
+    <a class="back" href="./">Back to full estimator</a>
+    <span class="pill">Simple MVP</span>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">AI automation decision MVP</div>
+    <h1>Answer a few questions. Get a practical build and cost recommendation.</h1>
+    <p class="sub">This page is intentionally simple. Choose one website direction, select any workflow outcomes that apply, then review stack fit, monthly cost breakdown, and setup estimate.</p>
+    <div class="steps">
+      <div class="step"><strong>1. Choose scope</strong><span>Website direction is single-choice. Workflows can be multi-select.</span></div>
+      <div class="step"><strong>2. Add basics</strong><span>Business size, usage, sensitivity, integrations, and budget.</span></div>
+      <div class="step"><strong>3. Review estimate</strong><span>Decision, stack, monthly cost, and setup/consulting cost.</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>1. Website Direction</h2>
+    <p class="sub">Choose one. Building a new website and revamping an existing website are alternatives, not parallel outcomes.</p>
+    <div class="grid" id="websiteGrid">
+      <button class="choice" data-website="none" type="button"><strong>No website work</strong><span>Focus only on automation or internal tools.</span></button>
+      <button class="choice" data-website="new" type="button"><strong>Build a brand-new website</strong><span>No useful current site, new company, or new product line.</span></button>
+      <button class="choice" data-website="revamp" type="button"><strong>Revamp existing website</strong><span>Current site exists but needs better content, design, conversion, or AI lead capture.</span></button>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>2. Workflow Outcomes</h2>
+    <p class="sub">Select all that apply. These can usually be combined or phased.</p>
+    <div class="grid" id="workflowGrid">
+      <button class="choice" data-workflow="manual" type="button"><strong>Automate manual workflow</strong><span>Copy/paste, approvals, routing, admin work.</span></button>
+      <button class="choice" data-workflow="support" type="button"><strong>Customer support chatbot</strong><span>Repeated customer questions and escalation.</span></button>
+      <button class="choice" data-workflow="knowledge" type="button"><strong>Internal knowledge assistant</strong><span>Employees need answers from docs and policies.</span></button>
+      <button class="choice" data-workflow="documents" type="button"><strong>Document processing</strong><span>PDFs, invoices, forms, contracts, intake packets.</span></button>
+      <button class="choice" data-workflow="leads" type="button"><strong>Lead qualification</strong><span>Score leads, update CRM, draft follow-ups.</span></button>
+      <button class="choice" data-workflow="dashboard" type="button"><strong>Reporting dashboard</strong><span>Replace spreadsheet reporting and manual summaries.</span></button>
+      <button class="choice" data-workflow="appointments" type="button"><strong>Appointment or intake flow</strong><span>Forms, scheduling, reminders, intake triage.</span></button>
+      <button class="choice" data-workflow="compliance" type="button"><strong>Compliance review assistant</strong><span>Human review, risk flags, approval trail.</span></button>
+      <button class="choice" data-workflow="voice" type="button"><strong>Voice or call summary</strong><span>Call notes, summaries, ticket creation.</span></button>
+    </div>
+    <div class="note" id="scopeNote"></div>
+  </section>
+
+  <section class="section">
+    <h2>3. Assessment Basics</h2>
+    <div class="form">
+      <label>Business size
+        <select id="businessSize">
+          <option value="very-small">Very small: fewer than 20</option>
+          <option value="small" selected>Small: fewer than 100</option>
+          <option value="medium">Medium: 500 to 2,000</option>
+          <option value="large">Large: 2,000 to 10,000</option>
+          <option value="very-large">Very large: 10,000+</option>
+        </select>
+      </label>
+      <label>Audience
+        <select id="audience">
+          <option>Internal employees</option>
+          <option>External customers</option>
+          <option>Both internal and external</option>
+        </select>
+      </label>
+      <label>Data sensitivity
+        <select id="sensitivity">
+          <option>Public or marketing data</option>
+          <option>Internal business data</option>
+          <option>Confidential data</option>
+          <option>Regulated data</option>
+        </select>
+      </label>
+      <label>Monthly AI interactions
+        <div class="range-row">
+          <input id="aiVolume" type="range" min="500" max="200000" step="500" value="5000">
+          <div class="readout" id="aiOut">5k</div>
+        </div>
+      </label>
+      <label>Integrations
+        <div class="range-row">
+          <input id="integrations" type="range" min="0" max="20" step="1" value="3">
+          <div class="readout" id="integrationsOut">3</div>
+        </div>
+      </label>
+      <label>Budget comfort
+        <select id="budget">
+          <option>Under $500/month</option>
+          <option selected>$500-$2,000/month</option>
+          <option>$2,000-$10,000/month</option>
+          <option>$10,000+/month</option>
+        </select>
+      </label>
+    </div>
+    <label style="margin-top:12px;">Business pain or goal
+      <textarea id="pain" placeholder="Example: Leads come through email and website forms. We manually review them, update a CRM, and send follow-up emails."></textarea>
+    </label>
+    <div class="actions">
+      <button class="btn" type="button" id="resetBtn">Reset</button>
+      <button class="btn primary" type="button" id="estimateBtn">Generate MVP estimate</button>
+    </div>
+  </section>
+
+  <section class="results" id="results">
+    <div class="summary">
+      <div class="metric"><span>Recommendation</span><strong id="decision">Pending</strong></div>
+      <div class="metric"><span>Primary build</span><strong id="primaryBuild">-</strong></div>
+      <div class="metric"><span>Monthly estimate</span><strong id="monthlyTotal">-</strong></div>
+      <div class="metric"><span>Setup estimate</span><strong id="setupTotal">-</strong></div>
+    </div>
+    <div class="two">
+      <div>
+        <h2>Recommended Path</h2>
+        <p id="memo" class="sub"></p>
+        <table>
+          <thead><tr><th>Layer</th><th>Recommended stack</th></tr></thead>
+          <tbody id="stackRows"></tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Monthly Cost Breakdown</h2>
+        <table>
+          <thead><tr><th>Cost area</th><th>Approx monthly</th><th>What it covers</th></tr></thead>
+          <tbody id="costRows"></tbody>
+        </table>
+        <h2 style="margin-top:18px;">Setup / Consulting Cost</h2>
+        <table>
+          <thead><tr><th>Cost area</th><th>Approx one-time</th><th>What it covers</th></tr></thead>
+          <tbody id="setupRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="copyBtn" type="button">Copy summary</button>
+      <button class="btn green" onclick="window.print()" type="button">Export PDF</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const workflowData = {
+  manual: { title: "Manual workflow automation", complexity: 3, value: 82 },
+  support: { title: "Customer support chatbot", complexity: 3, value: 76 },
+  knowledge: { title: "Internal knowledge assistant", complexity: 3, value: 74 },
+  documents: { title: "Document processing", complexity: 4, value: 84 },
+  leads: { title: "Sales lead qualification", complexity: 3, value: 80 },
+  dashboard: { title: "Reporting dashboard", complexity: 3, value: 72 },
+  appointments: { title: "Appointment or intake flow", complexity: 3, value: 78 },
+  compliance: { title: "Compliance review assistant", complexity: 5, value: 70 },
+  voice: { title: "Voice or call summary", complexity: 4, value: 73 }
+};
+
+const state = {
+  website: "none",
+  workflows: []
+};
+
+const $ = (id) => document.getElementById(id);
+const money = (value) => "$" + Math.round(value).toLocaleString();
+const compact = (value) => value >= 1000 ? Math.round(value / 1000) + "k" : String(value);
+
+function tier() {
+  const size = $("businessSize").value;
+  const sensitive = $("sensitivity").value;
+  const integrations = Number($("integrations").value);
+  const budget = $("budget").value;
+  if (["large", "very-large"].includes(size) || sensitive === "Regulated data") return "Enterprise / Governed";
+  if (size === "medium" || integrations > 6 || budget.includes("2,000") || budget.includes("10,000")) return "Balanced / Scalable";
+  return "Fast / Low Cost";
+}
+
+function selectedWorkflows() {
+  return state.workflows.map(id => workflowData[id]).filter(Boolean);
+}
+
+function websiteTitle() {
+  if (state.website === "new") return "Brand-new company website";
+  if (state.website === "revamp") return "Website revamp";
+  return "";
+}
+
+function primaryBuild() {
+  const workflows = selectedWorkflows();
+  if (workflows.length) return [...workflows].sort((a, b) => b.value - a.value)[0].title;
+  if (state.website !== "none") return websiteTitle();
+  return "Discovery assessment";
+}
+
+function complexity() {
+  const workflows = selectedWorkflows();
+  let base = state.website === "none" ? 1 : 2;
+  if (workflows.length) base = Math.max(base, Math.max(...workflows.map(item => item.complexity)));
+  return Math.min(5, base + Math.max(0, workflows.length - 1) * .4);
+}
+
+function estimate() {
+  const lane = tier();
+  const c = complexity();
+  const integrations = Number($("integrations").value);
+  const aiVolume = Number($("aiVolume").value);
+  const sensitive = $("sensitivity").value;
+  const hasWorkflow = state.workflows.length > 0;
+  const hasWebsite = state.website !== "none";
+
+  const aiUsage = Math.max(20, aiVolume * (sensitive === "Regulated data" ? .012 : sensitive === "Confidential data" ? .008 : .005));
+  const hosting = lane === "Enterprise / Governed" ? 1200 : lane === "Balanced / Scalable" ? 320 : hasWebsite ? 55 : 35;
+  const database = lane === "Enterprise / Governed" ? 900 : lane === "Balanced / Scalable" ? 180 : hasWorkflow ? 35 : 15;
+  const workflowTools = hasWorkflow ? integrations * (lane === "Enterprise / Governed" ? 95 : lane === "Balanced / Scalable" ? 45 : 18) : 0;
+  const monitoring = lane === "Enterprise / Governed" ? 650 : lane === "Balanced / Scalable" ? 120 : 0;
+  const productTools = lane === "Enterprise / Governed" ? 900 : lane === "Balanced / Scalable" ? 260 : 75;
+  const monthlyLow = hosting + database + aiUsage + workflowTools + monitoring + productTools;
+  const monthlyHigh = monthlyLow * (1.25 + c * .16);
+
+  const discovery = lane === "Enterprise / Governed" ? 7500 : lane === "Balanced / Scalable" ? 2500 : 750;
+  const configuration = (hasWebsite ? 2500 : 0) + c * (lane === "Enterprise / Governed" ? 7000 : lane === "Balanced / Scalable" ? 3500 : 1200) + integrations * 450;
+  const training = lane === "Enterprise / Governed" ? 4000 : lane === "Balanced / Scalable" ? 1500 : 500;
+  const setupLow = discovery + configuration + training;
+  const setupHigh = setupLow * (lane === "Enterprise / Governed" ? 2.2 : lane === "Balanced / Scalable" ? 1.8 : 1.5);
+
+  return {
+    lane, aiUsage, hosting, database, workflowTools, monitoring, productTools,
+    monthlyLow, monthlyHigh, discovery, configuration, training, setupLow, setupHigh
+  };
+}
+
+function stackFor(lane) {
+  if (lane === "Enterprise / Governed") {
+    return [
+      ["Frontend", "Next.js or enterprise portal"],
+      ["Backend", "AWS, Azure, or GCP governed APIs"],
+      ["Database", "Postgres, SQL Server, Oracle, Snowflake, or Databricks"],
+      ["AI", "Azure OpenAI, AWS Bedrock, Vertex AI, or approved private endpoint"],
+      ["Security", "SSO, RBAC, audit logs, approval workflow"]
+    ];
+  }
+  if (lane === "Balanced / Scalable") {
+    return [
+      ["Frontend", "Next.js, React, Retool, or polished low-code app"],
+      ["Backend", "Supabase, Neon, Cloud Run, or serverless APIs"],
+      ["Database", "Managed Postgres with optional vector search"],
+      ["AI", "OpenAI or Anthropic with usage logging"],
+      ["Security", "Clerk/Auth0/Supabase Auth and role-based access"]
+    ];
+  }
+  return [
+    ["Frontend", "Lovable, Replit, Webflow, Framer, or lightweight static app"],
+    ["Backend", "Supabase, Firebase, Airtable, or no-code database"],
+    ["Database", "Airtable, Supabase, Google Sheets, or Firebase"],
+    ["AI", "OpenAI, Anthropic, or Gemini API with simple limits"],
+    ["Security", "Basic access controls, no sensitive data in MVP"]
+  ];
+}
+
+function decision(est) {
+  if ($("budget").value === "Under $500/month" && est.monthlyLow > 900) return "Validate first";
+  if ($("sensitivity").value === "Regulated data" && est.lane !== "Enterprise / Governed") return "Validate first";
+  if (state.website === "none" && !state.workflows.length) return "Discovery first";
+  return "Proceed";
+}
+
+function render() {
+  document.querySelectorAll("[data-website]").forEach(button => {
+    button.classList.toggle("selected", button.dataset.website === state.website);
+  });
+  document.querySelectorAll("[data-workflow]").forEach(button => {
+    button.classList.toggle("selected", state.workflows.includes(button.dataset.workflow));
+  });
+  $("aiOut").textContent = compact(Number($("aiVolume").value));
+  $("integrationsOut").textContent = $("integrations").value;
+  const noteParts = [];
+  if (state.website !== "none") noteParts.push(`${websiteTitle()} selected as the website direction.`);
+  if (state.workflows.length > 1) noteParts.push(`${state.workflows.length} workflow outcomes selected. Treat them as phased work unless budget and timeline allow parallel delivery.`);
+  $("scopeNote").textContent = noteParts.join(" ");
+  $("scopeNote").classList.toggle("show", noteParts.length > 0);
+}
+
+function renderEstimate() {
+  const est = estimate();
+  const build = primaryBuild();
+  $("decision").textContent = decision(est);
+  $("primaryBuild").textContent = build;
+  $("monthlyTotal").textContent = `${money(est.monthlyLow)}-${money(est.monthlyHigh)}`;
+  $("setupTotal").textContent = `${money(est.setupLow)}-${money(est.setupHigh)}`;
+  $("memo").textContent = `Start with ${build.toLowerCase()} in the ${est.lane} lane. If multiple workflows are selected, phase the highest-value workflow first and keep the rest as follow-on releases.`;
+  $("stackRows").innerHTML = stackFor(est.lane).map(([layer, value]) => `<tr><td><strong>${layer}</strong></td><td>${value}</td></tr>`).join("");
+  $("costRows").innerHTML = [
+    ["Hosting / app runtime", est.hosting, "Website/app hosting, serverless runtime, CDN"],
+    ["Database / storage", est.database, "Structured data, files, optional vector storage"],
+    ["AI model usage", est.aiUsage, "Approximate token or model API usage"],
+    ["Workflow/connectors", est.workflowTools, "Zapier, Make, n8n, APIs, connector runs"],
+    ["Product/tool subscriptions", est.productTools, "Builder, auth, forms, analytics, admin tools"],
+    ["Monitoring/security", est.monitoring, "Logging, alerts, audit trail, governance controls"]
+  ].map(([area, cost, detail]) => `<tr><td>${area}</td><td>${money(cost)}</td><td>${detail}</td></tr>`).join("");
+  $("setupRows").innerHTML = [
+    ["Discovery and scope", est.discovery, "Workflow mapping, requirements, build/no-build decision"],
+    ["Build/configuration", est.configuration, "MVP implementation, integrations, data model, prompt setup"],
+    ["Training and launch", est.training, "User enablement, test plan, handoff, go-live support"]
+  ].map(([area, cost, detail]) => `<tr><td>${area}</td><td>${money(cost)}</td><td>${detail}</td></tr>`).join("");
+  $("results").classList.add("show");
+  $("results").scrollIntoView({ behavior: "smooth" });
+}
+
+function resetAll() {
+  state.website = "none";
+  state.workflows = [];
+  $("businessSize").value = "small";
+  $("audience").value = "Internal employees";
+  $("sensitivity").value = "Public or marketing data";
+  $("aiVolume").value = 5000;
+  $("integrations").value = 3;
+  $("budget").value = "$500-$2,000/month";
+  $("pain").value = "";
+  $("results").classList.remove("show");
+  render();
+}
+
+document.querySelectorAll("[data-website]").forEach(button => {
+  button.addEventListener("click", () => {
+    state.website = button.dataset.website;
+    render();
+  });
+});
+
+document.querySelectorAll("[data-workflow]").forEach(button => {
+  button.addEventListener("click", () => {
+    const id = button.dataset.workflow;
+    state.workflows = state.workflows.includes(id)
+      ? state.workflows.filter(item => item !== id)
+      : [...state.workflows, id];
+    render();
+  });
+});
+
+["businessSize", "audience", "sensitivity", "aiVolume", "integrations", "budget", "pain"].forEach(id => {
+  $(id).addEventListener("input", render);
+});
+
+$("estimateBtn").addEventListener("click", renderEstimate);
+$("resetBtn").addEventListener("click", resetAll);
+$("copyBtn").addEventListener("click", async () => {
+  const text = [
+    `Decision: ${$("decision").textContent}`,
+    `Primary build: ${$("primaryBuild").textContent}`,
+    `Monthly estimate: ${$("monthlyTotal").textContent}`,
+    `Setup estimate: ${$("setupTotal").textContent}`,
+    $("memo").textContent
+  ].join("\\n");
+  await navigator.clipboard.writeText(text);
+  $("copyBtn").textContent = "Copied";
+  setTimeout(() => $("copyBtn").textContent = "Copy summary", 1200);
+});
+
+render();
+</script>
+</body>
+</html>

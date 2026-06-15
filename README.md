@@ -34,7 +34,8 @@ VP-level Engineering, Data & Ops leader with 26+ years solving real-world busine
 ### Group 05 — PMO & Estimation Tools
 | App | File | Description |
 |-----|------|-------------|
-| **AI Automation Architect** | `ai-automation-architect/index.html` | Decision-support estimator that recommends what AI automation to build, which stack to use, expected cost, delivery timeline, risk, and proceed/validate/pause guidance. Includes MVP and full-version modes plus an interactive architect chatbot. |
+| **AI Automation Architect MVP** | `ai-automation-architect/mvp.html` | Simplified decision-support estimator with conflict-safe outcome choices, stack fit, monthly cost breakdown, and setup/consulting estimate. |
+| **AI Automation Architect Full Estimator** | `ai-automation-architect/index.html` | Expanded estimator that recommends what AI automation to build, which stack to use, expected cost, delivery timeline, risk, and proceed/validate/pause guidance. Includes full-version mode plus an interactive architect chatbot. |
 | **AI Transformation Estimation Framework** | `ai-estimation-framework.html` | Three-card estimator for AI build and transformation projects with build cost, annual OpEx, 3-year TCO, wave planning, and pricing-model recommendations. |
 
 ### Group 06 — Scripture Translators & Tutors
@@ -56,7 +57,8 @@ VP-level Engineering, Data & Ops leader with 26+ years solving real-world busine
 ├── ivr-call-flow-designer.html         # Group 2: IVR Designer
 ├── healthcare-translator.html          # Group 2: Healthcare Translator
 ├── ai-automation-architect/
-│   └── index.html                      # Group 5: AI Automation Architect
+│   ├── mvp.html                        # Group 5: AI Automation Architect MVP
+│   └── index.html                      # Group 5: AI Automation Architect Full Estimator
 ├── ai-estimation-framework.html        # Group 5: AI Transformation Estimator
 ├── rudram-app.html                     # Group 6: Rudram Learning App
 ├── bhagavatam-skandha1.html            # Group 6: Bhagavatam Skandha 1
