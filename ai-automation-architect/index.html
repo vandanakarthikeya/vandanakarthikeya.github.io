@@ -498,6 +498,12 @@
     flex-wrap: wrap;
   }
 
+  .field-help {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 650;
+  }
+
   .choice-chip {
     border: 1px solid var(--line);
     background: white;
@@ -951,8 +957,9 @@
           <span class="badge purple" id="modeBadge">MVP Explorer</span>
         </div>
         <div style="margin-bottom:14px;">
-          <label>Business size or audience size
+          <label>Business size or audience size (choose one)
             <div class="chip-group" id="businessSizeChips"></div>
+            <span class="field-help">Choose the largest audience that will use or be affected by this automation.</span>
           </label>
         </div>
         <div class="form-grid">
@@ -1308,12 +1315,7 @@ function toggleBuildOption(id) {
 }
 
 function toggleBusinessSize(id) {
-  if (state.businessSizes.includes(id)) {
-    state.businessSizes = state.businessSizes.filter(item => item !== id);
-  } else {
-    state.businessSizes.push(id);
-  }
-  if (!state.businessSizes.length) state.businessSizes = ["small"];
+  state.businessSizes = [id];
 }
 
 function selectedBuilds() {
@@ -1514,14 +1516,14 @@ function calculate() {
   const firstStep = input.build.id === "not-sure"
     ? "Run a short discovery sprint and compare 3 candidate automations before building."
     : `Start with ${input.build.title.toLowerCase()} as the primary build${input.builds.length > 1 ? " and keep the other selected outcomes as follow-on candidates" : ""}.`;
-  const sizeText = input.businessSizes.map(businessSizeLabel).join(", ");
+  const sizeText = businessSizeLabel(input.businessSize);
   const selectionText = buildTitles.length > 1
     ? `Selected outcomes: ${buildTitles.join(", ")}.`
     : `Selected outcome: ${input.build.title}.`;
 
   $("recommendationBody").innerHTML = `
     <h3>${decision}: ${input.build.title}</h3>
-    <p>${firstStep} ${selectionText} This is recommended for ${sizeText.toLowerCase()} audience sizing in ${input.industry.toLowerCase()} serving ${input.audience.toLowerCase()}.</p>
+    <p>${firstStep} ${selectionText} This is recommended for a ${sizeText.toLowerCase()} audience size in ${input.industry.toLowerCase()} serving ${input.audience.toLowerCase()}.</p>
     <div class="grid two">
       <div class="card pad">
         <span class="badge green">Primary path</span>
@@ -1566,7 +1568,7 @@ function loadSaved() {
     if (data.mode) state.mode = data.mode;
     if (Array.isArray(data.buildIds)) state.buildIds = data.buildIds;
     else if (data.buildId) state.buildIds = [data.buildId];
-    if (Array.isArray(data.businessSizes)) state.businessSizes = data.businessSizes;
+    if (Array.isArray(data.businessSizes)) state.businessSizes = [data.businessSizes[0] || "small"];
     else if (data.businessSize) state.businessSizes = [data.businessSize];
     if (data.stage) state.stage = data.stage;
     Object.keys(data).forEach(id => { if ($(id)) $(id).value = data[id]; });
@@ -1599,7 +1601,7 @@ function resetAll() {
 function loadSample() {
   state.mode = "full";
   state.buildIds = ["lead-qualification", "website-revamp"];
-  state.businessSizes = ["small", "medium"];
+  state.businessSizes = ["small"];
   state.stage = "results";
   $("industry").value = "Professional services";
   $("audience").value = "External customers";
@@ -1641,7 +1643,7 @@ function buildMemo() {
     "Recommended stack:",
     ...Object.entries(stack).map(([k,v]) => `- ${k}: ${v}`),
     "",
-    `Business context: ${input.businessSizes.map(businessSizeLabel).join(", ")}, ${input.industry}, ${input.audience}`,
+    `Business context: ${businessSizeLabel(input.businessSize)}, ${input.industry}, ${input.audience}`,
     `Pain point: ${input.pain || "Not provided"}`
   ].join("\n");
 }
