@@ -224,7 +224,7 @@
 
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
+    grid-template-columns: 1fr;
     gap: 22px;
     align-items: stretch;
     margin-bottom: 22px;
@@ -260,6 +260,47 @@
     max-width: 760px;
     font-size: 16px;
     margin-bottom: 20px;
+  }
+
+  .instruction-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 18px 0 20px;
+  }
+
+  .instruction-item {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f9fbfd;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .instruction-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .instruction-item strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .instruction-item span {
+    color: var(--muted);
+    font-size: 12px;
   }
 
   .hero-actions {
@@ -338,10 +379,14 @@
 
   .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid.four { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   .section {
     margin-top: 22px;
+  }
+
+  .flow-step.hidden-step {
+    display: none;
   }
 
   .section-head {
@@ -376,11 +421,11 @@
   .option-card {
     text-align: left;
     width: 100%;
-    min-height: 158px;
+    min-height: 132px;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 16px;
+    padding: 14px;
     transition: border-color .15s, transform .15s, box-shadow .15s;
   }
 
@@ -394,9 +439,26 @@
     outline: 3px solid rgba(30, 95, 153, .12);
   }
 
+  .option-card.selected::after {
+    content: "Selected";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--green);
+    color: white;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .option-card {
+    position: relative;
+  }
+
   .option-icon {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     background: var(--surface-2);
     display: grid;
@@ -407,13 +469,49 @@
 
   .option-card h3 {
     margin: 0 0 6px;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .option-card p {
     color: var(--muted);
     margin: 0;
     font-size: 12px;
+  }
+
+  .selection-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .selection-hint {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .chip-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .choice-chip {
+    border: 1px solid var(--line);
+    background: white;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 9px 11px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .choice-chip.selected {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
   }
 
   .badge-row {
@@ -747,13 +845,13 @@
     .nav-group { grid-template-columns: repeat(4, minmax(0, 1fr)); flex: 1; }
     .mode-card { margin-top: 0; min-width: 260px; }
     .hero, .recommendation { grid-template-columns: 1fr; }
-    .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid, .instruction-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
   @media (max-width: 680px) {
     .content, .top-inner { padding-left: 14px; padding-right: 14px; }
     .nav-group { grid-template-columns: 1fr 1fr; }
-    .grid.two, .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid { grid-template-columns: 1fr; }
+    .grid.two, .grid.three, .grid.four, .form-grid, .summary-grid, .plan-grid, .instruction-list { grid-template-columns: 1fr; }
     .hero-panel, .visual-panel { padding: 18px; }
     .top-inner, .section-head { align-items: flex-start; flex-direction: column; }
     .map-row { grid-template-columns: 1fr; }
@@ -799,7 +897,7 @@
     <div class="top-strip">
       <div class="top-inner">
         <a class="home-link" href="../index.html">← Back to portfolio</a>
-        <div class="top-actions">
+        <div class="top-actions hidden" id="resultActions">
           <button class="btn ghost" id="resetBtn" type="button">Reset</button>
           <button class="btn" id="copyBtn" type="button">Copy memo</button>
           <button class="btn primary" id="printBtn" type="button">Export PDF</button>
@@ -811,66 +909,53 @@
       <section class="hero" id="discover">
         <div class="hero-panel">
           <div class="eyebrow">AI automation decision platform</div>
-          <h1>Find what to automate, what to build, what stack to use, and what it may cost.</h1>
-          <p class="hero-copy">This estimator helps business owners, operators, and executives make a practical go/no-go decision before spending money on an AI automation build.</p>
+          <h1>Start with what you want to improve.</h1>
+          <p class="hero-copy">Choose one or more business outcomes below. Then the app will ask a short assessment and generate the recommended build, stack, cost range, timeline, and risk.</p>
+          <div class="instruction-list">
+            <div class="instruction-item"><div class="instruction-num">1</div><div><strong>Select outcomes</strong><span>Pick all areas you may want to automate or improve.</span></div></div>
+            <div class="instruction-item"><div class="instruction-num">2</div><div><strong>Answer assessment</strong><span>Share size, audience, volume, sensitivity, and budget.</span></div></div>
+            <div class="instruction-item"><div class="instruction-num">3</div><div><strong>Review decision</strong><span>Compare stack, cost, timeline, and go/no-go guidance.</span></div></div>
+          </div>
           <div class="hero-actions">
-            <a class="btn primary" href="#intake">Start assessment</a>
+            <a class="btn primary" href="#selection">Choose outcomes</a>
             <button class="btn" type="button" id="sampleBtn">Load sample business</button>
             <button class="btn green" type="button" id="openChatTop">Ask the architect</button>
           </div>
         </div>
-        <div class="visual-panel" aria-label="Decision flow preview">
-          <div>
-            <div class="eyebrow" style="color:#82d3b3;">How the estimator thinks</div>
-            <div class="decision-map">
-              <div class="map-row">
-                <div class="map-node">Business size and risk</div>
-                <div class="map-arrow">→</div>
-                <div class="map-node">Build option shortlist</div>
-              </div>
-              <div class="map-row">
-                <div class="map-node">Workflow pain and volume</div>
-                <div class="map-arrow">→</div>
-                <div class="map-node">Stack and hosting fit</div>
-              </div>
-              <div class="map-row">
-                <div class="map-node">Data sensitivity and integrations</div>
-                <div class="map-arrow">→</div>
-                <div class="map-node">Cost, timeline, and risk</div>
-              </div>
-            </div>
-          </div>
-          <div class="visual-metrics">
-            <div class="visual-metric"><strong id="visualCost">$0</strong><span>Monthly estimate</span></div>
-            <div class="visual-metric"><strong id="visualTimeline">0 wks</strong><span>Build timeline</span></div>
-            <div class="visual-metric"><strong id="visualScore">0</strong><span>Decision score</span></div>
-          </div>
-        </div>
       </section>
 
-      <section class="section">
+      <section class="section" id="selection">
         <div class="section-head">
           <div>
-            <h2>Choose a Starting Point</h2>
-            <p>Pick the closest business outcome. The recommendation will adapt as you answer the intake.</p>
+            <h2>Step 1: Choose Outcomes</h2>
+            <p>Select one or more. If you are unsure, choose “Not sure” and the assessment will help prioritize.</p>
           </div>
           <span class="badge green" id="selectedOptionBadge">No option selected</span>
         </div>
         <div class="grid four" id="optionGrid"></div>
+        <div class="selection-actions">
+          <div class="selection-hint" id="selectionHint">Select at least one option to continue.</div>
+          <div class="hero-actions">
+            <button class="btn" type="button" id="clearOptionsBtn">Clear</button>
+            <button class="btn primary" type="button" id="continueBtn">Continue to assessment</button>
+          </div>
+        </div>
       </section>
 
-      <section class="section card pad" id="intake">
+      <section class="section card pad flow-step hidden-step" id="intake">
         <div class="section-head">
           <div>
-            <h2>Assessment Intake</h2>
+            <h2>Step 2: Assessment Intake</h2>
             <p>MVP mode uses the essentials. Full mode adds governance, data, and monetization-grade detail.</p>
           </div>
           <span class="badge purple" id="modeBadge">MVP Explorer</span>
         </div>
-        <div class="form-grid">
-          <label>Business size
-            <select id="businessSize"></select>
+        <div style="margin-bottom:14px;">
+          <label>Business size or audience size
+            <div class="chip-group" id="businessSizeChips"></div>
           </label>
+        </div>
+        <div class="form-grid">
           <label>Industry
             <select id="industry"></select>
           </label>
@@ -919,9 +1004,13 @@
             <textarea id="pain" placeholder="Example: We manually review inbound leads, copy details into a spreadsheet, send follow-up emails, and lose track of hot prospects."></textarea>
           </label>
         </div>
+        <div class="selection-actions">
+          <button class="btn" type="button" id="backToSelectionBtn">Back to selection</button>
+          <button class="btn primary" type="button" id="showRecommendationBtn">Generate recommendation</button>
+        </div>
       </section>
 
-      <section class="section">
+      <section class="section flow-step hidden-step" id="summarySection">
         <div class="summary-grid">
           <div class="summary-tile"><span>Recommended build</span><strong id="summaryBuild">Select an option</strong></div>
           <div class="summary-tile"><span>Monthly run cost</span><strong id="summaryCost">$0</strong></div>
@@ -931,7 +1020,7 @@
         </div>
       </section>
 
-      <section class="section recommendation" id="recommendation">
+      <section class="section recommendation flow-step hidden-step" id="recommendation">
         <div class="card pad">
           <div class="section-head">
             <div>
@@ -954,7 +1043,7 @@
         </div>
       </section>
 
-      <section class="section card pad">
+      <section class="section card pad flow-step hidden-step" id="phases">
         <div class="section-head">
           <div>
             <h2>Cost and Phase Plan</h2>
@@ -964,7 +1053,7 @@
         <div class="grid three" id="phaseGrid"></div>
       </section>
 
-      <section class="section" id="plans">
+      <section class="section flow-step hidden-step" id="plans">
         <div class="section-head">
           <div>
             <h2>Monetization Model for This Product</h2>
@@ -1072,7 +1161,9 @@ const optionText = {
 
 const state = {
   mode: "mvp",
-  buildId: "not-sure"
+  buildIds: [],
+  businessSizes: ["small"],
+  stage: "selection"
 };
 
 const $ = (id) => document.getElementById(id);
@@ -1086,13 +1177,17 @@ function populateSelect(id, values) {
 }
 
 function init() {
-  Object.entries(optionText).forEach(([id, values]) => populateSelect(id, values));
+  Object.entries(optionText).forEach(([id, values]) => {
+    if (id !== "businessSize") populateSelect(id, values);
+  });
   renderOptions();
+  renderBusinessSizeChips();
   attachEvents();
   loadSaved();
   applyMode();
+  updateStage();
   calculate();
-  botSay("I can help you decide what to build, estimate cost, compare stacks, or shape an MVP. Pick a canned option and I will use that context.");
+  botSay("I can help you decide what to build, estimate cost, compare stacks, or shape an MVP. Select one or more outcomes, then continue to the assessment.");
 }
 
 function renderOptions() {
@@ -1103,6 +1198,12 @@ function renderOptions() {
       <p>${opt.fit}</p>
       <div class="badge-row">${opt.tags.map(tag => `<span class="badge">${tag}</span>`).join("")}</div>
     </button>
+  `).join("");
+}
+
+function renderBusinessSizeChips() {
+  $("businessSizeChips").innerHTML = optionText.businessSize.map(([value, label]) => `
+    <button class="choice-chip" type="button" data-size="${value}">${label}</button>
   `).join("");
 }
 
@@ -1118,16 +1219,49 @@ function attachEvents() {
   $("optionGrid").addEventListener("click", event => {
     const card = event.target.closest("[data-option]");
     if (!card) return;
-    state.buildId = card.dataset.option;
+    toggleBuildOption(card.dataset.option);
     calculate();
   });
 
-  ["businessSize","industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"].forEach(id => {
+  $("businessSizeChips").addEventListener("click", event => {
+    const chip = event.target.closest("[data-size]");
+    if (!chip) return;
+    toggleBusinessSize(chip.dataset.size);
+    calculate();
+  });
+
+  ["industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"].forEach(id => {
     $(id).addEventListener("input", calculate);
   });
 
   $("mvpMode").addEventListener("click", () => setMode("mvp"));
   $("fullMode").addEventListener("click", () => setMode("full"));
+  $("continueBtn").addEventListener("click", () => {
+    if (!state.buildIds.length) state.buildIds = ["not-sure"];
+    state.stage = "assessment";
+    updateStage();
+    calculate();
+    $("intake").scrollIntoView({ behavior: "smooth", block: "start" });
+    saveState();
+  });
+  $("backToSelectionBtn").addEventListener("click", () => {
+    state.stage = "selection";
+    updateStage();
+    $("selection").scrollIntoView({ behavior: "smooth", block: "start" });
+    saveState();
+  });
+  $("showRecommendationBtn").addEventListener("click", () => {
+    state.stage = "results";
+    updateStage();
+    calculate();
+    $("summarySection").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("clearOptionsBtn").addEventListener("click", () => {
+    state.buildIds = [];
+    state.stage = "selection";
+    updateStage();
+    calculate();
+  });
   $("printBtn").addEventListener("click", () => window.print());
   $("copyBtn").addEventListener("click", copyMemo);
   $("resetBtn").addEventListener("click", resetAll);
@@ -1160,10 +1294,73 @@ function applyMode() {
   document.querySelectorAll(".full-only").forEach(el => el.classList.toggle("hidden", state.mode === "mvp"));
 }
 
+function toggleBuildOption(id) {
+  if (id === "not-sure") {
+    state.buildIds = state.buildIds.includes("not-sure") ? [] : ["not-sure"];
+    return;
+  }
+  state.buildIds = state.buildIds.filter(item => item !== "not-sure");
+  if (state.buildIds.includes(id)) {
+    state.buildIds = state.buildIds.filter(item => item !== id);
+  } else {
+    state.buildIds.push(id);
+  }
+}
+
+function toggleBusinessSize(id) {
+  if (state.businessSizes.includes(id)) {
+    state.businessSizes = state.businessSizes.filter(item => item !== id);
+  } else {
+    state.businessSizes.push(id);
+  }
+  if (!state.businessSizes.length) state.businessSizes = ["small"];
+}
+
+function selectedBuilds() {
+  const ids = state.buildIds.length ? state.buildIds : ["not-sure"];
+  return ids.map(id => buildOptions.find(option => option.id === id)).filter(Boolean);
+}
+
+function primaryBuild() {
+  const selected = selectedBuilds();
+  return selected.find(option => option.id !== "not-sure") || selected[0] || buildOptions.at(-1);
+}
+
+function sizeRank(size) {
+  return { "very-small": 1, small: 2, medium: 3, large: 4, "very-large": 5 }[size] || 2;
+}
+
+function primaryBusinessSize() {
+  return [...state.businessSizes].sort((a, b) => sizeRank(b) - sizeRank(a))[0] || "small";
+}
+
+function businessSizeLabel(size) {
+  const match = optionText.businessSize.find(([value]) => value === size);
+  return match ? match[1].split(":")[0] : size;
+}
+
+function updateStage() {
+  const showAssessment = state.stage === "assessment" || state.stage === "results";
+  const showResults = state.stage === "results";
+  $("intake").classList.toggle("hidden-step", !showAssessment);
+  $("summarySection").classList.toggle("hidden-step", !showResults);
+  $("recommendation").classList.toggle("hidden-step", !showResults);
+  $("phases").classList.toggle("hidden-step", !showResults);
+  $("plans").classList.toggle("hidden-step", !showResults);
+  $("resultActions").classList.toggle("hidden", !showResults);
+}
+
 function getInputs() {
+  const builds = selectedBuilds();
+  const primary = primaryBuild();
+  const blendedComplexity = Math.min(5, primary.complexity + Math.max(0, builds.length - 1) * 0.45);
+  const blendedValue = Math.min(92, Math.round(builds.reduce((sum, build) => sum + build.value, 0) / builds.length + Math.max(0, builds.length - 1) * 3));
+  const build = { ...primary, complexity: blendedComplexity, value: blendedValue };
   return {
-    build: buildOptions.find(o => o.id === state.buildId) || buildOptions.at(-1),
-    businessSize: $("businessSize").value,
+    build,
+    builds,
+    businessSize: primaryBusinessSize(),
+    businessSizes: [...state.businessSizes],
     industry: $("industry").value,
     audience: $("audience").value,
     users: Number($("users").value),
@@ -1293,17 +1490,20 @@ function calculate() {
   $("usersOut").textContent = compact(input.users);
   $("aiVolumeOut").textContent = compact(input.aiVolume);
   $("integrationsOut").textContent = input.integrations;
-  $("selectedOptionBadge").textContent = input.build.title;
-  document.querySelectorAll(".option-card").forEach(card => card.classList.toggle("selected", card.dataset.option === input.build.id));
+  const buildTitles = input.builds.map(build => build.title);
+  const selectedCount = state.buildIds.length;
+  $("selectedOptionBadge").textContent = selectedCount ? `${selectedCount} selected` : "No option selected";
+  $("selectionHint").textContent = selectedCount
+    ? `${buildTitles.join(", ")} selected. Continue when ready.`
+    : "Select at least one option to continue.";
+  document.querySelectorAll(".option-card").forEach(card => card.classList.toggle("selected", state.buildIds.includes(card.dataset.option)));
+  document.querySelectorAll("[data-size]").forEach(chip => chip.classList.toggle("selected", state.businessSizes.includes(chip.dataset.size)));
 
-  $("summaryBuild").textContent = input.build.title;
+  $("summaryBuild").textContent = buildTitles.length > 1 ? `${input.build.title} + ${buildTitles.length - 1} more` : input.build.title;
   $("summaryCost").textContent = `${money(costs.monthlyLow)}-${money(costs.monthlyHigh)}`;
   $("summaryTimeline").textContent = `${costs.weeks}-${costs.weeks + 4} weeks`;
   $("summaryRisk").textContent = risk;
   $("summaryDecision").textContent = decision;
-  $("visualCost").textContent = `${money(costs.monthlyLow)}`;
-  $("visualTimeline").textContent = `${costs.weeks} wks`;
-  $("visualScore").textContent = score;
 
   $("scoreValue").textContent = score;
   $("scoreRing").style.setProperty("--score", score + "%");
@@ -1313,11 +1513,15 @@ function calculate() {
 
   const firstStep = input.build.id === "not-sure"
     ? "Run a short discovery sprint and compare 3 candidate automations before building."
-    : `Start with ${input.build.title.toLowerCase()} as the primary build.`;
+    : `Start with ${input.build.title.toLowerCase()} as the primary build${input.builds.length > 1 ? " and keep the other selected outcomes as follow-on candidates" : ""}.`;
+  const sizeText = input.businessSizes.map(businessSizeLabel).join(", ");
+  const selectionText = buildTitles.length > 1
+    ? `Selected outcomes: ${buildTitles.join(", ")}.`
+    : `Selected outcome: ${input.build.title}.`;
 
   $("recommendationBody").innerHTML = `
     <h3>${decision}: ${input.build.title}</h3>
-    <p>${firstStep} This is recommended for a ${input.businessSize.replace("-", " ")} organization in ${input.industry.toLowerCase()} serving ${input.audience.toLowerCase()}.</p>
+    <p>${firstStep} ${selectionText} This is recommended for ${sizeText.toLowerCase()} audience sizing in ${input.industry.toLowerCase()} serving ${input.audience.toLowerCase()}.</p>
     <div class="grid two">
       <div class="card pad">
         <span class="badge green">Primary path</span>
@@ -1345,8 +1549,13 @@ function calculate() {
 }
 
 function saveState() {
-  const ids = ["businessSize","industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"];
-  const data = { mode: state.mode, buildId: state.buildId };
+  const ids = ["industry","audience","users","aiVolume","integrations","sensitivity","budget","maturity","compliance","approval","timelinePressure","pain"];
+  const data = {
+    mode: state.mode,
+    buildIds: state.buildIds,
+    businessSizes: state.businessSizes,
+    stage: state.stage
+  };
   ids.forEach(id => data[id] = $(id).value);
   localStorage.setItem("aiAutomationArchitect", JSON.stringify(data));
 }
@@ -1355,7 +1564,11 @@ function loadSaved() {
   try {
     const data = JSON.parse(localStorage.getItem("aiAutomationArchitect") || "{}");
     if (data.mode) state.mode = data.mode;
-    if (data.buildId) state.buildId = data.buildId;
+    if (Array.isArray(data.buildIds)) state.buildIds = data.buildIds;
+    else if (data.buildId) state.buildIds = [data.buildId];
+    if (Array.isArray(data.businessSizes)) state.businessSizes = data.businessSizes;
+    else if (data.businessSize) state.businessSizes = [data.businessSize];
+    if (data.stage) state.stage = data.stage;
     Object.keys(data).forEach(id => { if ($(id)) $(id).value = data[id]; });
   } catch {}
 }
@@ -1363,8 +1576,9 @@ function loadSaved() {
 function resetAll() {
   localStorage.removeItem("aiAutomationArchitect");
   state.mode = "mvp";
-  state.buildId = "not-sure";
-  $("businessSize").value = "small";
+  state.buildIds = [];
+  state.businessSizes = ["small"];
+  state.stage = "selection";
   $("industry").value = "Healthcare";
   $("audience").value = "Internal employees";
   $("users").value = 100;
@@ -1378,13 +1592,15 @@ function resetAll() {
   $("timelinePressure").value = "MVP in 4-8 weeks";
   $("pain").value = "";
   applyMode();
+  updateStage();
   calculate();
 }
 
 function loadSample() {
   state.mode = "full";
-  state.buildId = "lead-qualification";
-  $("businessSize").value = "small";
+  state.buildIds = ["lead-qualification", "website-revamp"];
+  state.businessSizes = ["small", "medium"];
+  state.stage = "results";
   $("industry").value = "Professional services";
   $("audience").value = "External customers";
   $("users").value = 250;
@@ -1398,6 +1614,7 @@ function loadSample() {
   $("timelinePressure").value = "MVP in 4-8 weeks";
   $("pain").value = "Inbound leads arrive from the website, email, and referrals. The team manually reviews each lead, updates the CRM, drafts follow-up emails, and loses track of high-value prospects.";
   applyMode();
+  updateStage();
   calculate();
 }
 
@@ -1412,6 +1629,7 @@ function buildMemo() {
     "AI Automation Architect Decision Memo",
     "",
     `Recommended build: ${input.build.title}`,
+    `Selected outcomes: ${input.builds.map(build => build.title).join(", ")}`,
     `Decision: ${decision}`,
     `Fit score: ${score}/100`,
     `Architecture lane: ${costs.tier}`,
@@ -1423,7 +1641,7 @@ function buildMemo() {
     "Recommended stack:",
     ...Object.entries(stack).map(([k,v]) => `- ${k}: ${v}`),
     "",
-    `Business context: ${input.businessSize}, ${input.industry}, ${input.audience}`,
+    `Business context: ${input.businessSizes.map(businessSizeLabel).join(", ")}, ${input.industry}, ${input.audience}`,
     `Pain point: ${input.pain || "Not provided"}`
   ].join("\n");
 }
