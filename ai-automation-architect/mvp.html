@@ -621,6 +621,10 @@
     margin-top: 10px;
   }
 
+  .print-lock {
+    display: none;
+  }
+
   .summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -721,9 +725,31 @@
       padding-right: 76px;
     }
   }
+
+  @media print {
+    body:not(.purchase-unlocked) .app-shell {
+      display: none !important;
+    }
+
+    body:not(.purchase-unlocked) .print-lock {
+      display: block !important;
+      padding: 40px;
+      font-family: Inter, Arial, sans-serif;
+      color: #13202f;
+    }
+
+    body:not(.purchase-unlocked) .print-lock h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+  }
 </style>
 </head>
 <body>
+<div class="print-lock">
+  <h1>Purchase required</h1>
+  <p>PDF export and printed decision packets are available only after unlocking the full AI Automation Architect app.</p>
+</div>
 <div class="app-shell">
   <aside class="sidebar">
     <div class="brand">
@@ -908,7 +934,7 @@
     <div class="actions">
       <button class="btn" id="copyBtn" type="button">Copy summary</button>
       <button class="btn primary" type="button" data-buy>Unlock full recommendation</button>
-      <button class="btn green" onclick="window.print()" type="button">Export PDF</button>
+      <button class="btn green" id="exportBtn" type="button">Export PDF</button>
     </div>
   </section>
 
@@ -970,6 +996,20 @@ const PURCHASE_EMAIL = "";
 const $ = (id) => document.getElementById(id);
 const money = (value) => "$" + Math.round(value).toLocaleString();
 const compact = (value) => value >= 1000 ? Math.round(value / 1000) + "k" : String(value);
+
+function hasFullAccess() {
+  return localStorage.getItem("aiAutomationArchitectFullAccess") === "true";
+}
+
+function applyAccessState() {
+  document.body.classList.toggle("purchase-unlocked", hasFullAccess());
+}
+
+function requireFullAccess() {
+  if (hasFullAccess()) return true;
+  purchaseFullApp();
+  return false;
+}
 
 function tier() {
   const size = $("businessSize").value;
@@ -1183,7 +1223,12 @@ document.querySelectorAll("[data-workflow]").forEach(button => {
 $("estimateBtn").addEventListener("click", renderEstimate);
 $("resetBtn").addEventListener("click", resetAll);
 document.querySelectorAll("[data-buy]").forEach(button => button.addEventListener("click", purchaseFullApp));
+$("exportBtn").addEventListener("click", () => {
+  if (!requireFullAccess()) return;
+  window.print();
+});
 $("copyBtn").addEventListener("click", async () => {
+  if (!requireFullAccess()) return;
   const text = [
     `Decision: ${$("decision").textContent}`,
     `Primary build: ${$("primaryBuild").textContent}`,
@@ -1196,6 +1241,7 @@ $("copyBtn").addEventListener("click", async () => {
   setTimeout(() => $("copyBtn").textContent = "Copy summary", 1200);
 });
 
+applyAccessState();
 render();
 </script>
 </body>
