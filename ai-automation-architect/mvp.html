@@ -625,6 +625,10 @@
     display: none;
   }
 
+  .hidden {
+    display: none !important;
+  }
+
   .summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -779,6 +783,8 @@
         <a class="back" href="../index.html">← Back to portfolio</a>
         <div class="top-actions">
           <span class="pill">Simple MVP</span>
+          <button class="btn" id="topLoginBtn" type="button">Creator login</button>
+          <button class="btn hidden" id="logoutBtn" type="button">Logout</button>
           <button class="btn green" type="button" data-buy>Unlock full version</button>
         </div>
       </div>
@@ -992,6 +998,8 @@ const state = {
 
 const CHECKOUT_URL = "";
 const PURCHASE_EMAIL = "";
+const CREATOR_USERNAME = "Admin";
+const CREATOR_PASSWORD_SHA256 = "43e645cb930542a56719a176359443344bea50ba97a2e2bdc2d7b46013d9fefe";
 
 const $ = (id) => document.getElementById(id);
 const money = (value) => "$" + Math.round(value).toLocaleString();
@@ -1002,13 +1010,42 @@ function hasFullAccess() {
 }
 
 function applyAccessState() {
-  document.body.classList.toggle("purchase-unlocked", hasFullAccess());
+  const unlocked = hasFullAccess();
+  document.body.classList.toggle("purchase-unlocked", unlocked);
+  const loginBtn = $("topLoginBtn");
+  const logoutBtn = $("logoutBtn");
+  if (loginBtn) loginBtn.classList.toggle("hidden", unlocked);
+  if (logoutBtn) logoutBtn.classList.toggle("hidden", !unlocked);
 }
 
 function requireFullAccess() {
   if (hasFullAccess()) return true;
   purchaseFullApp();
   return false;
+}
+
+async function sha256(value) {
+  const data = new TextEncoder().encode(value);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function loginCreator() {
+  const username = window.prompt("Creator username");
+  if (username === null) return;
+  const password = window.prompt("Creator password");
+  if (password === null) return;
+  if (username.trim() === CREATOR_USERNAME && await sha256(password) === CREATOR_PASSWORD_SHA256) {
+    localStorage.setItem("aiAutomationArchitectFullAccess", "true");
+    applyAccessState();
+    return;
+  }
+  window.alert("Invalid creator login.");
+}
+
+function logoutCreator() {
+  localStorage.removeItem("aiAutomationArchitectFullAccess");
+  applyAccessState();
 }
 
 function tier() {
@@ -1223,6 +1260,8 @@ document.querySelectorAll("[data-workflow]").forEach(button => {
 $("estimateBtn").addEventListener("click", renderEstimate);
 $("resetBtn").addEventListener("click", resetAll);
 document.querySelectorAll("[data-buy]").forEach(button => button.addEventListener("click", purchaseFullApp));
+$("topLoginBtn").addEventListener("click", loginCreator);
+$("logoutBtn").addEventListener("click", logoutCreator);
 $("exportBtn").addEventListener("click", () => {
   if (!requireFullAccess()) return;
   window.print();

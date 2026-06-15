@@ -895,6 +895,48 @@
     margin-top: 18px;
   }
 
+  .login-box {
+    border: 1px solid var(--line);
+    background: #f9fbfd;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 18px;
+  }
+
+  .login-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 8px;
+    align-items: end;
+    margin-top: 10px;
+  }
+
+  .login-form label {
+    display: grid;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .login-form input {
+    min-height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 10px;
+    color: var(--ink);
+  }
+
+  .login-error {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
   .print-lock {
     display: none;
   }
@@ -922,6 +964,7 @@
     .top-inner, .section-head { align-items: flex-start; flex-direction: column; }
     .map-row { grid-template-columns: 1fr; }
     .map-arrow { display: none; }
+    .login-form { grid-template-columns: 1fr; }
   }
 
   @media print {
@@ -970,6 +1013,19 @@
       <a class="btn green" href="mvp.html">Open simplified MVP</a>
       <a class="btn" href="../index.html">Back to portfolio</a>
     </div>
+    <div class="login-box">
+      <div class="eyebrow">Creator access</div>
+      <form class="login-form" id="creatorLoginForm">
+        <label>Username
+          <input id="creatorUser" type="text" autocomplete="username" placeholder="Admin">
+        </label>
+        <label>Password
+          <input id="creatorPass" type="password" autocomplete="current-password" placeholder="Password">
+        </label>
+        <button class="btn primary" type="submit">Login</button>
+      </form>
+      <div class="login-error" id="loginError" aria-live="polite"></div>
+    </div>
   </div>
 </div>
 <div class="app-shell">
@@ -1001,10 +1057,14 @@
     <div class="top-strip">
       <div class="top-inner">
         <a class="home-link" href="../index.html">← Back to portfolio</a>
-        <div class="top-actions hidden" id="resultActions">
-          <button class="btn ghost" id="resetBtn" type="button">Reset</button>
-          <button class="btn" id="copyBtn" type="button">Copy memo</button>
-          <button class="btn primary" id="printBtn" type="button">Export PDF</button>
+        <div class="top-actions">
+          <button class="btn" id="topLoginBtn" type="button">Creator login</button>
+          <button class="btn ghost hidden" id="logoutBtn" type="button">Logout</button>
+          <div class="top-actions hidden" id="resultActions">
+            <button class="btn ghost" id="resetBtn" type="button">Reset</button>
+            <button class="btn" id="copyBtn" type="button">Copy memo</button>
+            <button class="btn primary" id="printBtn" type="button">Export PDF</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1275,6 +1335,8 @@ const state = {
 
 const CHECKOUT_URL = "";
 const PURCHASE_EMAIL = "";
+const CREATOR_USERNAME = "Admin";
+const CREATOR_PASSWORD_SHA256 = "43e645cb930542a56719a176359443344bea50ba97a2e2bdc2d7b46013d9fefe";
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => "$" + Math.round(n).toLocaleString();
@@ -1288,6 +1350,34 @@ function applyAccessGate() {
   const unlocked = hasFullAccess();
   document.body.classList.toggle("locked-access", !unlocked);
   document.body.classList.toggle("purchase-unlocked", unlocked);
+  const loginBtn = $("topLoginBtn");
+  const logoutBtn = $("logoutBtn");
+  if (loginBtn) loginBtn.classList.toggle("hidden", unlocked);
+  if (logoutBtn) logoutBtn.classList.toggle("hidden", !unlocked);
+}
+
+async function sha256(value) {
+  const data = new TextEncoder().encode(value);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function loginCreator(username, password) {
+  if (username === CREATOR_USERNAME && await sha256(password) === CREATOR_PASSWORD_SHA256) {
+    localStorage.setItem("aiAutomationArchitectFullAccess", "true");
+    const error = $("loginError");
+    if (error) error.textContent = "";
+    applyAccessGate();
+    return true;
+  }
+  const error = $("loginError");
+  if (error) error.textContent = "Invalid creator login.";
+  return false;
+}
+
+function logoutCreator() {
+  localStorage.removeItem("aiAutomationArchitectFullAccess");
+  applyAccessGate();
 }
 
 function purchaseFullApp() {
@@ -1421,6 +1511,15 @@ function attachEvents() {
   });
   $("copyBtn").addEventListener("click", copyMemo);
   document.querySelectorAll("[data-buy]").forEach(button => button.addEventListener("click", purchaseFullApp));
+  $("creatorLoginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    await loginCreator($("creatorUser").value.trim(), $("creatorPass").value);
+  });
+  $("topLoginBtn").addEventListener("click", () => {
+    applyAccessGate();
+    $("creatorUser").focus();
+  });
+  $("logoutBtn").addEventListener("click", logoutCreator);
   $("resetBtn").addEventListener("click", resetAll);
   $("sampleBtn").addEventListener("click", loadSample);
   $("chatLauncher").addEventListener("click", openChat);
