@@ -10,22 +10,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f3f6fb;
+    --bg: #f6f8fb;
     --surface: #ffffff;
     --surface-2: #eef3f7;
     --ink: #13202f;
     --muted: #64758a;
     --line: #dce4ec;
     --line-2: #edf2f6;
-    --blue: #2563eb;
-    --blue-2: #1d4ed8;
-    --green: #0f8a6a;
+    --blue: #2f669e;
+    --blue-2: #285886;
+    --green: #358a72;
     --green-2: #dff5ee;
-    --gold: #b7791f;
+    --gold: #a96813;
     --gold-2: #fff1d6;
-    --red: #d64545;
+    --red: #a33c3c;
     --red-2: #fde7e7;
-    --purple: #7c3aed;
+    --purple: #6b4aa0;
     --purple-2: #eee9f7;
     --shadow: 0 12px 28px rgba(31, 48, 69, 0.08);
     --radius: 8px;
@@ -37,8 +37,7 @@
     margin: 0;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: var(--ink);
-    background:
-      linear-gradient(180deg, #eef5ff 0, #f7f9fc 320px, var(--bg) 100%);
+    background: var(--bg);
     line-height: 1.5;
   }
 
@@ -56,7 +55,7 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    background: linear-gradient(180deg, #172033 0%, #1e293b 56%, #101827 100%);
+    background: #172230;
     color: #f6f8fb;
     padding: 22px 18px;
     display: flex;
@@ -74,7 +73,7 @@
     width: 42px;
     height: 42px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #60a5fa, #34d399 52%, #facc15);
+    background: linear-gradient(135deg, #62b3d8, #66c3a2);
     display: grid;
     place-items: center;
     color: #12202f;
@@ -209,7 +208,7 @@
   }
 
   .btn.primary {
-    background: linear-gradient(90deg, var(--blue), var(--blue-2));
+    background: var(--blue);
     color: white;
     border-color: var(--blue-2);
   }
@@ -241,22 +240,9 @@
   .hero-panel {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-top: 5px solid var(--blue);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 26px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-panel::after {
-    content: "";
-    position: absolute;
-    inset: auto 26px 0 auto;
-    width: 260px;
-    height: 7px;
-    background: linear-gradient(90deg, var(--green), #f6bf26, var(--red), var(--purple));
-    border-radius: 999px 999px 0 0;
   }
 
   .eyebrow {
@@ -293,29 +279,12 @@
   .instruction-item {
     border: 1px solid var(--line);
     border-radius: 8px;
-    background: linear-gradient(180deg, #ffffff, #fbfdff);
+    background: #f9fbfd;
     padding: 12px;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 10px;
     align-items: start;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .instruction-item::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
-  }
-
-  .instruction-item:nth-child(1)::before { background: var(--blue); }
-  .instruction-item:nth-child(2)::before { background: var(--green); }
-  .instruction-item:nth-child(3)::before { background: var(--purple); }
-
-  .instruction-item:nth-child(2) .instruction-num { background: var(--green); }
-  .instruction-item:nth-child(3) .instruction-num { background: var(--purple); }
   }
 
   .instruction-num {
