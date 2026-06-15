@@ -873,6 +873,25 @@
     display: none !important;
   }
 
+  body.purchase-unlocked [data-buy] {
+    display: none !important;
+  }
+
+  .creator-status {
+    display: none;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: var(--green-2);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  body.purchase-unlocked .creator-status {
+    display: inline-flex;
+  }
+
   .gate-card {
     width: min(760px, 100%);
     border: 1px solid var(--line);
@@ -1059,6 +1078,7 @@
         <a class="home-link" href="../index.html">← Back to portfolio</a>
         <div class="top-actions">
           <button class="btn" id="topLoginBtn" type="button">Creator login</button>
+          <span class="creator-status">Creator unlocked</span>
           <button class="btn ghost hidden" id="logoutBtn" type="button">Logout</button>
           <div class="top-actions hidden" id="resultActions">
             <button class="btn ghost" id="resetBtn" type="button">Reset</button>

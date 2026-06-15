@@ -629,6 +629,27 @@
     display: none !important;
   }
 
+  body.purchase-unlocked [data-buy],
+  body.purchase-unlocked [data-upgrade-link],
+  body.purchase-unlocked .upgrade-panel {
+    display: none !important;
+  }
+
+  .creator-status {
+    display: none;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: var(--green-soft);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  body.purchase-unlocked .creator-status {
+    display: inline-flex;
+  }
+
   .summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -767,7 +788,7 @@
       <a class="nav-button active" href="#scope">⌂ Scope</a>
       <a class="nav-button" href="#assessment">▣ Assessment</a>
       <a class="nav-button" href="#results">◇ Estimate</a>
-      <a class="nav-button" href="#upgrade">◆ Upgrade</a>
+      <a class="nav-button" href="#upgrade" data-upgrade-link>◆ Upgrade</a>
       <a class="nav-button" href="./">◈ Full estimator</a>
     </div>
     <div class="mode-card">
@@ -784,6 +805,7 @@
         <div class="top-actions">
           <span class="pill">Simple MVP</span>
           <button class="btn" id="topLoginBtn" type="button">Creator login</button>
+          <span class="creator-status">Creator unlocked</span>
           <button class="btn hidden" id="logoutBtn" type="button">Logout</button>
           <button class="btn green" type="button" data-buy>Unlock full version</button>
         </div>
