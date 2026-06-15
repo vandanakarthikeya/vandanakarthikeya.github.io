@@ -134,6 +134,11 @@
     margin: 8px 0 0;
   }
 
+  .sidebar-buy {
+    width: 100%;
+    margin-top: 12px;
+  }
+
   main {
     min-width: 0;
   }
@@ -181,12 +186,33 @@
     font-weight: 800;
   }
 
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
   .hero-card, .section, .results, .visual-panel {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 8px;
     box-shadow: var(--shadow);
     padding: 26px;
+  }
+
+  .upgrade-panel {
+    background: var(--navy);
+    color: white;
+    border-color: #223349;
+  }
+
+  .upgrade-panel .sub {
+    color: #b8c4d0;
+  }
+
+  .upgrade-panel h2 {
+    color: white;
   }
 
   .hero {
@@ -502,6 +528,99 @@
     color: white;
   }
 
+  .btn.gold {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+  }
+
+  .btn.dark {
+    background: var(--navy-2);
+    border-color: rgba(255,255,255,.16);
+    color: white;
+  }
+
+  .upgrade-grid {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .feature-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .locked-feature {
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    border-radius: 8px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .lock {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,.10);
+    color: #92d3bc;
+    font-weight: 800;
+  }
+
+  .locked-feature strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .locked-feature span {
+    color: #b8c4d0;
+    font-size: 12px;
+  }
+
+  .pricing-card {
+    background: white;
+    color: var(--ink);
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .pricing-card .price {
+    font-size: 34px;
+    line-height: 1;
+    font-weight: 800;
+    margin: 12px 0 6px;
+  }
+
+  .pricing-card .price span {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .pricing-card ul {
+    margin: 14px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .unlock-note {
+    color: #b8c4d0;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
   .summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -585,7 +704,7 @@
   }
 
   @media (max-width: 760px) {
-    .app-shell, .hero, .steps, .grid, .form, .summary, .two, .visual-stats {
+    .app-shell, .hero, .steps, .grid, .form, .summary, .two, .visual-stats, .upgrade-grid {
       grid-template-columns: 1fr;
     }
 
@@ -618,11 +737,13 @@
       <a class="nav-button active" href="#scope">⌂ Scope</a>
       <a class="nav-button" href="#assessment">▣ Assessment</a>
       <a class="nav-button" href="#results">◇ Estimate</a>
+      <a class="nav-button" href="#upgrade">◆ Upgrade</a>
       <a class="nav-button" href="./">◈ Full estimator</a>
     </div>
     <div class="mode-card">
       <div class="mode-label">Product mode</div>
       <p>Simple MVP keeps the intake short and produces a practical go/no-go estimate.</p>
+      <button class="btn green sidebar-buy" type="button" data-buy>Purchase full app</button>
     </div>
   </aside>
 
@@ -630,7 +751,10 @@
     <div class="top-strip">
       <div class="top-inner">
         <a class="back" href="../index.html">← Back to portfolio</a>
-        <span class="pill">Simple MVP</span>
+        <div class="top-actions">
+          <span class="pill">Simple MVP</span>
+          <button class="btn green" type="button" data-buy>Unlock full version</button>
+        </div>
       </div>
     </div>
 
@@ -647,6 +771,7 @@
           </div>
           <div class="actions" style="justify-content:flex-start;">
             <a class="btn primary" href="#scope">Start MVP estimate</a>
+            <button class="btn green" type="button" data-buy>Purchase full app</button>
             <a class="btn" href="./">Open full estimator</a>
           </div>
         </div>
@@ -782,9 +907,41 @@
     </div>
     <div class="actions">
       <button class="btn" id="copyBtn" type="button">Copy summary</button>
+      <button class="btn primary" type="button" data-buy>Unlock full recommendation</button>
       <button class="btn green" onclick="window.print()" type="button">Export PDF</button>
     </div>
-      </section>
+  </section>
+
+  <section class="section upgrade-panel" id="upgrade">
+    <div class="upgrade-grid">
+      <div>
+        <div class="eyebrow">Unlock the full app</div>
+        <h2>Turn the MVP estimate into a buyer-ready decision packet.</h2>
+        <p class="sub">The MVP gives a fast answer. The full version adds the artifacts a business needs before funding, approving, or buying an AI automation build.</p>
+        <div class="feature-list">
+          <div class="locked-feature"><div class="lock">⌁</div><div><strong>Full implementation roadmap</strong><span>Phased plan, dependencies, operating model, and rollout sequence.</span></div></div>
+          <div class="locked-feature"><div class="lock">⌁</div><div><strong>Detailed stack comparison</strong><span>Low-code, startup, mid-market, and enterprise stack options with tradeoffs.</span></div></div>
+          <div class="locked-feature"><div class="lock">⌁</div><div><strong>ROI and risk memo</strong><span>Payback logic, risk register, governance needs, and executive-ready recommendation.</span></div></div>
+          <div class="locked-feature"><div class="lock">⌁</div><div><strong>Consulting handoff package</strong><span>Requirements summary, cost assumptions, and build brief for vendors or internal teams.</span></div></div>
+        </div>
+      </div>
+      <div class="pricing-card">
+        <div class="pill">Full version</div>
+        <div class="price">$49 <span>intro access</span></div>
+        <p class="sub">Includes the full estimator, premium recommendation sections, exportable memo, and future checkout unlock flow.</p>
+        <ul>
+          <li>Best for business owners evaluating AI automation spend.</li>
+          <li>Use before talking to vendors or consultants.</li>
+          <li>Upgrade path for setup advisory and implementation help.</li>
+        </ul>
+        <div class="actions" style="justify-content:flex-start;">
+          <button class="btn primary" type="button" data-buy>Purchase full app</button>
+          <a class="btn" href="./">Preview full estimator</a>
+        </div>
+        <div class="unlock-note">Checkout is ready to connect to Stripe. Until then, this button opens a purchase-interest email.</div>
+      </div>
+    </div>
+  </section>
     </div>
   </main>
 </div>
@@ -806,6 +963,9 @@ const state = {
   website: "none",
   workflows: []
 };
+
+const CHECKOUT_URL = "";
+const PURCHASE_EMAIL = "";
 
 const $ = (id) => document.getElementById(id);
 const money = (value) => "$" + Math.round(value).toLocaleString();
@@ -952,6 +1112,39 @@ function renderEstimate() {
   $("results").scrollIntoView({ behavior: "smooth" });
 }
 
+function purchaseFullApp() {
+  const selected = selectedWorkflows().map(item => item.title).join(", ") || "No workflow selected yet";
+  const subject = "Purchase AI Automation Architect full app";
+  const body = [
+    "Hi Vandana,",
+    "",
+    "I want to purchase or unlock the full AI Automation Architect app.",
+    "",
+    `Website direction: ${websiteTitle() || "No website work selected"}`,
+    `Workflow outcomes: ${selected}`,
+    `Business size: ${$("businessSize").value}`,
+    `Budget comfort: ${$("budget").value}`,
+    "",
+    "Please send me the purchase link and full-version access details."
+  ].join("\n");
+
+  localStorage.setItem("aiAutomationArchitectPurchaseIntent", JSON.stringify({
+    createdAt: new Date().toISOString(),
+    website: state.website,
+    workflows: state.workflows,
+    businessSize: $("businessSize").value,
+    budget: $("budget").value
+  }));
+
+  if (CHECKOUT_URL) {
+    window.location.href = CHECKOUT_URL;
+    return;
+  }
+
+  const recipient = PURCHASE_EMAIL ? PURCHASE_EMAIL : "";
+  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function resetAll() {
   state.website = "none";
   state.workflows = [];
@@ -989,6 +1182,7 @@ document.querySelectorAll("[data-workflow]").forEach(button => {
 
 $("estimateBtn").addEventListener("click", renderEstimate);
 $("resetBtn").addEventListener("click", resetAll);
+document.querySelectorAll("[data-buy]").forEach(button => button.addEventListener("click", purchaseFullApp));
 $("copyBtn").addEventListener("click", async () => {
   const text = [
     `Decision: ${$("decision").textContent}`,
