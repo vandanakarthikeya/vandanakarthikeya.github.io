@@ -1156,7 +1156,8 @@ const workflowData = {
 
 const state = {
   website: "none",
-  workflows: []
+  workflows: [],
+  basicsTouched: false
 };
 
 const CHECKOUT_URL = "";
@@ -1328,6 +1329,7 @@ function render() {
 }
 
 function renderEstimate() {
+  state.basicsTouched = true;
   const est = estimate();
   const build = primaryBuild();
   $("decision").textContent = decision(est);
@@ -1357,7 +1359,7 @@ function renderEstimate() {
 function updateGuide(hasEstimate = $("results").classList.contains("show")) {
   const websiteDone = true;
   const workflowDone = state.workflows.length > 0;
-  const basicsDone = true;
+  const basicsDone = state.basicsTouched;
   const estimateDone = hasEstimate;
   const completeCount = [websiteDone, workflowDone, basicsDone, estimateDone].filter(Boolean).length;
 
@@ -1365,7 +1367,9 @@ function updateGuide(hasEstimate = $("results").classList.contains("show")) {
   $("workflowStatus").textContent = state.workflows.length === 0
     ? "Choose at least one"
     : `${state.workflows.length} selected`;
-  $("basicsStatus").textContent = `${$("businessSize").selectedOptions[0].textContent}; ${$("sensitivity").value}`;
+  $("basicsStatus").textContent = state.basicsTouched
+    ? `${$("businessSize").selectedOptions[0].textContent}; ${$("sensitivity").value}`
+    : "Use defaults or adjust";
   $("guideProgress").textContent = `${completeCount} of 4 complete`;
 
   $("progressWebsite").classList.toggle("done", websiteDone);
@@ -1410,6 +1414,7 @@ function purchaseFullApp() {
 function resetAll() {
   state.website = "none";
   state.workflows = [];
+  state.basicsTouched = false;
   $("businessSize").value = "small";
   $("audience").value = "Internal employees";
   $("sensitivity").value = "Public or marketing data";
@@ -1439,7 +1444,10 @@ document.querySelectorAll("[data-workflow]").forEach(button => {
 });
 
 ["businessSize", "audience", "sensitivity", "aiVolume", "integrations", "budget", "pain"].forEach(id => {
-  $(id).addEventListener("input", render);
+  $(id).addEventListener("input", () => {
+    state.basicsTouched = true;
+    render();
+  });
 });
 
 $("estimateBtn").addEventListener("click", renderEstimate);
