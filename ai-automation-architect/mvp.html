@@ -201,6 +201,111 @@
     padding: 26px;
   }
 
+  .guide-strip {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .guide-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .guide-title {
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .guide-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .progress-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .progress-step {
+    border: 1px solid var(--line);
+    background: #fbfdff;
+    border-radius: 8px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .progress-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .progress-step.done .progress-dot {
+    background: var(--green);
+  }
+
+  .progress-step strong {
+    display: block;
+    font-size: 13px;
+  }
+
+  .progress-step span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .section-copy {
+    min-width: 0;
+  }
+
+  .instruction-callout {
+    border: 1px solid var(--line);
+    background: #fbfdff;
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 12px 0 0;
+  }
+
+  .section-status {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
   .upgrade-panel {
     background: var(--navy);
     color: white;
@@ -817,16 +922,11 @@
         <div class="hero-card">
           <div class="eyebrow">AI automation decision MVP</div>
           <h1>Find the best first AI automation to build.</h1>
-          <p class="sub">Choose one website direction, select the workflow outcomes that apply, then get a practical stack, monthly cost, and setup estimate.</p>
-          <div class="steps">
-            <div class="step"><strong>1. Choose scope</strong><span>Website direction is single-choice. Workflows can be multi-select.</span></div>
-            <div class="step"><strong>2. Add basics</strong><span>Business size, usage, sensitivity, integrations, and budget.</span></div>
-            <div class="step"><strong>3. Review estimate</strong><span>Decision, stack, monthly cost, and setup/consulting cost.</span></div>
-          </div>
+          <p class="sub">Answer four short prompts. The app will turn your choices into a recommended build, stack lane, monthly cost range, and setup estimate.</p>
+          <div class="instruction-callout">Start with the blue button. If you are unsure, keep the default website choice and select the workflow pain that feels closest.</div>
           <div class="actions" style="justify-content:flex-start;">
             <a class="btn primary" href="#scope">Start MVP estimate</a>
-            <button class="btn green" type="button" data-buy>Purchase full app</button>
-            <a class="btn" href="./">Open full estimator</a>
+            <a class="btn" href="#guide">See the steps</a>
           </div>
         </div>
         <div class="visual-panel">
@@ -846,19 +946,50 @@
         </div>
       </section>
 
+      <section class="guide-strip" id="guide" aria-label="MVP estimate steps">
+        <div class="guide-head">
+          <div>
+            <div class="guide-title">What to do on this page</div>
+            <div class="guide-sub">Move top to bottom. Most people can finish this in about two minutes.</div>
+          </div>
+          <span class="pill" id="guideProgress">0 of 4 complete</span>
+        </div>
+        <div class="progress-steps">
+          <div class="progress-step" id="progressWebsite"><div class="progress-dot">1</div><div><strong>Website direction</strong><span>Pick one, or keep no website work.</span></div></div>
+          <div class="progress-step" id="progressWorkflow"><div class="progress-dot">2</div><div><strong>Workflow pain</strong><span>Select one or more business problems.</span></div></div>
+          <div class="progress-step" id="progressBasics"><div class="progress-dot">3</div><div><strong>Business basics</strong><span>Confirm size, data, usage, and budget.</span></div></div>
+          <div class="progress-step" id="progressEstimate"><div class="progress-dot">4</div><div><strong>Estimate</strong><span>Generate your recommendation.</span></div></div>
+        </div>
+      </section>
+
   <section class="section" id="scope">
-    <h2>1. Website Direction</h2>
-    <p class="sub">Choose one. Building a new website and revamping an existing website are alternatives, not parallel outcomes.</p>
+    <div class="section-head">
+      <div class="section-copy">
+        <h2>1. Website Direction</h2>
+        <p class="sub">Choose one. Building a new website and revamping an existing website are alternatives.</p>
+      </div>
+      <span class="section-status" id="websiteStatus">No website work selected</span>
+    </div>
+    <div class="instruction-callout">If the automation is not about your public website, keep “No website work” selected and continue.</div>
     <div class="grid" id="websiteGrid">
       <button class="choice" data-website="none" type="button"><strong>No website work</strong><span>Focus only on automation or internal tools.</span></button>
       <button class="choice" data-website="new" type="button"><strong>Build a brand-new website</strong><span>No useful current site, new company, or new product line.</span></button>
       <button class="choice" data-website="revamp" type="button"><strong>Revamp existing website</strong><span>Current site exists but needs better content, design, conversion, or AI lead capture.</span></button>
     </div>
+    <div class="actions">
+      <a class="btn primary" href="#workflows">Next: choose workflow pain</a>
+    </div>
   </section>
 
-  <section class="section">
-    <h2>2. Workflow Outcomes</h2>
-    <p class="sub">Select all that apply. These can usually be combined or phased.</p>
+  <section class="section" id="workflows">
+    <div class="section-head">
+      <div class="section-copy">
+        <h2>2. Workflow Pain</h2>
+        <p class="sub">Select all that apply. These can be combined, but the estimate will prioritize the highest-value first build.</p>
+      </div>
+      <span class="section-status" id="workflowStatus">0 selected</span>
+    </div>
+    <div class="instruction-callout">Pick the manual, repetitive, or high-volume work that costs the business time today.</div>
     <div class="grid" id="workflowGrid">
       <button class="choice" data-workflow="manual" type="button"><strong>Automate manual workflow</strong><span>Copy/paste, approvals, routing, admin work.</span></button>
       <button class="choice" data-workflow="support" type="button"><strong>Customer support chatbot</strong><span>Repeated customer questions and escalation.</span></button>
@@ -871,10 +1002,20 @@
       <button class="choice" data-workflow="voice" type="button"><strong>Voice or call summary</strong><span>Call notes, summaries, ticket creation.</span></button>
     </div>
     <div class="note" id="scopeNote"></div>
+    <div class="actions">
+      <a class="btn primary" href="#assessment">Next: add business basics</a>
+    </div>
   </section>
 
   <section class="section" id="assessment">
-    <h2>3. Assessment Basics</h2>
+    <div class="section-head">
+      <div class="section-copy">
+        <h2>3. Business Basics</h2>
+        <p class="sub">These inputs drive the stack lane, cost range, and risk level.</p>
+      </div>
+      <span class="section-status" id="basicsStatus">Defaults ready</span>
+    </div>
+    <div class="instruction-callout">You can use the defaults for a fast estimate. Adjust size, data sensitivity, volume, integrations, and budget if you know them.</div>
     <div class="form">
       <label>Business size
         <select id="businessSize">
@@ -1183,6 +1324,7 @@ function render() {
   if (state.workflows.length > 1) noteParts.push(`${state.workflows.length} workflow outcomes selected. Treat them as phased work unless budget and timeline allow parallel delivery.`);
   $("scopeNote").textContent = noteParts.join(" ");
   $("scopeNote").classList.toggle("show", noteParts.length > 0);
+  updateGuide();
 }
 
 function renderEstimate() {
@@ -1208,7 +1350,28 @@ function renderEstimate() {
     ["Training and launch", est.training, "User enablement, test plan, handoff, go-live support"]
   ].map(([area, cost, detail]) => `<tr><td>${area}</td><td>${money(cost)}</td><td>${detail}</td></tr>`).join("");
   $("results").classList.add("show");
+  updateGuide(true);
   $("results").scrollIntoView({ behavior: "smooth" });
+}
+
+function updateGuide(hasEstimate = $("results").classList.contains("show")) {
+  const websiteDone = true;
+  const workflowDone = state.workflows.length > 0;
+  const basicsDone = true;
+  const estimateDone = hasEstimate;
+  const completeCount = [websiteDone, workflowDone, basicsDone, estimateDone].filter(Boolean).length;
+
+  $("websiteStatus").textContent = state.website === "none" ? "No website work selected" : `${websiteTitle()} selected`;
+  $("workflowStatus").textContent = state.workflows.length === 0
+    ? "Choose at least one"
+    : `${state.workflows.length} selected`;
+  $("basicsStatus").textContent = `${$("businessSize").selectedOptions[0].textContent}; ${$("sensitivity").value}`;
+  $("guideProgress").textContent = `${completeCount} of 4 complete`;
+
+  $("progressWebsite").classList.toggle("done", websiteDone);
+  $("progressWorkflow").classList.toggle("done", workflowDone);
+  $("progressBasics").classList.toggle("done", basicsDone);
+  $("progressEstimate").classList.toggle("done", estimateDone);
 }
 
 function purchaseFullApp() {
