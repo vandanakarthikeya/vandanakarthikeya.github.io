@@ -734,6 +734,57 @@
     display: none !important;
   }
 
+  .login-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(246, 248, 251, .88);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-card {
+    width: min(520px, 100%);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 24px 70px rgba(24,36,50,.22);
+    padding: 22px;
+  }
+
+  .login-form {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .login-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .login-form input {
+    min-height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--ink);
+  }
+
+  .login-error {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 800;
+    min-height: 16px;
+  }
+
   body.purchase-unlocked [data-buy],
   body.purchase-unlocked [data-upgrade-link],
   body.purchase-unlocked .upgrade-panel {
@@ -879,6 +930,26 @@
 <div class="print-lock">
   <h1>Purchase required</h1>
   <p>PDF export and printed decision packets are available only after unlocking the full AI Automation Architect app.</p>
+</div>
+<div class="login-modal hidden" id="creatorLoginModal" role="dialog" aria-modal="true" aria-labelledby="creatorLoginTitle">
+  <div class="login-card">
+    <div class="eyebrow">Creator access</div>
+    <h2 id="creatorLoginTitle">Login to unlock creator access</h2>
+    <p class="sub">Use your creator credentials. Username is not case-sensitive. Password is masked.</p>
+    <form class="login-form" id="creatorLoginForm">
+      <label>Username
+        <input id="creatorUser" type="text" autocomplete="username" placeholder="Admin">
+      </label>
+      <label>Password
+        <input id="creatorPass" type="password" autocomplete="current-password" placeholder="Password">
+      </label>
+      <div class="login-error" id="loginError" aria-live="polite"></div>
+      <div class="actions" style="justify-content:flex-start;">
+        <button class="btn primary" type="submit">Login</button>
+        <button class="btn" type="button" id="cancelLoginBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
 </div>
 <div class="app-shell">
   <aside class="sidebar">
@@ -1194,17 +1265,25 @@ async function sha256(value) {
   return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-async function loginCreator() {
-  const username = window.prompt("Creator username");
-  if (username === null) return;
-  const password = window.prompt("Creator password");
-  if (password === null) return;
-  if (username.trim() === CREATOR_USERNAME && await sha256(password) === CREATOR_PASSWORD_SHA256) {
+function openCreatorLogin() {
+  $("creatorLoginModal").classList.remove("hidden");
+  $("creatorUser").focus();
+}
+
+function closeCreatorLogin() {
+  $("creatorLoginModal").classList.add("hidden");
+  $("creatorPass").value = "";
+  $("loginError").textContent = "";
+}
+
+async function loginCreator(username, password) {
+  if (username.trim().toLowerCase() === CREATOR_USERNAME.toLowerCase() && await sha256(password) === CREATOR_PASSWORD_SHA256) {
     localStorage.setItem("aiAutomationArchitectFullAccess", "true");
     applyAccessState();
+    closeCreatorLogin();
     return;
   }
-  window.alert("Invalid creator login.");
+  $("loginError").textContent = "Invalid creator login.";
 }
 
 function logoutCreator() {
@@ -1453,7 +1532,12 @@ document.querySelectorAll("[data-workflow]").forEach(button => {
 $("estimateBtn").addEventListener("click", renderEstimate);
 $("resetBtn").addEventListener("click", resetAll);
 document.querySelectorAll("[data-buy]").forEach(button => button.addEventListener("click", purchaseFullApp));
-$("topLoginBtn").addEventListener("click", loginCreator);
+$("topLoginBtn").addEventListener("click", openCreatorLogin);
+$("cancelLoginBtn").addEventListener("click", closeCreatorLogin);
+$("creatorLoginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  await loginCreator($("creatorUser").value, $("creatorPass").value);
+});
 $("logoutBtn").addEventListener("click", logoutCreator);
 $("exportBtn").addEventListener("click", () => {
   if (!requireFullAccess()) return;

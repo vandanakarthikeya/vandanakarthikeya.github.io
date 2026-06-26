@@ -1383,7 +1383,7 @@ async function sha256(value) {
 }
 
 async function loginCreator(username, password) {
-  if (username === CREATOR_USERNAME && await sha256(password) === CREATOR_PASSWORD_SHA256) {
+  if (username.trim().toLowerCase() === CREATOR_USERNAME.toLowerCase() && await sha256(password) === CREATOR_PASSWORD_SHA256) {
     localStorage.setItem("aiAutomationArchitectFullAccess", "true");
     const error = $("loginError");
     if (error) error.textContent = "";
