@@ -794,6 +794,89 @@
     color: var(--accent);
     background: var(--accent-soft);
   }
+  .hidden { display: none !important; }
+  .creator-status {
+    display: none;
+    align-items: center;
+    border-radius: 12px;
+    padding: 4px 10px;
+    background: var(--good-soft);
+    color: var(--good);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  body.purchase-unlocked .creator-status { display: inline-flex; }
+  .login-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(248,250,252,0.9);
+    backdrop-filter: blur(10px);
+  }
+  .login-card {
+    width: min(520px, 100%);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 70px rgba(10,31,68,0.18);
+    padding: 22px;
+  }
+  .login-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .login-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .login-copy {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .login-form {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .login-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .login-form input {
+    min-height: 42px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .login-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .login-error {
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 700;
+    min-height: 16px;
+  }
+  .print-lock { display: none; }
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -849,18 +932,59 @@
     .step-divider { width: 8px; }
   }
   @media print {
+    body:not(.purchase-unlocked) .top-bar,
+    body:not(.purchase-unlocked) .container {
+      display: none !important;
+    }
+    body:not(.purchase-unlocked) .print-lock {
+      display: block !important;
+      padding: 40px;
+      font-family: Inter, Arial, sans-serif;
+      color: #0a1f44;
+    }
+    body:not(.purchase-unlocked) .print-lock h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
     body { background: white; }
     .top-bar, .stepper, .nav-row, .btn { display: none !important; }
   }
 </style>
 </head>
 <body>
+<div class="print-lock">
+  <h1>Creator login required</h1>
+  <p>Print and PDF export are available only after creator access is unlocked.</p>
+</div>
+<div class="login-modal hidden" id="creatorLoginModal" role="dialog" aria-modal="true" aria-labelledby="creatorLoginTitle">
+  <div class="login-card">
+    <div class="login-eyebrow">Creator access</div>
+    <div class="login-title" id="creatorLoginTitle">Login to unlock export</div>
+    <div class="login-copy">Username is not case-sensitive. Password is masked.</div>
+    <form class="login-form" id="creatorLoginForm">
+      <label>Username
+        <input id="creatorUser" type="text" autocomplete="username" placeholder="Admin">
+      </label>
+      <label>Password
+        <input id="creatorPass" type="password" autocomplete="current-password" placeholder="Password">
+      </label>
+      <div class="login-error" id="loginError" aria-live="polite"></div>
+      <div class="login-actions">
+        <button class="btn btn-primary" type="submit">Login</button>
+        <button class="btn btn-secondary" type="button" id="cancelLoginBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <div class="top-bar">
   <div class="top-bar-inner">
     <a href="index.html#pocs" class="back-link">← Back to AI Lab</a>
     <div style="display:flex;align-items:center;gap:12px;">
       <span style="font-size:11px;color:var(--muted);">Methodology &amp; sources at bottom</span>
+      <button class="btn btn-secondary" id="topLoginBtn" type="button" style="padding:7px 10px;font-size:12px;">Creator login</button>
+      <span class="creator-status">Creator unlocked</span>
+      <button class="btn btn-secondary hidden" id="logoutBtn" type="button" style="padding:7px 10px;font-size:12px;">Logout</button>
       <span class="top-badge">v6</span>
     </div>
   </div>
@@ -1022,6 +1146,8 @@ const TOKEN_WEIGHT_MAP = {
   high: { tokensPerCall: 8000, costPer1K: 0.006 },
   very_high: { tokensPerCall: 25000, costPer1K: 0.007 }
 };
+const CREATOR_USERNAME = "Admin";
+const CREATOR_PASSWORD_SHA256 = "43e645cb930542a56719a176359443344bea50ba97a2e2bdc2d7b46013d9fefe";
 
 let state = {
   step: 0,
@@ -1047,6 +1173,64 @@ let state = {
     run_y2_y3: false
   }
 };
+
+function hasFullAccess() {
+  return localStorage.getItem("aiAutomationArchitectFullAccess") === "true";
+}
+
+function applyAccessState() {
+  const unlocked = hasFullAccess();
+  document.body.classList.toggle("purchase-unlocked", unlocked);
+  const loginBtn = document.getElementById('topLoginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (loginBtn) loginBtn.classList.toggle('hidden', unlocked);
+  if (logoutBtn) logoutBtn.classList.toggle('hidden', !unlocked);
+}
+
+async function sha256(value) {
+  const data = new TextEncoder().encode(value);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function openCreatorLogin() {
+  document.getElementById('creatorLoginModal').classList.remove('hidden');
+  document.getElementById('creatorUser').focus();
+}
+
+function closeCreatorLogin() {
+  document.getElementById('creatorLoginModal').classList.add('hidden');
+  document.getElementById('creatorPass').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+async function loginCreator(username, password) {
+  if (username.trim().toLowerCase() === CREATOR_USERNAME.toLowerCase() && await sha256(password) === CREATOR_PASSWORD_SHA256) {
+    localStorage.setItem("aiAutomationArchitectFullAccess", "true");
+    applyAccessState();
+    renderStatusBar();
+    closeCreatorLogin();
+    return;
+  }
+  document.getElementById('loginError').textContent = 'Invalid creator login.';
+}
+
+function logoutCreator() {
+  localStorage.removeItem("aiAutomationArchitectFullAccess");
+  applyAccessState();
+  renderStatusBar();
+}
+
+function requireFullAccess() {
+  if (hasFullAccess()) return true;
+  openCreatorLogin();
+  return false;
+}
+
+function printEstimate() {
+  if (!requireFullAccess()) return;
+  window.print();
+}
 
 // Industry-sourced phase percentages (% of full build cost)
 // Sources cited in UI tooltip
@@ -1373,8 +1557,8 @@ function renderStatusBar() {
   confEl.className = 'status-value active';
 
   if (state.step === 4) {
-    exportEl.textContent = 'Print / PDF available';
-    exportEl.className = 'status-value active';
+    exportEl.textContent = hasFullAccess() ? 'Print / PDF available' : 'Creator login required';
+    exportEl.className = 'status-value' + (hasFullAccess() ? ' active' : ' pending');
   } else {
     exportEl.textContent = 'Continue to Step ' + (state.step + 2);
     exportEl.className = 'status-value pending';
@@ -1996,11 +2180,23 @@ function renderResult() {
   nav.className = 'nav-row';
   nav.innerHTML =
     '<button class="btn btn-secondary" onclick="setState({step:3})">← Edit TCO Inputs</button>' +
-    '<button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>';
+    '<button class="btn btn-primary" onclick="printEstimate()">🖨️ Print / Save PDF</button>';
   wrap.appendChild(nav);
   return wrap;
 }
 
+function initAccessControls() {
+  applyAccessState();
+  document.getElementById('topLoginBtn').addEventListener('click', openCreatorLogin);
+  document.getElementById('logoutBtn').addEventListener('click', logoutCreator);
+  document.getElementById('cancelLoginBtn').addEventListener('click', closeCreatorLogin);
+  document.getElementById('creatorLoginForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    await loginCreator(document.getElementById('creatorUser').value, document.getElementById('creatorPass').value);
+  });
+}
+
+initAccessControls();
 render();
 </script>
 </body>
