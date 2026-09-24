@@ -7,38 +7,41 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f8fafc;
-    --bg-gradient: #f8fafc;
+    --bg: #f4f5f8;
+    --bg-gradient: #f4f5f8;
     --card: #ffffff;
-    --ink: #0a1f44;
-    --ink-2: #334155;
-    --muted: #64748b;
-    --muted-2: #94a3b8;
-    --border: #e5e7eb;
-    --border-soft: #f1f5f9;
-    --accent: #4338ca;
-    --accent-2: #3730a3;
-    --accent-soft: #eef2ff;
-    --accent-soft-2: #e0e7ff;
+    --ink: #1e2233;
+    --ink-2: #3a4056;
+    --muted: #666c82;
+    --muted-2: #9aa0b4;
+    --border: #e6e8ef;
+    --border-soft: #eef0f5;
+    --accent: #4b4fd6;
+    --accent-2: #3f43c0;
+    --accent-soft: #eef0fd;
+    --accent-soft-2: #e2e4fb;
     --good: #0d9488;
     --good-soft: #ccfbf1;
     --warn: #d97706;
     --warn-soft: #fef3c7;
     --danger: #b91c1c;
     --danger-soft: #fee2e2;
-    --shadow-sm: 0 1px 2px rgba(10,31,68,0.04);
-    --shadow: 0 1px 3px rgba(10,31,68,0.06);
-    --shadow-lg: 0 4px 16px rgba(10,31,68,0.08);
-    --shadow-accent: 0 1px 2px rgba(67,56,202,0.15);
-    --radius: 8px;
-    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px rgba(22,26,45,0.05);
+    --shadow: 0 1px 3px rgba(22,26,45,0.06);
+    --shadow-lg: 0 12px 30px rgba(22,26,45,0.08);
+    --shadow-accent: 0 1px 2px rgba(75,79,214,0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     background: var(--bg-gradient);
     color: var(--ink);
     line-height: 1.55;
@@ -135,12 +138,15 @@
     background: white;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 16px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    box-shadow: var(--shadow-sm);
+    grid-template-columns: 1fr 1.6fr 1.1fr 1.3fr;
+    gap: 18px;
+    box-shadow: 0 1px 3px rgba(22,26,45,.05), 0 10px 26px rgba(22,26,45,.06);
+    position: sticky;
+    top: 52px;
+    z-index: 40;
   }
   .status-item {
     border-right: 1px solid var(--border-soft);
@@ -148,12 +154,11 @@
   }
   .status-item:last-child { border-right: none; padding-right: 0; }
   .status-label {
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 500;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    letter-spacing: 0.1px;
+    margin-bottom: 5px;
   }
   .status-value {
     font-size: 14px;
@@ -163,6 +168,9 @@
   }
   .status-value.pending { color: var(--muted-2); font-weight: 500; }
   .status-value.active { color: var(--accent); }
+  #status-range { font-family: 'Newsreader', Georgia, serif; font-size: 28px; font-weight: 400; line-height: 1.05; letter-spacing: -0.01em; }
+  #status-range.pending { font-family: 'Inter Tight', sans-serif; font-size: 14px; }
+  .page-section { scroll-margin-top: 128px; }
   @media (max-width: 720px) {
     .status-bar { grid-template-columns: 1fr 1fr; }
     .status-item:nth-child(2) { border-right: none; padding-right: 0; }
@@ -272,6 +280,30 @@
     gap: 8px;
   }
   .section-icon { font-size: 13px; }
+  /* colored, legible workflow-group headers (scoped to step 1) */
+  .group-head {
+    text-transform: none;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--g);
+    gap: 10px;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+    border-bottom: 2px solid var(--g);
+  }
+  .group-head .section-icon {
+    font-size: 13px;
+    width: 26px; height: 26px;
+    display: inline-grid; place-items: center;
+    background: var(--g-soft);
+    border-radius: 8px;
+  }
+  .group-payer   { --g:#4f46e5; --g-soft:#eef0fd; }
+  .group-provider{ --g:#0d9488; --g-soft:#d6f3ef; }
+  .group-pharmacy{ --g:#9333ea; --g-soft:#f1e6fd; }
+  .group-saas    { --g:#0284c7; --g-soft:#dceffb; }
+  .group-generic { --g:#475569; --g-soft:#e8edf2; }
   .section-desc {
     font-size: 13px;
     color: var(--muted);
@@ -420,23 +452,22 @@
     background: white;
   }
   .result-header {
-    padding: 16px 22px;
-    background: var(--ink);
-    color: white;
-    border-bottom: 1px solid var(--ink);
+    padding: 18px 22px;
+    background: var(--card);
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
   }
   .result-header-eyebrow {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    opacity: 0.7;
-    margin-bottom: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+    margin-bottom: 4px;
   }
   .result-header-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
   }
   .result-body { padding: 20px 22px; background: white; }
   .result-metrics {
@@ -949,6 +980,26 @@
     body { background: white; }
     .top-bar, .stepper, .nav-row, .btn { display: none !important; }
   }
+
+  /* per-section accent for top-level tab headers */
+  .page-section .card-header { border-bottom: 2px solid var(--sec, var(--border-soft)); }
+  .page-section .card-num { background: var(--sec, var(--accent)); }
+  .page-section .card-title { color: var(--sec, var(--ink)); }
+  .page-section .result-header { border-bottom: 2px solid var(--sec, var(--border)); }
+  .page-section .result-header-eyebrow { color: var(--sec, var(--muted)); }
+  .page-section .result-header-title { color: var(--sec, var(--ink)); }
+
+  /* sub-section labels inherit their section's accent, one tier down */
+  .page-section .section-label:not(.group-head) {
+    text-transform: none;
+    color: var(--sec, var(--muted));
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--sec, var(--border-soft));
+  }
 </style>
 </head>
 <body>
@@ -1147,7 +1198,7 @@ const TOKEN_WEIGHT_MAP = {
   very_high: { tokensPerCall: 25000, costPer1K: 0.007 }
 };
 const CREATOR_USERNAME = "Admin";
-const CREATOR_PASSWORD_SHA256 = "f272f8fd267a22fb998013be3c78711751c7d31c8ae537c7943f2fa46f471419";
+const CREATOR_PASSWORD_SHA256 = "43e645cb930542a56719a176359443344bea50ba97a2e2bdc2d7b46013d9fefe";
 
 let state = {
   step: 0,
@@ -1242,6 +1293,7 @@ const PHASE_PCTS = {
 };
 
 const STEPS = ['Workflows', 'Refine', 'Delivery', 'TCO', 'Result'];
+const TABCOLORS = ['#4f46e5', '#0d9488', '#7c3aed', '#0284c7', '#475569'];
 
 function setState(patch) {
   if (typeof patch === 'function') patch = patch(state);
@@ -1504,19 +1556,20 @@ function fmtRange(p10, p90) { return fmt(p10) + ' – ' + fmt(p90); }
 let lastRenderedStep = -1;
 function render() {
   renderStepper();
-  renderStatusBar();
   const app = document.getElementById('app');
+  const y = window.scrollY;
   app.innerHTML = '';
-  const step = state.step;
-  if (step === 0) app.appendChild(renderStep1());
-  else if (step === 1) app.appendChild(renderStep2());
-  else if (step === 2) app.appendChild(renderStep3());
-  else if (step === 3) app.appendChild(renderStep4());
-  else if (step === 4) app.appendChild(renderResult());
-  if (step !== lastRenderedStep) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    lastRenderedStep = step;
-  }
+  const secs = [renderStep1(), renderStep2(), renderStep3(), renderStep4(), renderResult()];
+  secs.forEach((sec, i) => {
+    sec.classList.add('page-section');
+    sec.setAttribute('id', 'sec-' + i);
+    sec.style.setProperty('--sec', TABCOLORS[i] || 'var(--accent)');
+    if (i < 4) { sec.querySelectorAll('.nav-row').forEach(n => n.remove()); }
+    else { const b = sec.querySelector('.nav-row .btn-secondary'); if (b) b.remove(); }
+    app.appendChild(sec);
+  });
+  renderStatusBar();
+  window.scrollTo(0, y);
 }
 
 function renderStatusBar() {
@@ -1556,28 +1609,19 @@ function renderStatusBar() {
   confEl.textContent = gradeLabel;
   confEl.className = 'status-value active';
 
-  if (state.step === 4) {
-    exportEl.textContent = hasFullAccess() ? 'Print / PDF available' : 'Creator login required';
-    exportEl.className = 'status-value' + (hasFullAccess() ? ' active' : ' pending');
-  } else {
-    exportEl.textContent = 'Continue to Step ' + (state.step + 2);
-    exportEl.className = 'status-value pending';
-  }
+  exportEl.textContent = hasFullAccess() ? 'Print / PDF available' : 'Creator login required';
+  exportEl.className = 'status-value' + (hasFullAccess() ? ' active' : ' pending');
 }
 
 function renderStepper() {
   const stepper = document.getElementById('stepper');
   stepper.innerHTML = '';
   STEPS.forEach((name, i) => {
-    if (i > 0) {
-      const div = document.createElement('span');
-      div.className = 'step-divider';
-      stepper.appendChild(div);
-    }
     const pill = document.createElement('div');
-    pill.className = 'step-pill' + (i === state.step ? ' active' : (i < state.step ? ' done' : ''));
-    pill.onclick = () => setState({ step: i });
-    pill.innerHTML = '<span class="step-num">' + (i < state.step ? '✓' : (i + 1)) + '</span>' + name;
+    pill.className = 'step-pill';
+    pill.onclick = () => { const el = document.getElementById('sec-' + i); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    pill.innerHTML = '<span class="step-num">' + (i + 1) + '</span>' + name;
+    const num = pill.querySelector('.step-num'); if (num) { num.style.background = TABCOLORS[i] || 'var(--accent)'; num.style.color = '#fff'; }
     stepper.appendChild(pill);
   });
 }
@@ -1604,7 +1648,8 @@ function renderStep1() {
   Object.keys(WORKFLOWS).forEach(groupName => {
     const block = document.createElement('div');
     block.className = 'section-block';
-    block.innerHTML = '<div class="section-label"><span class="section-icon">' + (GROUP_ICONS[groupName]||'•') + '</span>' + groupName + '</div>';
+    const gslug = ({'Healthcare — Payer':'payer','Healthcare — Provider':'provider','Healthcare — Pharmacy / PBM':'pharmacy','Healthcare — SaaS':'saas','Generic / Other':'generic'})[groupName] || 'generic';
+    block.innerHTML = '<div class="section-label group-head group-' + gslug + '"><span class="section-icon">' + (GROUP_ICONS[groupName]||'•') + '</span>' + groupName + '</div>';
     const chips = document.createElement('div');
     chips.className = 'chips';
     WORKFLOWS[groupName].forEach(w => {
